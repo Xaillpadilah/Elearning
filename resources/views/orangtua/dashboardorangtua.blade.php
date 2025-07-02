@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dashboard Admin</title>
+  <title>Dashboard Orang Tua</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   @vite(['resources/css/app.css'])
   <style>
-    /* Tetap gunakan semua style dari versi guru */
-      * { box-sizing: border-box; }
+    /* Styles sama seperti dashboard siswa */
+       * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
@@ -240,70 +240,76 @@
 
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-  <h2>Dashboard Admin</h2>
+  <h2>ORANG TUA</h2>
   <ul>
-    <li><a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">🏠 Dashboard</a></li>
-    <li><a href="{{ route('admin.guru') }}" class="{{ request()->routeIs('admin.guru') ? 'active' : '' }}">👨‍🏫 Data Guru</a></li>
-    <li><a href="{{ route('admin.siswa') }}" class="{{ request()->routeIs('admin.siswa') ? 'active' : '' }}">👥 Data Siswa</a></li>
-    <li><a href="{{ route('admin.kelas') }}" class="{{ request()->routeIs('admin.kelas') ? 'active' : '' }}">🏫 Kelas</a></li>
-    <li><a href="{{ route('admin.mapel') }}" class="{{ request()->routeIs('admin.mapel') ? 'active' : '' }}">📘 Mata Pelajaran</a></li>
-    <li><a href="{{ route('admin.pengumuman') }}" class="{{ request()->routeIs('admin.pengumuman') ? 'active' : '' }}">📢 Pengumuman</a></li>
+    <li><a href="{{ route('orangtua.dashboard') }}" class="{{ request()->routeIs('orangtua.dashboard') ? 'active' : '' }}">🏠 Beranda</a></li>
+    <li><a href="{{ route('orangtua.anak') }}" class="{{ request()->routeIs('orangtua.anak') ? 'active' : '' }}">👨‍👩‍👧 Anak Saya</a></li>
+    <li><a href="{{ route('orangtua.nilai') }}" class="{{ request()->routeIs('orangtua.nilai') ? 'active' : '' }}">📊 Nilai Anak</a></li>
+    <li><a href="{{ route('orangtua.absensi') }}" class="{{ request()->routeIs('orangtua.absensi') ? 'active' : '' }}">📸 Absensi</a></li>
+    <li><a href="{{ route('orangtua.catatan') }}" class="{{ request()->routeIs('orangtua.catatan') ? 'active' : '' }}">📝 Catatan Guru</a></li>
   </ul>
 </div>
 
-<!-- Main Content -->
+<!-- Konten Utama -->
 <div class="main" id="main-content">
   <div class="header">
     <button class="fullscreen-btn" onclick="toggleFullscreenDashboard()">☰</button>
-    <div class="user">🛡️ {{ $user->name ?? 'Admin Sistem' }}</div>
+    <div class="user">🧑‍💼 {{ $user->name ?? 'Nama Orang Tua' }}</div>
   </div>
 
   <div class="info-frame">
-    <h4>🔧 Informasi Sistem</h4>
-    <p>Selamat datang di dashboard admin. Anda dapat mengelola data guru, siswa, kelas, dan pengaturan sistem lainnya.</p>
+    <h4>📢 Informasi Umum</h4>
+    <p>Selamat datang di dashboard orang tua. Pantau aktivitas dan perkembangan anak Anda setiap hari.</p>
   </div>
 
   <div class="cards">
     <div class="card">
-      <img src="{{ asset('assets/image/guru.png') }}" alt="Data Guru">
-      <div class="card-title">Data Guru</div>
-      <p>Kelola akun dan informasi guru aktif.</p>
-      <a href="{{ route('admin.guru') }}"><button>LIHAT GURU</button></a>
+      <img src="{{ asset('assets/image/hariini.png') }}" alt="Jadwal Hari Ini">
+      <div class="card-title">Jadwal Hari Ini <span class="kelas">{{ $jadwalHariIni }} KELAS</span></div>
+      <p>Lihat mata pelajaran yang sedang diikuti anak Anda hari ini.</p>
+      <a href="{{ route('orangtua.jadwal.hariini') }}"><button>LIHAT JADWAL</button></a>
     </div>
 
     <div class="card">
-      <img src="{{ asset('assets/image/siswa.png') }}" alt="Data Siswa">
-      <div class="card-title">Data Siswa</div>
-      <p>Kelola semua siswa dari berbagai kelas.</p>
-      <a href="{{ route('admin.siswa') }}"><button>LIHAT SISWA</button></a>
+      <img src="{{ asset('assets/image/jadwalini.png') }}" alt="Tugas Hari Ini">
+      <div class="card-title">Tugas Hari Ini <span class="kelas">{{ $tugasHariIni }} TUGAS</span></div>
+      <p>Periksa tugas yang perlu dikerjakan anak Anda hari ini.</p>
+      <a href="{{ route('orangtua.tugas.hariini') }}"><button>LIHAT TUGAS</button></a>
     </div>
 
     <div class="card">
-      <img src="{{ asset('assets/image/kelas.png') }}" alt="Data Kelas">
-      <div class="card-title">Manajemen Kelas</div>
-      <p>Atur struktur dan jadwal kelas.</p>
-      <a href="{{ route('admin.kelas') }}"><button>LIHAT KELAS</button></a>
+      <img src="{{ asset('assets/image/selanjutnya.png') }}" alt="Pelajaran Selanjutnya">
+      <div class="card-title">Pelajaran Selanjutnya <span class="kelas">{{ $pelajaranSelanjutnya['jam'] }}</span></div>
+      <p>Pelajaran berikutnya adalah {{ $pelajaranSelanjutnya['mapel'] }}.</p>
+      <a href="{{ route('orangtua.pelajaran.selanjutnya') }}"><button>LIHAT DETAIL</button></a>
     </div>
 
     <div class="card">
-      <img src="{{ asset('assets/image/mapel.png') }}" alt="Mata Pelajaran">
-      <div class="card-title">Mata Pelajaran</div>
-      <p>Kelola daftar dan distribusi mata pelajaran.</p>
-      <a href="{{ route('admin.mapel') }}"><button>LIHAT MAPEL</button></a>
+      <img src="{{ asset('assets/image/jadwal mingguan.png') }}" alt="Nilai Terbaru">
+      <div class="card-title">Nilai Terbaru <span class="kelas">{{ $nilaiTerbaru['mapel'] }}</span></div>
+      <p>Nilai terbaru anak Anda adalah <strong>{{ $nilaiTerbaru['nilai'] }}</strong>.</p>
+      <a href="{{ route('orangtua.nilai.terbaru') }}"><button>LIHAT NILAI</button></a>
     </div>
 
     <div class="card">
-      <img src="{{ asset('assets/image/pengumuman.png') }}" alt="Pengumuman">
-      <div class="card-title">Pengumuman Umum</div>
-      <p>Publikasikan informasi penting untuk semua pengguna.</p>
-      <a href="{{ route('admin.pengumuman') }}"><button>BUAT PENGUMUMAN</button></a>
+      <img src="{{ asset('assets/image/nilai.png') }}" alt="Jadwal Mingguan">
+      <div class="card-title">Jadwal Minggu Ini <span class="kelas">{{ $jadwalMingguan }} KELAS</span></div>
+      <p>Ringkasan kelas anak Anda untuk minggu ini.</p>
+      <a href="{{ route('orangtua.jadwal.mingguan') }}"><button>LIHAT RINCIAN</button></a>
+    </div>
+
+    <div class="card">
+      <img src="{{ asset('assets/image/tugas terbaru.png') }}" alt="Tugas Terbaru">
+      <div class="card-title">Tugas Terbaru <span class="kelas">{{ $tugasTerbaru['mapel'] }}</span></div>
+      <p>{{ $tugasTerbaru['judul'] }}</p>
+      <a href="{{ route('orangtua.tugas.terbaru') }}"><button>LIHAT DETAIL</button></a>
     </div>
   </div>
 </div>
 
 <!-- Footer -->
 <footer id="footer">
-  &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN - Dashboard Admin.
+  &copy; {{ date('Y') }} Pantauan Orang Tua SMP 5 CIDAUN.
 </footer>
 
 <script>
