@@ -19,7 +19,7 @@ class UserSeeder extends Seeder
         ]);
 
         User::create([
-            'name' => 'Orang Tua Rizki',
+            'name' => 'Orang Tua Dummy',
             'email' => 'ortu@example.com',
             'password' => Hash::make('password'), // default password
             'role' => 'orangtua',

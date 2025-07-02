@@ -2,130 +2,77 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
+
 use Illuminate\Http\Request;
 
 class OrangtuaController extends Controller
 {
- // Halaman utama dashboard orang tua
-    
-    // Dashboard utama orang tua
+       // Halaman utama dashboard orang tua
     public function index()
     {
-        $user = auth()->user();
+        $user = Auth::user();
+            $user = (object) ['name' => 'Orang Tua Dummy'];
 
-        $jadwalHariIni = 3;
-        $tugasHariIni = 2;
-        $pelajaranSelanjutnya = ['mapel' => 'Bahasa Indonesia', 'jam' => '10:30 - 11:30'];
-        $nilaiTerbaru = ['mapel' => 'Matematika', 'nilai' => 88];
-        $jadwalMingguan = 12;
-        $tugasTerbaru = ['mapel' => 'IPA', 'judul' => 'Kerjakan soal bab 3 halaman 45-46'];
-
-        return view('orangtua.dashboardorangtua', compact(
-            'user', 'jadwalHariIni', 'tugasHariIni',
-            'pelajaranSelanjutnya', 'nilaiTerbaru',
-            'jadwalMingguan', 'tugasTerbaru'
-        ));
+        return view('orangtua.orangtuadashboard', compact('user'));
     }
 
-    public function anak()
-    {
-        $anak = [
-            'nama' => 'Rizki Ramadhan',
-            'nis' => '20250123',
-            'kelas' => '8B',
-            'jenis_kelamin' => 'Laki-laki',
-            'foto' => 'assets/image/siswa1.png',
-        ];
-
-        return view('orangtua.anak', compact('anak'));
-    }
-
+    // Halaman nilai anak
     public function nilai()
     {
-        $nilaiAnak = [
-            ['mapel' => 'Matematika', 'nilai' => 88],
-            ['mapel' => 'IPA', 'nilai' => 91],
-            ['mapel' => 'IPS', 'nilai' => 84],
+        $user = Auth::user();
+
+        // Dummy data nilai
+        $nilai = [
+            ['mapel' => 'Matematika', 'nilai' => 85],
+            ['mapel' => 'Bahasa Indonesia', 'nilai' => 90],
+            ['mapel' => 'IPA', 'nilai' => 88],
         ];
 
-        return view('orangtua.nilai', compact('nilaiAnak'));
+        return view('orangtua.nilai', compact('user', 'nilai'));
     }
 
+    // Halaman absensi anak
     public function absensi()
     {
+        $user = Auth::user();
+
+        // Dummy data absensi
         $absensi = [
-            ['tanggal' => '2025-07-01', 'status' => 'Hadir'],
+            ['tanggal' => '2025-06-30', 'status' => 'Hadir'],
+            ['tanggal' => '2025-07-01', 'status' => 'Sakit'],
             ['tanggal' => '2025-07-02', 'status' => 'Hadir'],
-            ['tanggal' => '2025-07-03', 'status' => 'Izin'],
         ];
 
-        return view('orangtua.absensi', compact('absensi'));
+        return view('orangtua.absensi', compact('user', 'absensi'));
     }
 
-    public function catatan()
+    // Halaman tugas anak
+    public function tugas()
     {
-        $catatan = [
-            ['tanggal' => '2025-07-01', 'guru' => 'Bu Siti', 'isi' => 'Anak perlu meningkatkan fokus saat pelajaran.'],
-            ['tanggal' => '2025-06-28', 'guru' => 'Pak Dedi', 'isi' => 'Tugas dikerjakan dengan baik dan tepat waktu.']
+        $user = Auth::user();
+
+        // Dummy data tugas
+        $tugas = [
+            ['mapel' => 'IPS', 'judul' => 'Tugas Sejarah', 'status' => 'Sudah Dikerjakan'],
+            ['mapel' => 'IPA', 'judul' => 'Laporan Percobaan', 'status' => 'Belum Dikerjakan'],
         ];
 
-        return view('orangtua.catatan', compact('catatan'));
+        return view('orangtua.tugas', compact('user', 'tugas'));
     }
 
-    public function jadwalHariIni()
+    // Halaman jadwal pelajaran anak
+    public function jadwal()
     {
+        $user = Auth::user();
+
+        // Dummy data jadwal
         $jadwal = [
-            ['jam' => '07:00 - 08:30', 'mapel' => 'Matematika'],
-            ['jam' => '08:45 - 10:15', 'mapel' => 'IPA'],
-            ['jam' => '10:30 - 11:30', 'mapel' => 'IPS'],
+            ['hari' => 'Senin', 'jam' => '07:00 - 08:30', 'mapel' => 'Matematika'],
+            ['hari' => 'Senin', 'jam' => '08:45 - 10:15', 'mapel' => 'Bahasa Inggris'],
+            ['hari' => 'Selasa', 'jam' => '07:00 - 08:30', 'mapel' => 'IPA'],
         ];
 
-        return view('orangtua.jadwal.hariini', compact('jadwal'));
-    }
-
-    public function tugasHariIni()
-    {
-        $tugas = [
-            ['mapel' => 'Bahasa Indonesia', 'judul' => 'Menulis Puisi', 'deadline' => 'Hari Ini'],
-            ['mapel' => 'IPS', 'judul' => 'Kerjakan soal latihan 5', 'deadline' => 'Hari Ini']
-        ];
-
-        return view('orangtua.tugas.hariini', compact('tugas'));
-    }
-
-    public function pelajaranSelanjutnya()
-    {
-        $pelajaran = ['mapel' => 'Bahasa Inggris', 'jam' => '13:00 - 14:30'];
-
-        return view('orangtua.pelajaran.selanjutnya', compact('pelajaran'));
-    }
-
-    public function nilaiTerbaru()
-    {
-        $nilai = ['mapel' => 'IPA', 'nilai' => 91, 'tanggal' => '2025-07-02'];
-
-        return view('orangtua.nilai.terbaru', compact('nilai'));
-    }
-
-    public function jadwalMingguan()
-    {
-        $mingguan = [
-            ['hari' => 'Senin', 'mapel' => ['Matematika', 'Bahasa Inggris']],
-            ['hari' => 'Selasa', 'mapel' => ['IPA', 'IPS']],
-            ['hari' => 'Rabu', 'mapel' => ['Bahasa Indonesia', 'PKN']],
-        ];
-
-        return view('orangtua.jadwal.mingguan', compact('mingguan'));
-    }
-
-    public function tugasTerbaru()
-    {
-        $tugas = [
-            'mapel' => 'Bahasa Sunda',
-            'judul' => 'Tugas Membuat Cerita Pendek',
-            'tanggal' => '2025-07-01'
-        ];
-
-        return view('orangtua.tugas.terbaru', compact('tugas'));
+        return view('orangtua.jadwal', compact('user', 'jadwal'));
     }
 }

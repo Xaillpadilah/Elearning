@@ -74,23 +74,10 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/pengumuman', [AdminController::class, 'pengumuman'])->name('admin.pengumuman');
 });
 //orang tua
-Route::get('/login-sementara', function () {
-    $user = User::where('role', 'orangtua')->first(); // pastikan user dengan role orangtua ada
-    Auth::login($user);
-    return redirect()->route('orangtua.dashboard');
-});
-Route::prefix('orangtua')->middleware(['auth'])->group(function () {
+Route::prefix('orangtua')->group(function () {
     Route::get('/dashboard', [OrangtuaController::class, 'index'])->name('orangtua.dashboard');
-    Route::get('/anak', [OrangtuaController::class, 'anak'])->name('orangtua.anak');
     Route::get('/nilai', [OrangtuaController::class, 'nilai'])->name('orangtua.nilai');
     Route::get('/absensi', [OrangtuaController::class, 'absensi'])->name('orangtua.absensi');
-    Route::get('/catatan', [OrangtuaController::class, 'catatan'])->name('orangtua.catatan');
-
-    // subfitur
-    Route::get('/jadwal/hariini', [OrangtuaController::class, 'jadwalHariIni'])->name('orangtua.jadwal.hariini');
-    Route::get('/tugas/hariini', [OrangtuaController::class, 'tugasHariIni'])->name('orangtua.tugas.hariini');
-    Route::get('/pelajaran/selanjutnya', [OrangtuaController::class, 'pelajaranSelanjutnya'])->name('orangtua.pelajaran.selanjutnya');
-    Route::get('/nilai/terbaru', [OrangtuaController::class, 'nilaiTerbaru'])->name('orangtua.nilai.terbaru');
-    Route::get('/jadwal/mingguan', [OrangtuaController::class, 'jadwalMingguan'])->name('orangtua.jadwal.mingguan');
-    Route::get('/tugas/terbaru', [OrangtuaController::class, 'tugasTerbaru'])->name('orangtua.tugas.terbaru');
+    Route::get('/tugas', [OrangtuaController::class, 'tugas'])->name('orangtua.tugas');
+    Route::get('/jadwal', [OrangtuaController::class, 'jadwal'])->name('orangtua.jadwal');
 });
