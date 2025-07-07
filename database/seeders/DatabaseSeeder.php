@@ -12,6 +12,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        $this->call([
+            UserSeeder::class,
+            GuruSeeder::class, 
+        AdminUserSeeder::class,
+    ]);// ← tambahkan baris ini
+    
+
+        // Jika masih ingin menggunakan factory (opsional):
         // \App\Models\User::factory(10)->create();
 
         // \App\Models\User::factory()->create([
@@ -19,4 +27,5 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
     }
+    
 }

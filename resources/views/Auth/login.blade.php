@@ -1,32 +1,102 @@
-@extends('layouts.login')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Login</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
 
-@section('title', 'Login E-Learning')
+    body {
+      background: linear-gradient(to right, #4facfe, #00f2fe);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
 
-@section('content')
-<div class="login">
-  <div class="login-box">
-    <div class="login-image"></div>
+    .login-container {
+      background-color: #ffffff;
+      padding: 40px 30px;
+      border-radius: 15px;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+    }
 
-    <div class="login-form">
-      <h2>Login E-Learning</h2>
-      <p>Selamat datang kembali, silakan login ke akun Anda untuk melanjutkan.</p>
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+    }
 
-      @if(session('error'))
-        <div style="color: red; margin-bottom: 10px;">{{ session('error') }}</div>
-      @endif
+    label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #444;
+    }
 
-      <form method="POST" action="{{ route('login') }}">
-        @csrf
-        <input type="email" name="email" placeholder="Email" required>
-        <input type="password" name="password" placeholder="Password" required>
-        <button type="submit">Login</button>
-      </form>
-    </div>
+    input[type="email"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px 15px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      transition: border-color 0.3s;
+    }
+
+    input[type="email"]:focus,
+    input[type="password"]:focus {
+      border-color: #00c6ff;
+      outline: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #00c6ff;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background: #009bd6;
+    }
+
+    .error {
+      color: red;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Login</h2>
+
+    @if ($errors->any())
+      <div class="error">{{ $errors->first('message') }}</div>
+    @endif
+
+    <form method="POST" action="{{ route('login.submit') }}">
+      @csrf
+      <label>Email:</label>
+      <input type="email" name="email" required>
+
+      <label>Password:</label>
+      <input type="password" name="password" required>
+
+      <button type="submit">Login</button>
+    </form>
   </div>
-</div>
-
-<a href="https://wa.me/6281234567890" target="_blank" class="whatsapp-float">
-  <img src="{{ asset('assets/icon/whatsapp.svg') }}" alt="WhatsApp">
-  <span>Hubungi Kami</span>
-</a>
-@endsection
+</body>
+</html>

@@ -9,14 +9,12 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
-    {
-          Schema::create('gurus', function (Blueprint $table) {
+    public function up()
+{
+    Schema::create('chats', function (Blueprint $table) {
         $table->id();
-        $table->string('nama');
-        $table->string('nik')->unique();
-        $table->string('mengajar');
-        $table->string('email')->unique();
+        $table->string('from'); // 'orangtua' atau 'guru'
+        $table->text('message');
         $table->timestamps();
     });
 }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('gurus');
+        Schema::dropIfExists('chats');
     }
 };
