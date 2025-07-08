@@ -85,15 +85,33 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/mapel', [AdminController::class, 'mapel'])->name('admin.mapel');
     Route::get('/pengumuman', [AdminController::class, 'pengumuman'])->name('admin.pengumuman');
     //admin guru
-       Route::get('/guru/create', [AdminController::class, 'create'])->name('admin.guru.create');
+    Route::get('/guru/create', [AdminController::class, 'create'])->name('admin.guru.create');
     Route::post('/guru/store', [AdminController::class, 'store'])->name('admin.guru.store');
-       // Ekspor dan Impor
+    // Ekspor dan Impor
     Route::get('/guru/export', [AdminController::class, 'export'])->name('admin.guru.export');
-   Route::get('/guru/import', [AdminController::class, 'showImportForm'])->name('admin.guru.import.form');
+    Route::get('/guru/import', [AdminController::class, 'showImportForm'])->name('admin.guru.import.form');
     Route::post('/guru/import', [AdminController::class, 'import'])->name('admin.guru.import');
-     Route::get('/guru/{id}/edit', [AdminController::class, 'edit'])->name('admin.guru.edit'); // 👈
-    Route::put('/guru/{id}', [AdminController::class, 'update'])->name('admin.guru.update'); // 👈
+    Route::get('/guru/{id}/edit', [AdminController::class, 'edit'])->name('admin.guru.edit'); 
+    Route::put('/guru/{id}', [AdminController::class, 'update'])->name('admin.guru.update'); 
+    //siswa admin
+    Route::get('/siswa', [AdminController::class, 'indexsiswa'])->name('admin.siswa');
+    Route::post('/siswa', [AdminController::class, 'storesiswa'])->name('admin.siswa.store');
+    Route::put('/siswa/{id}', [AdminController::class, 'updatesiswa'])->name('admin.siswa.update');
+    Route::get('/siswa/export', [AdminController::class, 'exportsiswa'])->name('admin.siswa.export');
+    Route::post('/admin/siswa/import', [AdminController::class, 'importsiswa'])->name('admin.siswa.import');
+    Route::delete('/admin/siswa/{id}', [AdminController::class, 'destroySiswa'])->name('admin.siswa.destroy');
+    Route::delete('/admin/siswa/{id}', [SiswaController::class, 'destroy'])->name('admin.siswa.destroy');
+    Route::put('/admin/siswa/{id}', [SiswaController::class, 'update'])->name('admin.siswa.update');
+Route::delete('/admin/siswa/{id}', [SiswaController::class, 'destroy'])->name('admin.siswa.destroy');
+    //admin kelas
+      Route::get('/kelas', [AdminController::class, 'indexkelas'])->name('admin.kelas');
+    Route::post('/kelas', [AdminController::class, 'storekelas'])->name('admin.kelas.store');
+    Route::post('/kelas/{id}', [AdminController::class, 'updatekelas'])->name('admin.kelas.update');
+    Route::post('/kelas/import', [AdminController::class, 'importkelas'])->name('admin.kelas.import');
+    Route::get('/kelas/export', [AdminController::class, 'exportkelas'])->name('admin.kelas.export');
+    Route::post('/kelas/{id}', [AdminController::class, 'updatekelas'])->name('admin.kelas.update');
 });
+
 //orang tua
 Route::prefix('orangtua')->group(function () {
     Route::get('/dashboard', [OrangtuaController::class, 'index'])->name('orangtua.dashboard');
@@ -104,7 +122,7 @@ Route::prefix('orangtua')->group(function () {
     Route::get('/orangtua/hasil', [OrangtuaController::class, 'hasil'])->name('orangtua.hasil');
     //pesan 
     Route::get('/orangtua/komunikasi', [OrangtuaController::class, 'komunikasi'])->name('orangtua.komunikasi');
-Route::post('/orangtua/kirim-pesan', [OrangtuaController::class, 'kirimPesan'])->name('orangtua.kirimPesan');
+    Route::post('/orangtua/kirim-pesan', [OrangtuaController::class, 'kirimPesan'])->name('orangtua.kirimPesan');
 });
 
 //import

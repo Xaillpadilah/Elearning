@@ -15,7 +15,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserSeeder::class,
             GuruSeeder::class, 
-        AdminUserSeeder::class,
+            AdminUserSeeder::class,
+            SiswaSeeder::class,
+            KelasSeeder::class,
     ]);// ← tambahkan baris ini
     
 

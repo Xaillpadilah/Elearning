@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 
 class GuruController extends Controller
 {
+    
       public function index()
     {
         $user = auth()->user(); // ambil user login

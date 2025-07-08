@@ -10,6 +10,13 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Exports\GuruExport;
 use App\Imports\GuruImport;
+use App\Models\Siswa;
+use App\Exports\SiswaExport;
+use App\Imports\SiswaImport;
+use App\Models\Kelas;
+use App\Imports\KelasImport;
+use App\Exports\KelasExport;
+
 class AdminController extends Controller
 {
      // Dashboard Admin
@@ -113,6 +120,7 @@ class AdminController extends Controller
         {
                 return view('admin.guru.import');
         }
+        
 public function edit($id)
 {
     $guru = Guru::findOrFail($id);
@@ -148,22 +156,130 @@ public function update(Request $request, $id)
             return back()->withErrors('Terjadi kesalahan saat mengimpor data: ' . $e->getMessage());
         }
     }
+    //siswa
+    public function indexsiswa(Request $request)
+{
+     $search = $request->search;
 
-    public function siswa()
+    $siswas = Siswa::with('kelas')
+        ->when($search, function ($query, $search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%{$search}%")
+                  ->orWhere('nisn', 'like', "%{$search}%")
+                  ->orWhereHas('kelas', function ($kelasQuery) use ($search) {
+                      $kelasQuery->where('nama_kelas', 'like', "%{$search}%");
+                  });
+            });
+        })
+        ->get();
+
+    return view('admin.siswa.index', compact('siswas', 'search'));
+}
+
+public function storesiswa(Request $request)
+{
+    $request->validate([
+        'nama' => 'required',
+        'nisn' => 'required|unique:siswas',
+        'kelas' => 'required',
+        'email' => 'required|email|unique:siswas',
+    ]);
+
+    Siswa::create($request->all());
+
+    return redirect()->route('admin.siswa')->with('success', 'Siswa berhasil ditambahkan.');
+}
+
+public function updatesiswa(Request $request, $id)
+{
+    $siswa = Siswa::findOrFail($id);
+
+    $request->validate([
+        'nama' => 'required',
+        'nisn' => 'required|unique:siswas,nisn,' . $id,
+        'kelas' => 'required',
+        'email' => 'required|email|unique:siswas,email,' . $id,
+    ]);
+
+    $siswa->update($request->all());
+
+    return redirect()->route('admin.siswa')->with('success', 'Data siswa berhasil diperbarui.');
+}
+
+public function exportsiswa()
+{
+    return Excel::download(new SiswaExport, 'data-siswa.xlsx');
+}
+public function importsiswa(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,xls,csv'
+    ]);
+
+    Excel::import(new SiswaImport, $request->file('file'));
+
+    return redirect()->route('admin.siswa')->with('success', 'Data siswa berhasil diimpor.');
+}
+public function destroy($id)
+{
+    $siswa = Siswa::findOrFail($id);
+    $siswa->delete();
+
+    return redirect()->route('admin.siswa')->with('success', 'Data siswa berhasil dihapus.');
+}
+//kelas
+   public function indexkelas(Request $request)
     {
-        $user = auth()->user();
-        $daftarSiswa = [
-            ['nama' => 'Budi', 'kelas' => '7A'],
-            ['nama' => 'Ani', 'kelas' => '8B'],
-        ];
-        return view('admin.siswa.index', compact('user', 'daftarSiswa'));
+        $search = $request->search;
+        $kelas = Kelas::when($search, function ($query, $search) {
+            $query->where('nama_kelas', 'like', "%$search%")
+                  ->orWhere('wali_kelas', 'like', "%$search%");
+        })->get();
+
+        return view('admin.kelas.index', compact('kelas', 'search'));
     }
 
-    public function kelas()
+    public function storekelas(Request $request)
     {
-        $user = auth()->user();
-        $daftarKelas = ['7A', '7B', '8A', '8B', '9A'];
-        return view('admin.kelas.index', compact('user', 'daftarKelas'));
+        $request->validate([
+            'nama_kelas' => 'required|string|max:255',
+            'wali_kelas' => 'required|string|max:255',
+            'jumlah_siswa' => 'required|integer|min:0',
+        ]);
+
+        Kelas::create($request->all());
+
+        return redirect()->route('admin.kelas')->with('success', 'Kelas berhasil ditambahkan.');
+    }
+
+    public function updatekelas(Request $request, $id)
+    {
+        $request->validate([
+            'nama_kelas' => 'required|string|max:255',
+            'wali_kelas' => 'required|string|max:255',
+            'jumlah_siswa' => 'required|integer|min:0',
+        ]);
+
+        $kelas = Kelas::findOrFail($id);
+        $kelas->update($request->all());
+
+        return redirect()->route('admin.kelas')->with('success', 'Kelas berhasil diperbarui.');
+    }
+
+    public function importkelas(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        Excel::import(new KelasImport, $request->file('file'));
+
+        return redirect()->route('admin.kelas')->with('success', 'Data kelas berhasil diimpor.');
+    }
+
+    public function exportkelas()
+    {
+        return Excel::download(new KelasExport, 'data_kelas.xlsx');
     }
 
     public function mapel()

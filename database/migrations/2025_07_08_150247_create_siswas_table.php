@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('notifikasis', function (Blueprint $table) {
+        Schema::create('siswas', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('orangtua_id')->constrained('users')->onDelete('cascade');
-            $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
-            $table->string('judul');
-            $table->text('pesan');
-            $table->boolean('dibaca')->default(false);
+            $table->string('nama');
+            $table->string('nisn')->unique();
+            $table->string('email')->unique();
+            $table->foreignId('kelas_id')->constrained('kelas')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -27,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('notifikasis');
+        Schema::dropIfExists('siswas');
     }
 };

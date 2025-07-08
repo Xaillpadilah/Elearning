@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-       Schema::create('absensis', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('siswa_id')->constrained('siswas')->onDelete('cascade');
-            $table->date('tanggal');
-            $table->enum('status', ['hadir', 'izin', 'sakit', 'alpa']);
-            $table->timestamps();
+        Schema::table('kelas', function (Blueprint $table) {
+            //
         });
     }
 
@@ -25,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('absensis');
+        Schema::table('kelas', function (Blueprint $table) {
+            //
+        });
     }
 };
