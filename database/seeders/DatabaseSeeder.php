@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             AdminUserSeeder::class,
             SiswaSeeder::class,
             KelasSeeder::class,
+             PengumumanSeeder::class,
+              MateriSeeder::class,
     ]);// ← tambahkan baris ini
     
 

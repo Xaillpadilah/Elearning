@@ -11,16 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-         Schema::create('materis', function (Blueprint $table) {
-        $table->id();
-        $table->string('judul');
-        $table->string('mapel');
-        $table->string('kelas');
-        $table->string('file');
-        $table->timestamp('uploaded_at')->nullable();
-        $table->timestamps();
-    });
-}
+        Schema::create('materis', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+        });
+    }
 
     /**
      * Reverse the migrations.

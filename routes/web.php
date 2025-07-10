@@ -83,8 +83,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/siswa', [AdminController::class, 'siswa'])->name('admin.siswa');
     Route::get('/kelas', [AdminController::class, 'kelas'])->name('admin.kelas');
     Route::get('/mapel', [AdminController::class, 'mapel'])->name('admin.mapel');
-    Route::get('/pengumuman', [AdminController::class, 'pengumuman'])->name('admin.pengumuman');
-    //admin guru
+   
     Route::get('/guru/create', [AdminController::class, 'create'])->name('admin.guru.create');
     Route::post('/guru/store', [AdminController::class, 'store'])->name('admin.guru.store');
     // Ekspor dan Impor
@@ -110,6 +109,17 @@ Route::delete('/admin/siswa/{id}', [SiswaController::class, 'destroy'])->name('a
     Route::post('/kelas/import', [AdminController::class, 'importkelas'])->name('admin.kelas.import');
     Route::get('/kelas/export', [AdminController::class, 'exportkelas'])->name('admin.kelas.export');
     Route::post('/kelas/{id}', [AdminController::class, 'updatekelas'])->name('admin.kelas.update');
+    //materi admin
+    Route::get('/mapel', [AdminController::class, 'indexmateri'])->name('admin.mapel.index');
+    Route::post('/mapel', [AdminController::class, 'storemateri'])->name('admin.mapel.store');
+    Route::post('/mapel/{id}/update', [AdminController::class, 'updatemateri'])->name('admin.mapel.update');
+    Route::post('/mapel/import', [AdminController::class, 'importmateri'])->name('admin.mapel.import');
+    Route::get('/mapel/export', [AdminController::class, 'exportmateri'])->name('admin.mapel.export');
+    //pengumuman
+    Route::get('/pengumuman', [AdminController::class, 'indexpengumuman'])->name('admin.pengumuman');
+    Route::post('/pengumuman/store', [AdminController::class, 'store'])->name('admin.pengumuman.store');
+    Route::get('/pengumuman/edit/{id}', [AdminController::class, 'editpengumuman'])->name('admin.pengumuman.edit');
+    Route::post('/pengumuman/update/{id}', [AdminController::class, 'updatepengumuman'])->name('admin.pengumuman.update');
 });
 
 //orang tua

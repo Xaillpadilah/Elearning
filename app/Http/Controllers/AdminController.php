@@ -16,14 +16,38 @@ use App\Imports\SiswaImport;
 use App\Models\Kelas;
 use App\Imports\KelasImport;
 use App\Exports\KelasExport;
+use App\Models\Materi;
+use Illuminate\Support\Facades\Storage;
+use App\Models\Pengumuman;
 
 class AdminController extends Controller
 {
      // Dashboard Admin
      public function dashboard()
     {
-        return view('admin.dashboard');
-    }
+         $user = auth()->user();
+
+    $jumlahGuru = Guru::count();
+    $jumlahSiswa = Siswa::count();
+    $jumlahKelas = Kelas::count();
+    $jumlahMapel = Materi::distinct('mapel')->count('mapel');
+    $jumlahPengumuman = Pengumuman::count();
+
+    $dataChart = [
+        'labels' => ['Guru', 'Siswa', 'Kelas', 'Mapel', 'Pengumuman'],
+        'jumlah' => [$jumlahGuru, $jumlahSiswa, $jumlahKelas, $jumlahMapel, $jumlahPengumuman],
+    ];
+
+    return view('admin.dashboard', compact(
+        'user',
+        'jumlahGuru',
+        'jumlahSiswa',
+        'jumlahKelas',
+        'jumlahMapel',
+        'jumlahPengumuman',
+        'dataChart'
+    ));
+}
 
    public function guru(Request $request)
     {
@@ -100,7 +124,7 @@ class AdminController extends Controller
     {
         return Excel::download(new GuruExport, 'data_guru.xlsx');
     }
-        public function store(Request $request)
+        public function storeguru(Request $request)
     {
     $request->validate([
         'nama' => 'required|string|max:255',
@@ -281,21 +305,131 @@ public function destroy($id)
     {
         return Excel::download(new KelasExport, 'data_kelas.xlsx');
     }
-
-    public function mapel()
+//mapel
+      public function indexmateri(Request $request)
     {
         $user = auth()->user();
-        $daftarMapel = ['Matematika', 'Bahasa Indonesia', 'IPA', 'IPS', 'Bahasa Inggris'];
-        return view('admin.mapel.index', compact('user', 'daftarMapel'));
+        $search = $request->input('search');
+
+        $materi = Materi::when($search, function ($query, $search) {
+            return $query->where('judul', 'like', "%$search%")
+                         ->orWhere('mapel', 'like', "%$search%")
+                         ->orWhere('kelas', 'like', "%$search%");
+        })->latest()->get();
+
+        return view('admin.mapel.index', compact('materi', 'user', 'search'));
     }
 
-    public function pengumuman()
+    public function storemateri(Request $request)
     {
-        $user = auth()->user();
-        $pengumuman = [
-            ['judul' => 'Ujian Tengah Semester', 'tanggal' => '2025-09-15'],
-            ['judul' => 'Libur Akhir Tahun', 'tanggal' => '2025-12-20'],
-        ];
-        return view('admin.pengumuman.index', compact('user', 'pengumuman'));
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'mapel' => 'required|string|max:255',
+            'kelas' => 'required|string|max:100',
+            'file'  => 'required|file|mimes:pdf,docx,ppt,pptx|max:2048',
+        ]);
+
+        $path = $request->file('file')->store('mapel', 'public');
+
+        Materi::create([
+            'judul' => $request->judul,
+            'mapel' => $request->mapel,
+            'kelas' => $request->kelas,
+            'file'  => $path,
+            'uploaded_at' => now(),
+        ]);
+
+        return redirect()->route('admin.mapel.index')->with('success', 'Materi berhasil ditambahkan.');
+    }
+
+    public function updatemateri(Request $request, $id)
+    {
+        $materi = Materi::findOrFail($id);
+
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'mapel' => 'required|string|max:255',
+            'kelas' => 'required|string|max:100',
+            'file'  => 'nullable|file|mimes:pdf,docx,ppt,pptx|max:2048',
+        ]);
+
+        if ($request->hasFile('file')) {
+            // Hapus file lama
+            if ($materi->file && Storage::disk('public')->exists($materi->file)) {
+                Storage::disk('public')->delete($materi->file);
+            }
+
+            $materi->file = $request->file('file')->store('materi', 'public');
+        }
+
+        $materi->update([
+            'judul' => $request->judul,
+            'mapel' => $request->mapel,
+            'kelas' => $request->kelas,
+            'file'  => $materi->file,
+        ]);
+
+        return redirect()->route('admin.mapel.index')->with('success', 'Materi berhasil diperbarui.');
+    }
+
+    public function importmateri(Request $request)
+    {
+        // Validasi dan baca file excel
+        // Gunakan Laravel Excel (maatwebsite/excel) jika sudah terpasang
+        return back()->with('info', 'Fitur impor materi belum diimplementasikan.');
+    }
+
+    public function exportmateri()
+    {
+        // Gunakan Laravel Excel juga di sini jika sudah di-setup
+        return back()->with('info', 'Fitur ekspor materi belum diimplementasikan.');
+    }
+
+//pengumuman
+  public function indexpengumuman(Request $request)
+    {
+        $search = $request->input('search');
+
+        $pengumuman = Pengumuman::when($search, function ($query, $search) {
+            return $query->where('judul', 'like', "%$search%")
+                         ->orWhere('isi', 'like', "%$search%");
+        })->latest()->get();
+
+        return view('admin.pengumuman.index', compact('pengumuman', 'search'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'judul' => 'required',
+            'isi' => 'required',
+            'tujuan' => 'required|in:guru,siswa,orangtua',
+            'tanggal' => 'required|date',
+        ]);
+
+        Pengumuman::create($request->all());
+
+        return redirect()->route('admin.pengumuman')->with('success', 'Pengumuman berhasil ditambahkan.');
+    }
+
+    public function editpengumuman($id)
+    {
+        $pengumuman = Pengumuman::findOrFail($id);
+        return view('admin.pengumuman.edit', compact('pengumuman'));
+    }
+
+    public function updatepengumuman(Request $request, $id)
+    {
+        $request->validate([
+            'judul' => 'required',
+            'isi' => 'required',
+            'tujuan' => 'required|in:guru,siswa,orangtua',
+            'tanggal' => 'required|date',
+        ]);
+
+        $pengumuman = Pengumuman::findOrFail($id);
+        $pengumuman->update($request->all());
+
+        return redirect()->route('admin.pengumuman')->with('success', 'Pengumuman berhasil diperbarui.');
     }
 }

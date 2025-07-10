@@ -214,7 +214,7 @@
       <li><a href="{{ route('admin.guru') }}">👨‍🏫 Data Guru</a></li>
       <li><a href="{{ route('admin.siswa') }}">👥 Data Siswa</a></li>
       <li><a href="{{ route('admin.kelas') }}" class="active">🏫 Data Kelas</a></li>
-      <li><a href="{{ route('admin.mapel') }}">📘 Mata Pelajaran</a></li>
+      <li><a href="{{ route('admin.mapel.index') }}">📘 Mata Pelajaran</a></li>
       <li><a href="{{ route('admin.pengumuman') }}">📢 Pengumuman</a></li>
     </ul>
   </div>
