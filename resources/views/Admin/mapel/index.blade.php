@@ -13,7 +13,6 @@
       background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
       min-height: 100vh;
       color: #333;
-      transition: all 0.3s ease;
     }
 
     .sidebar {
@@ -26,7 +25,6 @@
       left: 0;
       bottom: 0;
       overflow-y: auto;
-      transition: all 0.3s ease;
     }
 
     .sidebar h2 {
@@ -49,7 +47,6 @@
       padding: 10px 14px;
       color: #333;
       border-radius: 8px;
-      transition: 0.3s;
     }
 
     .sidebar ul li a:hover,
@@ -62,7 +59,7 @@
       margin-left: 250px;
       padding: 30px 40px 80px;
       flex: 1;
-      transition: all 0.3s ease;
+      width: 100%;
     }
 
     .header {
@@ -231,29 +228,11 @@
     }
 
     footer {
-      position: fixed;
-      bottom: 0;
-      left: 250px;
-      width: calc(100% - 250px);
+      margin-top: 40px;
       background: #eceff1;
       text-align: center;
       padding: 12px;
       font-size: 14px;
-      transition: all 0.3s ease;
-    }
-
-    /* COLLAPSED SIDEBAR MODE */
-    body.sidebar-collapsed .sidebar {
-      display: none;
-    }
-
-    body.sidebar-collapsed .main {
-      margin-left: 0;
-    }
-
-    body.sidebar-collapsed footer {
-      left: 0;
-      width: 100%;
     }
   </style>
 </head>
@@ -284,10 +263,10 @@
     <div class="actions">
       <button class="btn-tambah" onclick="document.getElementById('modalTambah').style.display='flex'">➕ Tambah Materi</button>
       <a href="{{ route('admin.mapel.export') }}" class="btn-ekspor">📤 Ekspor Excel</a>
-      <form method="POST" action="{{ route('admin.mapel.import') }}" enctype="multipart/form-data">
+      <form method="POST" action="{{ route('admin.mapel.import') }}" enctype="multipart/form-data" style="display:flex; gap: 10px;">
         @csrf
         <input type="file" class="btn-impor" name="file" required>
-        <button class="btn-impor">📥 Impor Excel</button>
+        <button class="btn-impor">📥 Impor</button>
       </form>
     </div>
 
@@ -295,64 +274,66 @@
       <input type="text" name="search" placeholder="Cari materi..." value="{{ $search ?? '' }}">
       <button type="submit">🔍 Cari</button>
     </form>
-
-    <table>
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Judul Materi</th>
-          <th>Mata Pelajaran</th>
-          <th>Kelas</th>
-          <th>Tanggal Upload</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody>
-        @forelse ($materi as $index => $item)
-        <tr>
-          <td>{{ $index + 1 }}</td>
-          <td>{{ $item->judul }}</td>
-          <td>{{ $item->mapel }}</td>
-          <td>{{ $item->kelas }}</td>
-          <td>{{ \Carbon\Carbon::parse($item->uploaded_at)->format('d M Y') }}</td>
-          <td>
-            <form action="{{ route('admin.mapel.update', $item->id) }}" method="POST" enctype="multipart/form-data">
-              @csrf
-              <button class="btn-edit" type="submit">✏️ Edit</button>
-            </form>
-          </td>
-        </tr>
-        @empty
-        <tr>
-          <td colspan="6" style="text-align:center; padding:20px;">Tidak ada data materi ditemukan.</td>
-        </tr>
-        @endforelse
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Modal Tambah -->
-  <div class="modal" id="modalTambah">
-    <div class="modal-content">
-      <h3>Tambah Materi</h3>
-      <form method="POST" action="{{ route('admin.mapel.store') }}" enctype="multipart/form-data">
-        @csrf
-        <input type="text" name="judul" placeholder="Judul Materi" required>
-        <input type="text" name="mapel" placeholder="Mata Pelajaran" required>
-        <input type="text" name="kelas" placeholder="Kelas" required>
-        <input type="file" name="file" required>
-        <button type="submit">💾 Simpan</button>
-      </form>
+<table>
+  <thead>
+    <tr>
+      <th>No</th>
+      <th>Nama Guru</th>
+      <th>Mengajar Mata Pelajaran</th>
+      <th>Mengajar di Kelas</th>
+    </tr>
+  </thead>
+  <tbody>
+    @forelse ($gurus as $index => $guru)
+    <tr>
+      <td>{{ $index + 1 }}</td>
+      <td>{{ $guru->nama }}</td>
+      <td>
+        @if ($guru->mapels->count())
+          {{ $guru->mapels->pluck('nama_mapel')->unique()->join(', ') }}
+        @else
+          <em>Belum ada mapel</em>
+        @endif
+      </td>
+      <td>
+        @if ($guru->kelas->count())
+          {{ $guru->kelas->pluck('nama_kelas')->unique()->join(', ') }}
+        @else
+          <em>Belum ada kelas</em>
+        @endif
+      </td>
+    </tr>
+    @empty
+    <tr>
+      <td colspan="4" style="text-align:center; padding:20px;">Tidak ada data guru ditemukan.</td>
+    </tr>
+    @endforelse
+  </tbody>
+</table>
+    <!-- Modal Tambah -->
+    <div class="modal" id="modalTambah">
+      <div class="modal-content">
+        <h3>Tambah Materi</h3>
+        <form method="POST" action="{{ route('admin.mapel.store') }}" enctype="multipart/form-data">
+          @csrf
+          <input type="text" name="judul" placeholder="Judul Materi" required>
+          <input type="text" name="mapel" placeholder="Mata Pelajaran" required>
+          <input type="text" name="kelas" placeholder="Kelas" required>
+          <input type="file" name="file" required>
+          <button type="submit">💾 Simpan</button>
+        </form>
+      </div>
     </div>
-  </div>
 
-  <footer>
-    &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN - Kelola Materi Pembelajaran.
-  </footer>
+    <footer>
+      &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN - Kelola Materi Pembelajaran.
+    </footer>
+  </div>
 
   <script>
     function toggleSidebar() {
-      document.body.classList.toggle('sidebar-collapsed');
+      document.querySelector('.sidebar').classList.toggle('d-none');
+      document.querySelector('.main').classList.toggle('full');
     }
 
     window.onclick = function(e) {

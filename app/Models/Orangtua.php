@@ -5,19 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Siswa extends Model
+class Orangtua extends Model
 {
-    use HasFactory;
+   use HasFactory;
 
-    protected $fillable = ['user_id', 'nama', 'nisn', 'kelas_id', 'email'];
+    protected $fillable = ['user_id', 'nama', 'no_hp', 'alamat'];
 
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function kelas()
-    {
-        return $this->belongsTo(Kelas::class);
     }
 }

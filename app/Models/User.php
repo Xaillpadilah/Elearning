@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'role', // penting! pastikan role bisa diisi
     ];
 
     /**
@@ -41,4 +42,26 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // === RELASI KE TABEL-TABEL LAIN ===
+
+    public function admin()
+    {
+        return $this->hasOne(Admin::class);
+    }
+
+    public function guru()
+    {
+        return $this->hasOne(Guru::class);
+    }
+
+    public function siswa()
+    {
+        return $this->hasOne(Siswa::class);
+    }
+
+    public function orangtua()
+    {
+        return $this->hasOne(Orangtua::class);
+    }
 }

@@ -10,10 +10,13 @@ use App\Http\Controllers\GuruController;
 use App\Http\Controllers\Guru\JadwalController;
 use App\Http\Controllers\Guru\SiswaaaController;
 use App\Http\Controllers\Guru\NilaiController;
-use App\Http\Controllers\Guru\MateriController;
+use App\Http\Controllers\MateriController;
 use App\Http\Controllers\Guru\TugasController;
 use App\Http\Controllers\Guru\PengumumanController;
 use App\Http\Controllers\OrangtuaController;
+use App\Http\Controllers\ProfilController;
+use App\Http\Controllers\RedirectController;
+use App\Http\Controllers\CrudController;
 use App\Http\Controllers\AdminGuruController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
@@ -23,20 +26,52 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Login
+// Auth routes
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
+Route::post('/login', [AuthController::class, 'login'])->name('login.process');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Logout
-Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+// Redirect after login
+Route::get('/redirect', [RedirectController::class, 'index'])->name('redirect.dashboard')->middleware('auth');
 
+// Role-based dashboards
+Route::middleware(['auth', 'checkrole:admin'])->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+});
+
+Route::middleware(['auth', 'checkrole:siswa'])->group(function () {
+    Route::get('/dashboard-siswa', [SiswaController::class, 'index'])->name('siswa.dashboard');
+});
+
+Route::middleware(['auth', 'checkrole:guru'])->group(function () {
+    Route::get('/dashboard-guru', [GuruController::class, 'index'])->name('guru.dashboard');
+});
+
+Route::middleware(['auth', 'checkrole:orangtua'])->group(function () {
+    Route::get('/dashboard-orangtua', [OrangtuaController::class, 'index'])->name('orangtua.dashboard');
+});
+// Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // Dashboard Redirect by Role
-// Route::get('/admin/dashboard', fn() => view('dashboard.admin'))->name('admin.dashboard');
-Route::get('/guru/dashboard', fn() => view('dashboard.guru'))->name('guru.dashboard');
-Route::get('/siswa/dashboard', fn() => view('dashboard.siswa'))->name('siswa.dashboard');
-Route::get('/orangtua/dashboard', fn() => view('dashboard.orangtua'))->name('orangtua.dashboard');
+
 //  Admin
-  
+  Route::middleware(['auth', 'checkrole:admin'])->group(function () {
+    Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
+});
+
+Route::middleware(['auth', 'checkrole:siswa'])->group(function () {
+    Route::get('/dashboard-siswa', [SiswaController::class, 'index'])->name('siswa.dashboard');
+});
+
+Route::middleware(['auth', 'checkrole:guru'])->group(function () {
+    Route::get('/dashboard-guru', [GuruController::class, 'index'])->name('guru.dashboard');
+});
+
+Route::middleware(['auth', 'checkrole:orangtua'])->group(function () {
+    Route::get('/dashboard-orangtua', [OrangtuaController::class, 'index'])->name('orangtua.dashboard');
+});
 
 // siswa
 Route::get(uri: '/siswa', action: [SiswaController::class, 'index'])->name('siswa.index');
@@ -72,7 +107,7 @@ Route::prefix('guru')->group(function () {
     Route::get('/jadwal', [JadwalController::class, 'index'])->name('guru.jadwal');
     Route::get('/siswa', [SiswaaaController::class, 'index'])->name('guru.siswa');
     Route::get('/nilai', [NilaiController::class, 'index'])->name('guru.nilai');
-    Route::get('/materi', [MateriController::class, 'index'])->name('guru.materi');
+    //Route::get('/materi', [MateriController::class, 'index'])->name('guru.materi');
     Route::get('/tugas', [TugasController::class, 'index'])->name('guru.tugas');
     Route::get('/pengumuman', [PengumumanController::class, 'index'])->name('guru.pengumuman');
 });
@@ -83,25 +118,32 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/siswa', [AdminController::class, 'siswa'])->name('admin.siswa');
     Route::get('/kelas', [AdminController::class, 'kelas'])->name('admin.kelas');
     Route::get('/mapel', [AdminController::class, 'mapel'])->name('admin.mapel');
-   
-    Route::get('/guru/create', [AdminController::class, 'create'])->name('admin.guru.create');
-    Route::post('/guru/store', [AdminController::class, 'store'])->name('admin.guru.store');
-    // Ekspor dan Impor
-    Route::get('/guru/export', [AdminController::class, 'export'])->name('admin.guru.export');
-    Route::get('/guru/import', [AdminController::class, 'showImportForm'])->name('admin.guru.import.form');
-    Route::post('/guru/import', [AdminController::class, 'import'])->name('admin.guru.import');
-    Route::get('/guru/{id}/edit', [AdminController::class, 'edit'])->name('admin.guru.edit'); 
-    Route::put('/guru/{id}', [AdminController::class, 'update'])->name('admin.guru.update'); 
+   //guru
+    Route::get('/guru', [AdminController::class, 'guruIndex'])->name('admin.guru');
+    Route::post('/guru', [AdminController::class, 'guruStore'])->name('admin.guru.store');
+    Route::put('/guru/{id}', [AdminController::class, 'guruUpdate'])->name('admin.guru.update');
+    Route::get('/guru/export', [AdminController::class, 'guruExport'])->name('admin.guru.export');
+    Route::post('/guru/import', [AdminController::class, 'guruImport'])->name('admin.guru.import');
     //siswa admin
-    Route::get('/siswa', [AdminController::class, 'indexsiswa'])->name('admin.siswa');
-    Route::post('/siswa', [AdminController::class, 'storesiswa'])->name('admin.siswa.store');
-    Route::put('/siswa/{id}', [AdminController::class, 'updatesiswa'])->name('admin.siswa.update');
-    Route::get('/siswa/export', [AdminController::class, 'exportsiswa'])->name('admin.siswa.export');
-    Route::post('/admin/siswa/import', [AdminController::class, 'importsiswa'])->name('admin.siswa.import');
-    Route::delete('/admin/siswa/{id}', [AdminController::class, 'destroySiswa'])->name('admin.siswa.destroy');
-    Route::delete('/admin/siswa/{id}', [SiswaController::class, 'destroy'])->name('admin.siswa.destroy');
-    Route::put('/admin/siswa/{id}', [SiswaController::class, 'update'])->name('admin.siswa.update');
-Route::delete('/admin/siswa/{id}', [SiswaController::class, 'destroy'])->name('admin.siswa.destroy');
+ 
+    // Halaman utama data siswa
+   Route::get('/siswa', [AdminController::class, 'indexSiswa'])->name('admin.siswa');
+
+    // Simpan siswa baru
+    Route::post('/siswa', [AdminController::class, 'storeSiswa'])->name('admin.siswa.store');
+
+    // Import siswa dari Excel
+    Route::post('/siswa/import', [AdminController::class, 'importSiswa'])->name('admin.siswa.import');
+
+    // Export siswa ke Excel
+    Route::get('/siswa/export', [AdminController::class, 'exportSiswa'])->name('admin.siswa.export');
+
+    // Update siswa
+    Route::post('/siswa/{id}', [AdminController::class, 'updateSiswa'])->name('admin.siswa.update');
+
+    // Hapus siswa
+    Route::delete('/siswa/{id}', [AdminController::class, 'destroySiswa'])->name('admin.siswa.destroy');
+
     //admin kelas
       Route::get('/kelas', [AdminController::class, 'indexkelas'])->name('admin.kelas');
     Route::post('/kelas', [AdminController::class, 'storekelas'])->name('admin.kelas.store');
@@ -110,11 +152,11 @@ Route::delete('/admin/siswa/{id}', [SiswaController::class, 'destroy'])->name('a
     Route::get('/kelas/export', [AdminController::class, 'exportkelas'])->name('admin.kelas.export');
     Route::post('/kelas/{id}', [AdminController::class, 'updatekelas'])->name('admin.kelas.update');
     //materi admin
-    Route::get('/mapel', [AdminController::class, 'indexmateri'])->name('admin.mapel.index');
-    Route::post('/mapel', [AdminController::class, 'storemateri'])->name('admin.mapel.store');
-    Route::post('/mapel/{id}/update', [AdminController::class, 'updatemateri'])->name('admin.mapel.update');
-    Route::post('/mapel/import', [AdminController::class, 'importmateri'])->name('admin.mapel.import');
-    Route::get('/mapel/export', [AdminController::class, 'exportmateri'])->name('admin.mapel.export');
+    Route::get('/admin/materi', [MateriController::class, 'index'])->name('admin.mapel.index');
+    Route::post('/admin/materi', [MateriController::class, 'store'])->name('admin.mapel.store');
+    Route::post('/admin/materi/import', [MateriController::class, 'import'])->name('admin.mapel.import');
+    Route::get('/admin/materi/export', [MateriController::class, 'export'])->name('admin.mapel.export');
+    Route::post('/admin/materi/{id}/update', [MateriController::class, 'update'])->name('admin.mapel.update');
     //pengumuman
     Route::get('/pengumuman', [AdminController::class, 'indexpengumuman'])->name('admin.pengumuman');
     Route::post('/pengumuman/store', [AdminController::class, 'store'])->name('admin.pengumuman.store');
@@ -139,3 +181,27 @@ Route::prefix('orangtua')->group(function () {
 Route::get('/cek-zip', function () {
     return class_exists('ZipArchive') ? 'ZipArchive aktif' : 'ZipArchive tidak ditemukan';
 });
+// Materi - Bisa diakses oleh admin dan guru
+Route::middleware(['auth', 'role:admin,guru'])->group(function () {
+    Route::get('/materi', [MateriController::class, 'index'])->name('admin.mapel.index');
+    Route::get('/materi/export', [MateriController::class, 'export'])->name('admin.mapel.export');
+    Route::post('/materi/import', [MateriController::class, 'import'])->name('admin.mapel.import');
+});
+
+// Hanya admin yang boleh tambah & update
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::post('/materi', [MateriController::class, 'store'])->name('admin.mapel.store');
+    Route::post('/materi/{id}/update', [MateriController::class, 'update'])->name('admin.mapel.update');
+});
+
+// Route untuk guru
+Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(function () {
+    Route::get('/materi', [MateriController::class, 'index'])->name('mapel.index');
+    Route::get('/guru/materi', [GuruController::class, 'materi'])->name('guru.materi');
+});
+Route::middleware(['auth', 'role:guru'])->prefix('guru')->name('guru.')->group(function () {
+    Route::get('/profil', [ProfilController::class, 'index'])->name('profil');
+});
+//crud siswaadmin 
+// Siswa routes
+

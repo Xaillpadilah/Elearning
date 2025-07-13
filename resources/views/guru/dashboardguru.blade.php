@@ -6,8 +6,9 @@
   <title>Dashboard Guru</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
   @vite(['resources/css/app.css'])
+
   <style>
-      * { box-sizing: border-box; }
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
@@ -39,7 +40,7 @@
     .sidebar ul { list-style: none; padding: 0; }
     .sidebar ul li { margin: 14px 0; }
 
-    .sidebar ul li a {
+    .sidebar ul li a, .dropdown-toggle {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -50,10 +51,12 @@
       border-radius: 12px;
       transition: background 0.3s, color 0.3s;
       background: transparent;
+      cursor: pointer;
     }
 
     .sidebar ul li a:hover,
-    .sidebar ul li a.active {
+    .sidebar ul li a.active,
+    .dropdown-toggle:hover {
       background: linear-gradient(to right, #d1c4e9, #bbdefb);
       color: #6a1b9a;
     }
@@ -86,7 +89,6 @@
       flex: 1;
       padding: 30px 40px 80px;
       background: linear-gradient(to bottom right, #f3f4f6, #e0f7fa);
-      transition: margin-left 0.3s ease;
     }
 
     .main.fullscreen { margin-left: 0; }
@@ -98,7 +100,7 @@
       margin-bottom: 20px;
     }
 
-    .header .fullscreen-btn {
+    .fullscreen-btn {
       background: linear-gradient(to right, #c5cae9, #b2ebf2);
       border: none;
       color: #0d47a1;
@@ -106,12 +108,6 @@
       border-radius: 10px;
       font-weight: 500;
       cursor: pointer;
-      font-size: 14px;
-      transition: background 0.3s ease;
-    }
-
-    .header .fullscreen-btn:hover {
-      background: linear-gradient(to right, #9fa8da, #80deea);
     }
 
     .user {
@@ -137,12 +133,6 @@
       font-size: 18px;
       color: #4a148c;
       margin-bottom: 10px;
-    }
-
-    .info-frame p {
-      margin: 0;
-      font-size: 14px;
-      color: #555;
     }
 
     .cards {
@@ -178,7 +168,6 @@
       color: #222;
       margin-bottom: 10px;
       display: flex;
-      align-items: center;
       justify-content: space-between;
     }
 
@@ -188,14 +177,6 @@
       font-size: 12px;
       padding: 4px 10px;
       border-radius: 50px;
-      font-weight: 500;
-    }
-
-    .card p {
-      font-size: 14px;
-      color: #555;
-      line-height: 1.5;
-      flex: 1;
     }
 
     .card a button {
@@ -208,12 +189,6 @@
       font-weight: 500;
       border-radius: 10px;
       cursor: pointer;
-      align-self: flex-start;
-      transition: background 0.3s ease;
-    }
-
-    .card a button:hover {
-      background: linear-gradient(to right, #388e3c, #2e7d32);
     }
 
     footer {
@@ -226,7 +201,6 @@
       padding: 12px 30px;
       text-align: center;
       font-size: 14px;
-      transition: left 0.3s ease, width 0.3s ease;
     }
 
     .fullscreen footer {
@@ -245,7 +219,16 @@
     <li><a href="{{ route('guru.jadwal') }}" class="{{ request()->routeIs('guru.jadwal') ? 'active' : '' }}">🗓️ Jadwal Mengajar</a></li>
     <li><a href="{{ route('guru.siswa') }}" class="{{ request()->routeIs('guru.siswa') ? 'active' : '' }}">👥 Daftar Siswa</a></li>
     <li><a href="{{ route('guru.nilai') }}" class="{{ request()->routeIs('guru.nilai') ? 'active' : '' }}">📊 Penilaian</a></li>
-    <li><a href="{{ route('guru.materi') }}" class="{{ request()->routeIs('guru.materi') ? 'active' : '' }}">📚 Materi</a></li>
+    
+    <!-- Dropdown Menu Materi -->
+    <li>
+      <div class="dropdown-toggle" onclick="toggleDropdown()">📚 Materi <span style="margin-left:auto;">▾</span></div>
+      <ul class="sub-mapel" id="dropdownMenu">
+        <li><a href="{{ route('guru.mapel.index') }}" class="{{ request()->routeIs('guru.mapel.index') ? 'active' : '' }}">📘 Daftar Mapel</a></li>
+        <li><a href="{{ route('guru.mapel.index') }}" class="{{ request()->routeIs('guru.materi') ? 'active' : '' }}">📄 Materi Pembelajaran</a></li>
+      </ul>
+    </li>
+
     <li><a href="{{ route('guru.tugas') }}" class="{{ request()->routeIs('guru.tugas') ? 'active' : '' }}">📝 Tugas</a></li>
     <li><a href="{{ route('guru.pengumuman') }}" class="{{ request()->routeIs('guru.pengumuman') ? 'active' : '' }}">📢 Pengumuman</a></li>
   </ul>
@@ -264,47 +247,14 @@
   </div>
 
   <div class="cards">
+    <!-- Contoh card -->
     <div class="card">
-      <img src="{{ asset('assets/image/jadwal.png') }}" alt="Jadwal Hari Ini">
-      <div class="card-title">Jadwal Hari Ini <span class="kelas">{{ $jadwalHariIni }} KELAS</span></div>
-      <p>Lihat kelas yang akan Anda ajar hari ini.</p>
-      <a href="{{ route('guru.jadwal') }}"><button>LIHAT JADWAL</button></a>
+      <img src="{{ asset('assets/image/jadwal.png') }}" alt="Jadwal">
+      <div class="card-title">Jadwal Hari Ini <span class="kelas">{{ $jadwalHariIni ?? 0 }} Kelas</span></div>
+      <p>Lihat kelas yang Anda ajar hari ini.</p>
+      <a href="{{ route('guru.jadwal') }}"><button>Lihat Jadwal</button></a>
     </div>
-
-    <div class="card">
-      <img src="{{ asset('assets/image/siswa.png') }}" alt="Daftar Siswa">
-      <div class="card-title">Daftar Siswa</div>
-      <p>Kelola siswa dari setiap kelas yang Anda ajar.</p>
-      <a href="{{ route('guru.siswa') }}"><button>LIHAT DAFTAR</button></a>
-    </div>
-
-    <div class="card">
-      <img src="{{ asset('assets/image/nilai.png') }}" alt="Penilaian">
-      <div class="card-title">Input Nilai</div>
-      <p>Berikan dan pantau nilai siswa secara berkala.</p>
-      <a href="{{ route('guru.nilai') }}"><button>KE HALAMAN NILAI</button></a>
-    </div>
-
-    <div class="card">
-      <img src="{{ asset('assets/image/materi.png') }}" alt="Materi">
-      <div class="card-title">Materi Pembelajaran</div>
-      <p>Unggah dan atur materi pelajaran untuk siswa.</p>
-      <a href="{{ route('guru.materi') }}"><button>KE MATERI</button></a>
-    </div>
-
-    <div class="card">
-      <img src="{{ asset('assets/image/tugas.png') }}" alt="Tugas">
-      <div class="card-title">Tugas Siswa</div>
-      <p>Kelola tugas-tugas yang harus dikerjakan siswa.</p>
-      <a href="{{ route('guru.tugas') }}"><button>LIHAT TUGAS</button></a>
-    </div>
-
-    <div class="card">
-      <img src="{{ asset('assets/image/pengumuman.png') }}" alt="Pengumuman">
-      <div class="card-title">Pengumuman</div>
-      <p>Buat pengumuman penting untuk seluruh kelas.</p>
-      <a href="{{ route('guru.pengumuman') }}"><button>BUAT PENGUMUMAN</button></a>
-    </div>
+    <!-- Tambahkan card lain sesuai kebutuhan -->
   </div>
 </div>
 
@@ -319,6 +269,20 @@
     document.getElementById('main-content').classList.toggle('fullscreen');
     document.getElementById('footer').classList.toggle('fullscreen');
   }
+
+  function toggleDropdown() {
+    const dropdown = document.getElementById('dropdownMenu');
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  }
+
+  // Buka dropdown jika route aktif
+  window.onload = function () {
+    const currentRoute = "{{ Route::currentRouteName() }}";
+    if (['guru.mapel.index', 'guru.materi'].includes(currentRoute)) {
+      document.getElementById('dropdownMenu').style.display = 'block';
+    }
+  };
 </script>
+
 </body>
 </html>

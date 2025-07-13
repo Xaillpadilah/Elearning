@@ -11,17 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('materis', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
+      Schema::create('mapels', function (Blueprint $table) {
+    $table->id();
+    $table->string('nama_mapel');
+    $table->string('kode_mapel')->unique();
+    $table->timestamps();
+});
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('materis');
+        Schema::dropIfExists('mapels');
     }
 };

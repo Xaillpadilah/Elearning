@@ -9,7 +9,7 @@ class Kelas extends Model
 {
    use HasFactory;
 
-    protected $fillable = ['nama_kelas', 'wali_kelas'];
+   protected $fillable = ['nama_kelas', 'wali_kelas'];
 
     public function siswa()
     {

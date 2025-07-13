@@ -217,7 +217,7 @@
       <li><a href="{{ route('admin.guru') }}" class="active">👨‍🏫 Data Guru</a></li>
       <li><a href="{{ route('admin.siswa') }}">👥 Data Siswa</a></li>
       <li><a href="{{ route('admin.kelas') }}">🏫 Kelas</a></li>
-      <li><a href="{{ route('admin.mapel.index') }}">📘 Mata Pelajaran</a></li>
+      <li><a href="{{ route('admin.mapel.index') }}">📚 Mata Pelajaran</a></li>
       <li><a href="{{ route('admin.pengumuman') }}">📢 Pengumuman</a></li>
     </ul>
   </div>
@@ -236,11 +236,11 @@
 
     <div class="actions">
       <button class="btn-tambah" onclick="document.getElementById('modalTambahGuru').style.display='flex'">➕ Tambah Guru</button>
-      <a href="{{ route('admin.guru.export') }}" class="btn-ekspor">📤 Ekspor Excel</a>
+      <a href="{{ route('admin.guru.export') }}" class="btn-ekspor">📄 Ekspor Excel</a>
       <form action="{{ route('admin.guru.import') }}" method="POST" enctype="multipart/form-data" style="display: flex; gap: 10px;">
         @csrf
         <input type="file" name="file" required class="btn-impor" style="background: white; color: black;">
-        <button type="submit" class="btn-impor">📥 Impor Excel</button>
+        <button type="submit" class="btn-impor">📅 Impor Excel</button>
       </form>
     </div>
 
@@ -261,20 +261,29 @@
           <th>Aksi</th>
         </tr>
       </thead>
-      <tbody>
-        @foreach($gurus as $index => $guru)
-        <tr>
-          <td>{{ $index + 1 }}</td>
-          <td>{{ $guru->nama }}</td>
-          <td>{{ $guru->nik }}</td>
-          <td>{{ $guru->mengajar }}</td>
-          <td>{{ $guru->email }}</td>
-          <td>
-            <button class="btn-edit" onclick="openEditModal({{ $guru->id }}, '{{ $guru->nama }}', '{{ $guru->nik }}', '{{ $guru->mengajar }}', '{{ $guru->email }}')">✏️ Edit</button>
-          </td>
-        </tr>
-        @endforeach
-      </tbody>
+     <tbody>
+@foreach($gurus as $index => $guru)
+<tr>
+  <td>{{ $index + 1 }}</td>
+  <td>{{ $guru->nama }}</td>
+  <td>{{ $guru->nik }}</td>
+  <td>
+    @if($guru->mapels->count())
+     {{ $guru->mapels->pluck('nama_mapel')->join(', ') }}
+    @else
+      -
+    @endif
+  </td>
+  <td>{{ $guru->user->email ?? '-' }}</td>
+  <td>
+    <button class="btn-edit"
+      onclick="openEditModal({{ $guru->id }}, '{{ $guru->nama }}', '{{ $guru->nik }}', '{{ $guru->mapels->pluck('nama_mapel')->join(', ') }}', '{{ $guru->user->email ?? '-' }}')">
+      ✏️ Edit
+    </button>
+  </td>
+</tr>
+@endforeach
+</tbody>
     </table>
     @else
       <div class="info-frame no-data">Tidak ada data guru ditemukan.</div>
@@ -313,9 +322,9 @@
   </div>
 
   <!-- Footer -->
-<footer id="footer">
-  &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN - Dashboard Admin.
-</footer>
+  <footer id="footer">
+    &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN - Dashboard Admin.
+  </footer>
 
   <script>
     function toggleFullscreenDashboard() {

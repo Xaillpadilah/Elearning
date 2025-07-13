@@ -12,4 +12,8 @@ class Materi extends Model
     protected $fillable = [
         'judul', 'mapel', 'kelas', 'file', 'uploaded_at',
     ];
+    public function uploader()
+{
+    return $this->belongsTo(User::class, 'uploaded_by');
+}
 }

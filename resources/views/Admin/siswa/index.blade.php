@@ -1,3 +1,4 @@
+@php use Illuminate\Support\Str; @endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -204,6 +205,7 @@
       left: 0;
       width: 100%;
     }
+    
   </style>
 </head>
 <body>
@@ -214,7 +216,7 @@
       <li><a href="{{ route('admin.guru') }}">👨‍🏫 Data Guru</a></li>
       <li><a href="{{ route('admin.siswa') }}" class="active">👥 Data Siswa</a></li>
       <li><a href="{{ route('admin.kelas') }}">🏫 Kelas</a></li>
-      <li><a href="{{ route('admin.mapel.index') }}">📘 Mata Pelajaran</a></li>
+      <li><a href="{{ route('admin.mapel.index') }}">📛 Mata Pelajaran</a></li>
       <li><a href="{{ route('admin.pengumuman') }}">📢 Pengumuman</a></li>
     </ul>
   </div>
@@ -232,16 +234,16 @@
 
     <div class="actions">
       <button class="btn-tambah" onclick="document.getElementById('modalTambahSiswa').style.display='flex'">➕ Tambah Siswa</button>
-      <a href="{{ route('admin.siswa.export') }}" class="btn-ekspor">📤 Ekspor Excel</a>
+      <a href="{{ route('admin.siswa.export') }}" class="btn-ekspor">📄 Ekspor Excel</a>
       <form action="{{ route('admin.siswa.import') }}" method="POST" enctype="multipart/form-data" style="display: flex; gap: 10px;">
         @csrf
         <input type="file" name="file" required class="btn-impor" style="background: white; color: black;">
-        <button type="submit" class="btn-impor">📥 Impor Excel</button>
+        <button type="submit" class="btn-impor">📅 Impor Excel</button>
       </form>
     </div>
 
     <form action="{{ route('admin.siswa') }}" method="GET" class="search-form">
-      <input type="text" name="search" placeholder="Cari siswa..." value="{{ $search ?? '' }}">
+      <input type="text" name="search" placeholder="Cari siswa..." value="{{ request('search') }}">
       <button type="submit">🔍 Cari</button>
     </form>
 
@@ -252,8 +254,8 @@
           <th>No</th>
           <th>Nama</th>
           <th>NISN</th>
-            <th>Kelas</th>
-            <th>Email</th>
+          <th>Kelas</th>
+          <th>Email</th>
           <th>Aksi</th>
         </tr>
       </thead>
@@ -261,15 +263,20 @@
         @foreach($siswas as $index => $siswa)
         <tr>
           <td>{{ $index + 1 }}</td>
-          <td>{{ $siswa->nama }}</td>
+          <td>{{ $siswa->nama ?? $siswa->user->name ?? '-' }}</td>
           <td>{{ $siswa->nisn }}</td>
-          <td>{{ $siswa->kelas->nama_kelas ?? '-' }}</td>
-          <td>{{ $siswa->email }}</td>
-         <td style="display: flex; gap: 6px;">
-  <button class="btn-edit" onclick="openEditModal({{ $siswa->id }}, '{{ $siswa->nama }}', '{{ $siswa->nisn }}', '{{ $siswa->kelas_id }}', '{{ $siswa->email }}')">✏️ Edit</button>
-  
-  <button class="btn-delete" onclick="openDeleteModal({{ $siswa->id }})">🗑️ Hapus</button>
-</td>
+          <td>{{ $siswa->kelas->nama_kelas ?? 'No Kelas' }}</td>
+          <td>{{ $siswa->user->email ?? 'No Email' }}</td>
+          <td style="display: flex; gap: 6px;">
+            <button class="btn-edit" onclick="openEditModal(
+              {{ $siswa->id }},
+              '{{ $siswa->nama }}',
+              '{{ $siswa->nisn }}',
+              '{{ $siswa->kelas_id }}',
+              '{{ $siswa->user->email ?? '' }}'
+            )">✏️ Edit</button>
+            <button class="btn-delete" onclick="openDeleteModal({{ $siswa->id }})">🗑️ Hapus</button>
+          </td>
         </tr>
         @endforeach
       </tbody>
@@ -279,12 +286,37 @@
     @endif
   </div>
 
-  <!-- Modal Tambah -->
- @include('admin.siswa.creates')
-@include('admin.siswa.delete')
-  
-  <!-- Modal Edit -->
-@include('admin.siswa.edits')
+  {{-- Modal Tambah Siswa --}}
+ <div id="modalTambahSiswa" class="modal">
+  <div class="modal-content">
+    <h3>➕ Tambah Siswa</h3>
+    <form action="{{ route('admin.siswa.store') }}" method="POST">
+      @csrf
+      <input type="text" name="nama" placeholder="Nama Lengkap" required>
+      <input type="text" name="nisn" placeholder="NISN" required>
+
+      <select name="kelas_id" required style="width: 100%; padding: 10px; margin-bottom: 12px; border: 1px solid #ccc; border-radius: 8px;">
+        <option value="">Pilih Kelas</option>
+        @foreach($kelas as $k)
+          <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+        @endforeach
+      </select>
+
+      <input type="email" name="email" placeholder="Email Akun" required>
+      <input type="password" name="password" placeholder="Password Akun" required>
+
+      <div style="display: flex; justify-content: flex-end; gap: 10px;">
+        <button type="button" onclick="document.getElementById('modalTambahSiswa').style.display='none'" style="background: #ccc;">Batal</button>
+        <button type="submit">Simpan</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+
+  {{-- Modal Edit & Delete --}}
+  @include('admin.siswa.edits')
+  @include('admin.siswa.delete')
 
   <footer id="footer">
     &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN - Dashboard Admin.
@@ -306,19 +338,27 @@
       document.getElementById('formEditSiswa').action = `/admin/siswa/${id}`;
     }
 
+    function openDeleteModal(id) {
+      const form = document.getElementById('formDeleteSiswa');
+      form.action = `/admin/siswa/${id}`;
+      document.getElementById('modalDeleteSiswa').style.display = 'flex';
+    }
+
     document.addEventListener('keydown', function(e) {
       if (e.key === "Escape") {
         document.getElementById('modalEditSiswa').style.display = 'none';
         document.getElementById('modalTambahSiswa').style.display = 'none';
+        document.getElementById('modalDeleteSiswa').style.display = 'none';
       }
     });
 
     window.onclick = function(event) {
-      if (event.target === document.getElementById('modalEditSiswa') || event.target === document.getElementById('modalTambahSiswa')) {
-        event.target.style.display = "none";
-      }
+      ['modalEditSiswa', 'modalTambahSiswa', 'modalDeleteSiswa'].forEach(id => {
+        if (event.target === document.getElementById(id)) {
+          event.target.style.display = "none";
+        }
+      });
     };
-    
   </script>
 </body>
 </html>

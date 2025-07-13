@@ -197,6 +197,31 @@ footer.fullwidth {
   left: 0 !important;
   width: 100% !important;
 }
+.submenu {
+  list-style: none;
+  margin-left: 15px;
+  padding-left: 10px;
+  display: none;
+}
+
+.submenu li a {
+  font-size: 14px;
+  display: block;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #333;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.submenu li a:hover {
+  background: #f0f0f0;
+  color: #4a148c;
+}
+
+.submenu.show {
+  display: block;
+}
   </style>
 </head>
 <body>
@@ -206,7 +231,15 @@ footer.fullwidth {
   <h2>Dashboard Admin</h2>
   <ul>
     <li><a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">🏠 Dashboard</a></li>
-    <li><a href="{{ route('admin.guru') }}" class="{{ request()->routeIs('admin.guru') ? 'active' : '' }}">👨‍🏫 Data Guru</a></li>
+    <li>
+  <a href="#" onclick="toggleDropdown('submenu-guru')" class="{{ request()->routeIs('admin.guru*') ? 'active' : '' }}">
+    👨‍🏫 Data Guru ▼
+  </a>
+  <ul id="submenu-guru" class="submenu {{ request()->routeIs('admin.guru*') ? 'show' : '' }}">
+    <li><a href="{{ route('admin.guru') }}" class="{{ request()->routeIs('admin.guru') ? 'active' : '' }}">📋 Daftar Guru</a></li>
+    <li><a href="{{ route('admin.mapel.index') }}" class="{{ request()->routeIs('admin.mapel.index') ? 'active' : '' }}">📘 Materi Diajarkan</a></li>
+  </ul>
+</li>
     <li><a href="{{ route('admin.siswa') }}" class="{{ request()->routeIs('admin.siswa') ? 'active' : '' }}">👥 Data Siswa</a></li>
     <li><a href="{{ route('admin.kelas') }}" class="{{ request()->routeIs('admin.kelas') ? 'active' : '' }}">🏫 Kelas</a></li>
     <li><a href="{{ route('admin.mapel.index') }}" class="{{ request()->routeIs('admin.mapel.index') ? 'active' : '' }}">📘 Mata Pelajaran</a></li>
@@ -247,12 +280,7 @@ footer.fullwidth {
         <div class="card-title">Jumlah Mapel</div>
         <p>{{ $jumlahMapel }} Mata pelajaran tersedia.</p>
       </div>
-      <div class="card card-red" data-icon="📢">
-        <div class="card-title">Jumlah Pengumuman</div>
-        <p>{{ $jumlahPengumuman }} Pengumuman dipublikasi.</p>
-      </div>
-    </div>
-  </div>
+     
 
   <!-- Grafik -->
   <div class="info-frame">
@@ -317,6 +345,12 @@ footer.fullwidth {
     sidebar.classList.toggle('hidden');
     main.classList.toggle('fullwidth');
     footer.classList.toggle('fullwidth');
+  }
+</script>
+<script>
+  function toggleDropdown(id) {
+    const submenu = document.getElementById(id);
+    submenu.classList.toggle('show');
   }
 </script>
 </body>

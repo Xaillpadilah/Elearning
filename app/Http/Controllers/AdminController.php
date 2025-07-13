@@ -19,6 +19,8 @@ use App\Exports\KelasExport;
 use App\Models\Materi;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Pengumuman;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AdminController extends Controller
 {
@@ -31,11 +33,11 @@ class AdminController extends Controller
     $jumlahSiswa = Siswa::count();
     $jumlahKelas = Kelas::count();
     $jumlahMapel = Materi::distinct('mapel')->count('mapel');
-    $jumlahPengumuman = Pengumuman::count();
+    // $jumlahPengumuman = Pengumuman::count();
 
     $dataChart = [
         'labels' => ['Guru', 'Siswa', 'Kelas', 'Mapel', 'Pengumuman'],
-        'jumlah' => [$jumlahGuru, $jumlahSiswa, $jumlahKelas, $jumlahMapel, $jumlahPengumuman],
+        'jumlah' => [$jumlahGuru, $jumlahSiswa, $jumlahKelas, $jumlahMapel, ],
     ];
 
     return view('admin.dashboard', compact(
@@ -44,213 +46,195 @@ class AdminController extends Controller
         'jumlahSiswa',
         'jumlahKelas',
         'jumlahMapel',
-        'jumlahPengumuman',
+    
         'dataChart'
     ));
 }
+//guru
+  public function guruIndex(Request $request)
+{
+    $search = $request->input('search');
 
-   public function guru(Request $request)
-    {
-        // Ekspor jika tombol ekspor ditekan
-        if ($request->has('export')) {
-            $gurus = Guru::all();
-
-            $spreadsheet = new Spreadsheet();
-            $sheet = $spreadsheet->getActiveSheet();
-
-            $sheet->setCellValue('A1', 'Nama');
-            $sheet->setCellValue('B1', 'NIK');
-            $sheet->setCellValue('C1', 'Mengajar');
-            $sheet->setCellValue('D1', 'Email');
-
-            $row = 2;
-            foreach ($gurus as $guru) {
-                $sheet->setCellValue('A' . $row, $guru->nama);
-                $sheet->setCellValue('B' . $row, $guru->nik);
-                $sheet->setCellValue('C' . $row, $guru->mengajar);
-                $sheet->setCellValue('D' . $row, $guru->email);
-                $row++;
-            }
-
-            $fileName = 'data_guru_' . date('Ymd_His') . '.xlsx';
-            $filePath = storage_path($fileName);
-            $writer = new Xlsx($spreadsheet);
-            $writer->save($filePath);
-
-            return response()->download($filePath)->deleteFileAfterSend(true);
-        }
-
-        // Impor jika file dikirim
-        if ($request->isMethod('post') && $request->hasFile('file')) {
-            $request->validate([
-                'file' => 'required|mimes:xlsx,xls'
-            ]);
-
-            $file = $request->file('file');
-            $spreadsheet = IOFactory::load($file);
-            $sheetData = $spreadsheet->getActiveSheet()->toArray(null, true, true, true);
-
-            for ($i = 2; $i <= count($sheetData); $i++) {
-                $row = $sheetData[$i];
-                Guru::create([
-                    'nama'     => $row['A'],
-                    'nik'      => $row['B'],
-                    'mengajar' => $row['C'],
-                    'email'    => $row['D'],
-                ]);
-            }
-
-            return redirect()->route('admin.guru')->with('success', 'Data guru berhasil diimpor.');
-        }
-
-        // Default: tampilkan halaman guru
-        $search = $request->input('search');
-
-        $gurus = Guru::when($search, function ($query, $search) {
+    $gurus = Guru::with(['user', 'mapels']) // << penting
+        ->when($search, function ($query, $search) {
             return $query->where('nama', 'like', "%{$search}%")
-                         ->orWhere('nik', 'like', "%{$search}%")
-                         ->orWhere('mengajar', 'like', "%{$search}%")
-                         ->orWhere('email', 'like', "%{$search}%");
-        })->orderBy('nama')->get();
+                         ->orWhere('nik', 'like', "%{$search}%");
+        })
+        ->get();
 
-        return view('admin.guru.index', compact('gurus', 'search'));
-    }
-
-        public function create()
-    {
-        return view('admin.guru.create');
-    }
-    public function export()
-    {
-        return Excel::download(new GuruExport, 'data_guru.xlsx');
-    }
-        public function storeguru(Request $request)
-    {
+    return view('admin.guru.index', compact('gurus', 'search'));
+}
+public function guruStore(Request $request)
+{
     $request->validate([
-        'nama' => 'required|string|max:255',
-        'nik' => 'required|string|max:100|unique:gurus',
-        'mengajar' => 'required|string|max:255',
-        'email' => 'required|email|unique:gurus',
+        'nama' => 'required',
+        'nik' => 'required|unique:gurus,nik',
+        'email' => 'required|email|unique:users,email',
+        'mengajar' => 'nullable',
     ]);
 
-    Guru::create($request->all());
+    // Buat akun user guru
+    $user = User::create([
+        'name' => $request->nama,
+        'email' => $request->email,
+        'password' => bcrypt('password'), // Default password
+        'role' => 'guru',
+    ]);
+
+    // Buat data guru
+    Guru::create([
+        'user_id' => $user->id,
+        'nama' => $request->nama,
+        'nik' => $request->nik,
+        'mengajar' => $request->mengajar ?? '-',
+    ]);
 
     return redirect()->route('admin.guru')->with('success', 'Guru berhasil ditambahkan.');
-    }
-   
-
- // Menangani upload & import file Excel
-     public function showImportForm()
-        {
-                return view('admin.guru.import');
-        }
-        
-public function edit($id)
-{
-    $guru = Guru::findOrFail($id);
-    return view('admin.guru.edit', compact('guru'));
 }
 
-public function update(Request $request, $id)
+public function guruUpdate(Request $request, $id)
 {
     $guru = Guru::findOrFail($id);
+    $user = $guru->user;
+
+    $request->validate([
+        'nama' => 'required',
+        'nik' => 'required|unique:gurus,nik,' . $guru->id,
+        'email' => 'required|email|unique:users,email,' . $user->id,
+        'mengajar' => 'nullable',
+    ]);
+
     $guru->update([
         'nama' => $request->nama,
         'nik' => $request->nik,
-        'mengajar' => $request->mengajar,
+        'mengajar' => $request->mengajar ?? '-',
+    ]);
+
+    $user->update([
+        'name' => $request->nama,
         'email' => $request->email,
     ]);
 
     return redirect()->route('admin.guru')->with('success', 'Data guru berhasil diperbarui.');
 }
-    // Menangani upload & import file Excel
-    public function import(Request $request)
+
+public function guruExport()
+{
+    return Excel::download(new GuruExport, 'data_guru.xlsx');
+}
+
+public function guruImport(Request $request)
+{
+    $request->validate([
+        'file' => 'required|mimes:xlsx,xls',
+    ]);
+
+    Excel::import(new GuruImport, $request->file('file'));
+
+    return redirect()->route('admin.guru')->with('success', 'Data guru berhasil diimpor.');
+}
+    //siswa
+    public function indexSiswa(Request $request)
+{
+    $search = $request->input('search');
+
+    $siswas = Siswa::with(['kelas', 'user'])
+        ->when($search, function ($query) use ($search) {
+            $query->where('nama', 'like', "%$search%")
+                  ->orWhere('nisn', 'like', "%$search%");
+        })
+        ->get();
+
+    $kelas = Kelas::all(); // variabel benar: $kelas
+
+    return view('admin.siswa.index', compact('siswas', 'kelas'));
+}
+
+public function storeSiswa(Request $request)
+{
+    $request->validate([
+        'nama' => 'required|string',
+        'nisn' => 'required|string|unique:siswas,nisn',
+        'email' => 'required|email|unique:users,email',
+        'kelas_id' => 'required|exists:kelas,id',
+        'password' => 'required|min:6',
+    ]);
+
+    $user = User::create([
+        'name' => $request->nama,
+        'email' => $request->email,
+        'password' => Hash::make($request->password),
+        'role' => 'siswa',
+    ]);
+
+    Siswa::create([
+        'user_id' => $user->id,
+        'nama' => $request->nama,
+        'email' => $request->email, // WAJIB ADA
+        'nisn' => $request->nisn,
+        'kelas_id' => $request->kelas_id,
+    ]);
+
+    return redirect()->route('admin.siswa')->with('success', 'Siswa berhasil ditambahkan.');
+}
+    // Import siswa dari file Excel
+    public function importSiswa(Request $request)
     {
-        // Validasi file
         $request->validate([
             'file' => 'required|mimes:xlsx,xls,csv',
         ]);
 
-        try {
-            // Proses import menggunakan GuruImport
-            Excel::import(new GuruImport, $request->file('file'));
+        Excel::import(new SiswaImport, $request->file('file'));
 
-            return back()->with('success', 'Data guru berhasil diimpor!');
-        } catch (\Exception $e) {
-            return back()->withErrors('Terjadi kesalahan saat mengimpor data: ' . $e->getMessage());
-        }
+        return redirect()->route('admin.siswa')->with('success', 'Data siswa berhasil diimpor.');
     }
-    //siswa
-    public function indexsiswa(Request $request)
-{
-     $search = $request->search;
 
-    $siswas = Siswa::with('kelas')
-        ->when($search, function ($query, $search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('nama', 'like', "%{$search}%")
-                  ->orWhere('nisn', 'like', "%{$search}%")
-                  ->orWhereHas('kelas', function ($kelasQuery) use ($search) {
-                      $kelasQuery->where('nama_kelas', 'like', "%{$search}%");
-                  });
-            });
-        })
-        ->get();
+    // Export siswa ke file Excel
+    public function exportSiswa()
+    {
+        return Excel::download(new SiswaExport, 'data_siswa.xlsx');
+    }
 
-    return view('admin.siswa.index', compact('siswas', 'search'));
-}
+    // Mengupdate data siswa
+    public function updateSiswa(Request $request, $id)
+    {
+        $siswa = Siswa::findOrFail($id);
+        $user = $siswa->user;
 
-public function storesiswa(Request $request)
-{
-    $request->validate([
-        'nama' => 'required',
-        'nisn' => 'required|unique:siswas',
-        'kelas' => 'required',
-        'email' => 'required|email|unique:siswas',
-    ]);
+        $request->validate([
+            'nama' => 'required|string',
+            'nisn' => 'required|string|unique:siswas,nisn,' . $siswa->id,
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'kelas_id' => 'required|exists:kelas,id',
+        ]);
 
-    Siswa::create($request->all());
+        $user->update([
+            'name' => $request->nama,
+            'email' => $request->email,
+        ]);
 
-    return redirect()->route('admin.siswa')->with('success', 'Siswa berhasil ditambahkan.');
-}
+        $siswa->update([
+            'nama' => $request->nama,
+            'nisn' => $request->nisn,
+            'kelas_id' => $request->kelas_id,
+        ]);
 
-public function updatesiswa(Request $request, $id)
-{
-    $siswa = Siswa::findOrFail($id);
+        return redirect()->route('admin.siswa')->with('success', 'Siswa berhasil diperbarui.');
+    }
 
-    $request->validate([
-        'nama' => 'required',
-        'nisn' => 'required|unique:siswas,nisn,' . $id,
-        'kelas' => 'required',
-        'email' => 'required|email|unique:siswas,email,' . $id,
-    ]);
+    // Menghapus data siswa
+    public function destroySiswa($id)
+    {
+        $siswa = Siswa::findOrFail($id);
+        $user = $siswa->user;
 
-    $siswa->update($request->all());
+        $siswa->delete();
+        if ($user) $user->delete();
 
-    return redirect()->route('admin.siswa')->with('success', 'Data siswa berhasil diperbarui.');
-}
+        return redirect()->route('admin.siswa')->with('success', 'Siswa berhasil dihapus.');
+    }
 
-public function exportsiswa()
-{
-    return Excel::download(new SiswaExport, 'data-siswa.xlsx');
-}
-public function importsiswa(Request $request)
-{
-    $request->validate([
-        'file' => 'required|mimes:xlsx,xls,csv'
-    ]);
 
-    Excel::import(new SiswaImport, $request->file('file'));
-
-    return redirect()->route('admin.siswa')->with('success', 'Data siswa berhasil diimpor.');
-}
-public function destroy($id)
-{
-    $siswa = Siswa::findOrFail($id);
-    $siswa->delete();
-
-    return redirect()->route('admin.siswa')->with('success', 'Data siswa berhasil dihapus.');
-}
 //kelas
    public function indexkelas(Request $request)
     {

@@ -13,13 +13,17 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            UserSeeder::class,
-            GuruSeeder::class, 
-            AdminUserSeeder::class,
-            SiswaSeeder::class,
+            AdminSeeder::class,
             KelasSeeder::class,
-             PengumumanSeeder::class,
-              MateriSeeder::class,
+            UserSeeder::class,
+            AdminUserSeeder::class,
+            GuruSeeder::class,
+            OrangtuaSeeder::class,
+            SiswaSeeder::class, // ← ditempatkan setelah User dan Kelas
+            PengumumanSeeder::class,
+            MateriSeeder::class,
+             GuruMapelSeeder::class,
+               GuruMapelKelasSeeder::class,
     ]);// ← tambahkan baris ini
     
 
