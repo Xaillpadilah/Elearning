@@ -10,11 +10,12 @@ return new class extends Migration
      * Run the migrations.
      */
      public function up(): void {
-        Schema::create('kelas', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_kelas');
-            $table->timestamps();
-        });
+       Schema::create('kelas', function (Blueprint $table) {
+    $table->id();
+    $table->string('nama_kelas');
+    $table->foreignId('wali_kelas')->constrained('gurus')->onDelete('cascade');
+    $table->timestamps();
+});
     }
 
     public function down(): void {

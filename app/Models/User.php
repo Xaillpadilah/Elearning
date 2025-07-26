@@ -18,11 +18,12 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role', // penting! pastikan role bisa diisi
-    ];
+    'name',
+    'email',
+    'nisn',
+    'password',
+    'role',
+];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -64,4 +65,16 @@ class User extends Authenticatable
     {
         return $this->hasOne(Orangtua::class);
     }
+    public function user()
+{
+    return $this->belongsTo(User::class);
+}
+public function pengumumen()
+{
+    return $this->hasMany(Pengumuman::class, 'dibuat_oleh');
+}
+public function GuruMapelKelas()
+{
+    return $this->hasMany(GuruMapelKelas::class, 'guru_id');
+}
 }

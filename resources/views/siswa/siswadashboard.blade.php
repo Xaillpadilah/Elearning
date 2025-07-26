@@ -241,27 +241,30 @@
 <div class="sidebar" id="sidebar">
   <h2>E-LEARNING</h2>
   <ul>
-    <li><a href="{{ route('siswa.dashboard') }}" class="{{ request()->routeIs('siswa.dashboard') ? 'active' : '' }}">🏠 Beranda</a></li>
-    <li>
-      <a href="javascript:void(0)" onclick="toggleMapel()" class="{{ request()->routeIs('siswa.matapelajaran.show') ? 'active' : '' }}">📚 Mata Pelajaran</a>
-      <ul id="sub-mapel" class="sub-mapel" style="{{ request()->routeIs('siswa.matapelajaran.show') ? 'display:block' : '' }}">
-        @forelse($mataPelajaran ?? [] as $mapel)
-          <li><a href="{{ route('siswa.matapelajaran.show', $mapel['id']) }}" class="{{ request()->routeIs('siswa.matapelajaran.show') && request()->route('id') == $mapel['id'] ? 'active' : '' }}">📘 {{ $mapel['nama'] }}</a></li>
-        @empty
-          <li><em>Tidak ada pelajaran</em></li>
-        @endforelse
-      </ul>
-    </li>
-    <li><a href="{{ route('siswa.absensi') }}" class="{{ request()->routeIs('siswa.absensi') ? 'active' : '' }}">📸 Absensi</a></li>
-    <li><a href="{{ route('siswa.nilai') }}" class="{{ request()->routeIs('siswa.nilai') ? 'active' : '' }}">📊 Nilai Akhir</a></li>
+    <li><a href="{{ route('siswa.siswadashboard') }}" class="{{ request()->routeIs('siswa.siswadashboard') ? 'active' : '' }}">🏠 Beranda</a></li>
+  <li>
+ <li>
+  <a href="javascript:void(0)" onclick="toggleMapel()">📚 Mata Pelajaran</a>
+  <ul id="sub-mapel" class="sub-mapel" style="{{ request()->routeIs('siswa.mapel.index') || request()->routeIs('siswa.mapel.show') ? 'display:block' : 'display:none' }}">
+    @foreach($mapels as $m)
+      <li>
+        <a href="{{ route('siswa.mapel.index', $m->id) }}"
+           class="{{ request()->routeIs('siswa.mapel.index') && request()->route('id') == $m->id ? 'active' : '' }}">
+           {{ $m->kode_mapel }} - {{ $m->nama_mapel }}
+        </a>
+      </li>
+    @endforeach
   </ul>
+ <li><a href="{{ route('siswa.absensi.index') }}"> Absensi</a></li>
+  <li><a href="{{ route('siswa.nilai.index') }}"> Nilai</a></li>
+   </ul>
 </div>
 
 <!-- Konten Utama -->
 <div class="main" id="main-content">
   <div class="header">
     <button class="fullscreen-btn" onclick="toggleFullscreenDashboard()">☰</button>
-    <div class="user">👤 {{ $user->name ?? 'Nama Siswa' }}</div>
+ <div class="user">👤 {{ Auth::user()->name ?? 'Nama Siswa' }}</div>
   </div>
 
   <div class="info-frame">
@@ -269,50 +272,6 @@
     <p>Selamat datang di platform E-Learning! Silakan cek jadwal dan tugas Anda secara berkala.</p>
   </div>
 
-  <div class="cards">
-    <div class="card">
-      <img src="{{ asset('assets/image/hariini.png') }}" alt="Jadwal Hari Ini">
-      <div class="card-title">Jadwal Hari Ini <span class="kelas">{{ $jadwalHariIni }} KELAS</span></div>
-      <p>Silakan klik tombol “Lihat lebih” untuk melihat detail jadwal hari ini.</p>
-      <a href="{{ route('siswa.fitur.jadwal.hariini') }}"><button>LIHAT LEBIH</button></a>
-    </div>
-
-    <div class="card">
-      <img src="{{ asset('assets/image/jadwalini.png') }}" alt="Tugas Hari Ini">
-      <div class="card-title">Tugas Hari Ini <span class="kelas">{{ $tugasHariIni }} TUGAS</span></div>
-      <p>Cek dan kerjakan tugas yang diberikan hari ini agar tidak tertinggal.</p>
-      <a href="{{ route('siswa.fitur.tugas.hariini') }}"><button>LIHAT TUGAS</button></a>
-    </div>
-
-    <div class="card">
-      <img src="{{ asset('assets/image/selanjutnya.png') }}" alt="Pelajaran Selanjutnya">
-      <div class="card-title">Pelajaran Selanjutnya <span class="kelas">{{ $pelajaranSelanjutnya['jam'] }}</span></div>
-      <p>Pelajaran berikutnya adalah {{ $pelajaranSelanjutnya['mapel'] }}.</p>
-      <a href="{{ route('siswa.fitur.pelajaran.selanjutnya') }}"><button>LIHAT DETAIL</button></a>
-    </div>
-
-    <div class="card">
-      <img src="{{ asset('assets/image/jadwal mingguan.png') }}" alt="Nilai Terbaru">
-      <div class="card-title">Nilai Terbaru <span class="kelas">{{ $nilaiTerbaru['mapel'] }}</span></div>
-      <p>Nilai terbaru untuk pelajaran ini adalah <strong>{{ $nilaiTerbaru['nilai'] }}</strong>.</p>
-      <a href="{{ route('siswa.fitur.nilai.terbaru') }}"><button>LIHAT NILAI</button></a>
-    </div>
-
-    <div class="card">
-      <img src="{{ asset('assets/image/nilai.png') }}" alt="Jadwal Mingguan">
-      <div class="card-title">Jadwal Minggu Ini <span class="kelas">{{ $jadwalMingguan }} KELAS</span></div>
-      <p>Lihat ringkasan semua kelas yang akan kamu ikuti minggu ini.</p>
-      <a href="{{ route('siswa.fitur.jadwal.mingguan') }}"><button>LIHAT JADWAL</button></a>
-    </div>
-
-    <div class="card">
-      <img src="{{ asset('assets/image/tugas terbaru.png') }}" alt="Tugas Terbaru">
-      <div class="card-title">Tugas Terbaru <span class="kelas">{{ $tugasTerbaru['mapel'] }}</span></div>
-      <p>{{ $tugasTerbaru['judul'] }}</p>
-      <a href="{{ route('siswa.fitur.tugas.terbaru') }}"><button>LIHAT DETAIL</button></a>
-    </div>
-  </div>
-</div>
 
 <!-- Footer -->
 <footer id="footer">

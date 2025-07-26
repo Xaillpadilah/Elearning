@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Admin</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  @vite(['resources/css/app.css'])
+  @vite(['resources/css/adminguru.css'])
+
   <style>
+    /* ========== RESET & DASAR ========== */
     * { box-sizing: border-box; }
     body {
       margin: 0;
@@ -15,6 +17,7 @@
       min-height: 100vh;
     }
 
+    /* ========== SIDEBAR ========== */
     .sidebar {
       width: 250px;
       background: linear-gradient(to bottom, #ffffff, #e3f2fd);
@@ -23,31 +26,30 @@
       position: fixed;
       overflow-y: auto;
       box-shadow: 2px 0 8px rgba(0,0,0,0.05);
-      transition: transform 0.3s ease;
       z-index: 999;
+      transition: transform 0.3s ease;
     }
 
+    .sidebar.hidden { transform: translateX(-100%); }
+
     .sidebar h2 {
-      color: #4a148c;
       font-size: 24px;
       font-weight: 700;
+      color: #4a148c;
       margin-bottom: 35px;
     }
 
-    .sidebar ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .sidebar ul li {
-      margin: 14px 0;
-    }
+    .sidebar ul { list-style: none; padding: 0; }
 
     .sidebar ul li a {
-      display: flex; align-items: center; gap: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       padding: 10px 14px;
-      color: #222; text-decoration: none;
-      font-weight: 500; border-radius: 12px;
+      color: #222;
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 12px;
       transition: background 0.3s, color 0.3s;
     }
 
@@ -57,11 +59,37 @@
       color: #6a1b9a;
     }
 
+    .submenu {
+      list-style: none;
+      padding-left: 20px;
+      margin-top: 5px;
+      display: none;
+    }
+
+    .submenu.show { display: block; }
+
+    .submenu li a {
+      font-size: 14px;
+      display: block;
+      padding: 8px 12px;
+      border-radius: 8px;
+      color: #333;
+      text-decoration: none;
+    }
+
+    .submenu li a:hover {
+      background: #f0f0f0;
+      color: #4a148c;
+    }
+
+    /* ========== MAIN ========== */
     .main {
       margin-left: 270px;
       padding: 30px 40px 80px;
       transition: margin-left 0.3s ease;
     }
+
+    .main.fullwidth { margin-left: 0 !important; }
 
     .header {
       display: flex;
@@ -73,20 +101,20 @@
     .fullscreen-btn {
       background: linear-gradient(to right, #c5cae9, #b2ebf2);
       border: none;
-      color: #0d47a1;
       padding: 8px 16px;
       border-radius: 10px;
       font-weight: 500;
-      cursor: pointer;
       font-size: 16px;
+      cursor: pointer;
+      color: #0d47a1;
     }
 
     .user {
-      font-size: 14px;
       background: linear-gradient(to right, #c5cae9, #b2ebf2);
-      color: #0d47a1;
       padding: 6px 12px;
       border-radius: 8px;
+      color: #0d47a1;
+      font-size: 14px;
       font-weight: 500;
     }
 
@@ -99,6 +127,7 @@
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
 
+    /* ========== CARDS ========== */
     .cards .row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -114,18 +143,16 @@
 
     .card {
       color: #fff;
+      padding: 25px;
       border-radius: 15px;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-      padding: 25px;
-      transition: transform 0.3s ease;
       position: relative;
+      transition: transform 0.3s ease;
     }
 
-    .card:hover {
-      transform: translateY(-6px);
-    }
+    .card:hover { transform: translateY(-6px); }
 
-    .card .card-title {
+    .card-title {
       font-weight: 600;
       font-size: 18px;
       margin-bottom: 10px;
@@ -133,10 +160,10 @@
 
     .card::after {
       content: attr(data-icon);
-      font-size: 60px;
       position: absolute;
       bottom: 10px;
       right: 15px;
+      font-size: 60px;
       opacity: 0.1;
     }
 
@@ -146,108 +173,59 @@
     .card-orange { background: linear-gradient(135deg, #fb8c00, #ffe0b2); }
     .card-red    { background: linear-gradient(135deg, #e53935, #ef9a9a); }
 
+    /* ========== FOOTER ========== */
     footer {
       position: fixed;
       bottom: 0;
       left: 270px;
       width: calc(100% - 270px);
       background: #eceff1;
-      color: #333;
       padding: 12px 30px;
-      text-align: center;
       font-size: 14px;
+      text-align: center;
+      color: #333;
       transition: left 0.3s ease, width 0.3s ease;
     }
 
-    /* Responsif */
+    footer.fullwidth {
+      left: 0 !important;
+      width: 100% !important;
+    }
+
+    /* ========== RESPONSIVE ========== */
     @media (max-width: 1024px) {
-      .sidebar {
-        transform: translateX(-100%);
-      }
-
-      .sidebar.show {
-        transform: translateX(0);
-      }
-
-      .main {
-        margin-left: 0;
-      }
-
-      footer {
-        left: 0;
-        width: 100%;
-      }
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.show { transform: translateX(0); }
+      .main { margin-left: 0; }
+      footer { left: 0; width: 100%; }
     }
 
     @media (max-width: 768px) {
-      .cards .row,
-      .cards .row-two {
+      .cards .row, .cards .row-two {
         grid-template-columns: 1fr;
       }
     }
-    .sidebar.hidden {
-  transform: translateX(-100%);
-}
-
-.main.fullwidth {
-  margin-left: 0 !important;
-}
-
-footer.fullwidth {
-  left: 0 !important;
-  width: 100% !important;
-}
-.submenu {
-  list-style: none;
-  margin-left: 15px;
-  padding-left: 10px;
-  display: none;
-}
-
-.submenu li a {
-  font-size: 14px;
-  display: block;
-  padding: 8px 12px;
-  border-radius: 8px;
-  color: #333;
-  text-decoration: none;
-  transition: background 0.2s;
-}
-
-.submenu li a:hover {
-  background: #f0f0f0;
-  color: #4a148c;
-}
-
-.submenu.show {
-  display: block;
-}
   </style>
 </head>
+
 <body>
 
+<!-- SIDEBAR -->
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
   <h2>Dashboard Admin</h2>
   <ul>
     <li><a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">🏠 Dashboard</a></li>
-    <li>
-  <a href="#" onclick="toggleDropdown('submenu-guru')" class="{{ request()->routeIs('admin.guru*') ? 'active' : '' }}">
-    👨‍🏫 Data Guru ▼
-  </a>
-  <ul id="submenu-guru" class="submenu {{ request()->routeIs('admin.guru*') ? 'show' : '' }}">
-    <li><a href="{{ route('admin.guru') }}" class="{{ request()->routeIs('admin.guru') ? 'active' : '' }}">📋 Daftar Guru</a></li>
-    <li><a href="{{ route('admin.mapel.index') }}" class="{{ request()->routeIs('admin.mapel.index') ? 'active' : '' }}">📘 Materi Diajarkan</a></li>
-  </ul>
-</li>
-    <li><a href="{{ route('admin.siswa') }}" class="{{ request()->routeIs('admin.siswa') ? 'active' : '' }}">👥 Data Siswa</a></li>
-    <li><a href="{{ route('admin.kelas') }}" class="{{ request()->routeIs('admin.kelas') ? 'active' : '' }}">🏫 Kelas</a></li>
-    <li><a href="{{ route('admin.mapel.index') }}" class="{{ request()->routeIs('admin.mapel.index') ? 'active' : '' }}">📘 Mata Pelajaran</a></li>
-    <li><a href="{{ route('admin.pengumuman') }}" class="{{ request()->routeIs('admin.pengumuman') ? 'active' : '' }}">📢 Pengumuman</a></li>
+    <li><a href="{{ route('admin.guru') }}" class="{{ request()->routeIs('admin.guru') ? 'active' : '' }}">Data Guru</a></li>
+    <li><a href="{{ route('admin.siswa') }}" class="{{ request()->routeIs('admin.siswa') ? 'active' : '' }}">Data Siswa</a></li>
+    <li><a href="{{ route('admin.kelas') }}" class="{{ request()->routeIs('admin.kelas') ? 'active' : '' }}">Data Kelas Jadwal</a></li>
+    <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}">Materi Dan Konten</a></li>
+    <li><a href="{{ route('admin.pengumuman.index') }}" class="{{ request()->routeIs('admin.pengumuman.index') ? 'active' : '' }}">Pengumuman</a></li>
   </ul>
 </div>
 
-<!-- Main -->
+
+<!-- MAIN -->
 <div class="main" id="main-content">
   <div class="header">
     <button class="fullscreen-btn" onclick="toggleSidebar()" id="menuToggle">☰</button>
@@ -262,25 +240,14 @@ footer.fullwidth {
   <!-- Kartu Statistik -->
   <div class="cards">
     <div class="row">
-      <div class="card card-purple" data-icon="👨‍🏫">
-        <div class="card-title">Jumlah Guru</div>
-        <p>{{ $jumlahGuru }} Guru terdaftar.</p>
-      </div>
-      <div class="card card-blue" data-icon="👥">
-        <div class="card-title">Jumlah Siswa</div>
-        <p>{{ $jumlahSiswa }} Siswa aktif.</p>
-      </div>
-      <div class="card card-green" data-icon="🏫">
-        <div class="card-title">Jumlah Kelas</div>
-        <p>{{ $jumlahKelas }} Kelas tersedia.</p>
-      </div>
+      <div class="card card-purple" data-icon="👨‍🏫"><div class="card-title">Jumlah Guru</div><p>{{ $jumlahGuru }} Guru terdaftar.</p></div>
+      <div class="card card-blue" data-icon="👥"><div class="card-title">Jumlah Siswa</div><p>{{ $jumlahSiswa }} Siswa aktif.</p></div>
+      <div class="card card-green" data-icon="🏫"><div class="card-title">Jumlah Kelas</div><p>{{ $jumlahKelas }} Kelas tersedia.</p></div>
     </div>
     <div class="row row-two">
-      <div class="card card-orange" data-icon="📘">
-        <div class="card-title">Jumlah Mapel</div>
-        <p>{{ $jumlahMapel }} Mata pelajaran tersedia.</p>
-      </div>
      
+    </div>
+  </div>
 
   <!-- Grafik -->
   <div class="info-frame">
@@ -289,24 +256,26 @@ footer.fullwidth {
   </div>
 </div>
 
-<!-- Footer -->
-<footer id="footer">
-  &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN - Dashboard Admin.
-</footer>
+<!-- FOOTER -->
+<footer id="footer">&copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN - Dashboard Admin.</footer>
 
-<!-- Script -->
+<!-- SCRIPT -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
   function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.classList.toggle('show');
+    document.getElementById('sidebar').classList.toggle('hidden');
+    document.getElementById('main-content').classList.toggle('fullwidth');
+    document.getElementById('footer').classList.toggle('fullwidth');
+  }
+
+  function toggleDropdown(id) {
+    document.getElementById(id).classList.toggle('show');
   }
 
   document.addEventListener('click', function(event) {
     const sidebar = document.getElementById('sidebar');
     const toggle = document.getElementById('menuToggle');
-    const isClickInside = sidebar.contains(event.target) || toggle.contains(event.target);
-    if (!isClickInside && sidebar.classList.contains('show')) {
+    if (!sidebar.contains(event.target) && !toggle.contains(event.target) && sidebar.classList.contains('show')) {
       sidebar.classList.remove('show');
     }
   });
@@ -319,39 +288,17 @@ footer.fullwidth {
       datasets: [{
         label: 'Jumlah Data',
         data: @json($dataChart['jumlah']),
-        backgroundColor: [
-          '#7986cb', '#4dd0e1', '#aed581', '#ffcc80', '#e57373'
-        ],
+        backgroundColor: ['#7986cb', '#4dd0e1', '#aed581', '#ffcc80', '#e57373'],
         borderWidth: 1
       }]
     },
     options: {
       responsive: true,
       scales: {
-        y: {
-          beginAtZero: true,
-          ticks: { precision: 0 }
-        }
+        y: { beginAtZero: true, ticks: { precision: 0 } }
       }
     }
   });
-</script>
-<script>
-  function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const main = document.getElementById('main-content');
-    const footer = document.getElementById('footer');
-
-    sidebar.classList.toggle('hidden');
-    main.classList.toggle('fullwidth');
-    footer.classList.toggle('fullwidth');
-  }
-</script>
-<script>
-  function toggleDropdown(id) {
-    const submenu = document.getElementById(id);
-    submenu.classList.toggle('show');
-  }
 </script>
 </body>
 </html>

@@ -2,89 +2,124 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Materi;
+use App\Models\Mapel;
+use App\Models\Kelas;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Maatwebsite\Excel\Facades\Excel;
-use App\Imports\MateriImport;
-use App\Exports\MateriExport;
-use App\Models\Guru;
 
 class MateriController extends Controller
-{  public function index(Request $request)
+{
+    public function __construct()
     {
-        $search = $request->input('search');
-
-        $gurus = Guru::with('mapels')
-            ->when($search, function ($query, $search) {
-                return $query->where('nama', 'like', '%' . $search . '%');
-            })
-            ->get();
-
-        return view('admin.mapel.index', [
-            'gurus' => $gurus,
-            'search' => $search,
-            'user' => auth()->user(),
-        ]);
+        $this->middleware('checkRole:admin,guru');
     }
 
+    public function index()
+    {
+        $user = auth()->user();
+    $materis = Materi::with(['mapel', 'kelas', 'uploader'])->latest()->get();
+
+    if ($user->role === 'guru') {
+        // ambil mapel dan kelas berdasarkan relasi mengajar guru
+        $guru = \App\Models\Guru::where('user_id', $user->id)->first();
+        $mapels = $guru->mapels ?? collect(); // atau mapel_guru
+        $kelas = $guru->kelas ?? collect();   // atau kelas_guru
+    } else {
+        $mapels = \App\Models\Mapel::all();
+        $kelas = \App\Models\Kelas::all();
+    }
+
+    return view('materi.index', compact('materis', 'mapels', 'kelas'));
+}
     public function store(Request $request)
     {
         $request->validate([
-            'judul' => 'required',
-            'mapel' => 'required',
-            'kelas' => 'required',
-            'file'  => 'required|file|mimes:pdf,doc,docx,zip',
+            'judul' => 'required|string|max:255',
+            'mapel_id' => 'required|exists:mapels,id',
+            'kelas_id' => 'required|exists:kelas,id',
+            'tipe_konten' => 'required|in:file,video,link',
+            'file_upload' => 'nullable|file|max:10240',
+            'link' => 'nullable|url',
+            'deskripsi' => 'nullable|string',
         ]);
 
-        $path = $request->file('file')->store('materi');
+        $materi = new Materi();
+        $materi->judul = $request->judul;
+        $materi->mapel_id = $request->mapel_id;
+        $materi->kelas_id = $request->kelas_id;
+        $materi->tipe_konten = $request->tipe_konten;
+        $materi->deskripsi = $request->deskripsi;
+        $materi->uploaded_by = Auth::id();
 
-        Materi::create([
-            'judul'       => $request->judul,
-            'mapel'       => $request->mapel,
-            'kelas'       => $request->kelas,
-            'file'        => $path,
-            'uploaded_by' => auth()->id(),
-            'uploaded_at' => now(),
-        ]);
+        if (in_array($request->tipe_konten, ['file', 'video']) && $request->hasFile('file_upload')) {
+            $path = $request->file('file_upload')->store('materi', 'public');
+            $materi->file_path = $path;
+        }
 
-        return back()->with('success', 'Materi berhasil ditambahkan.');
+        if ($request->tipe_konten === 'link') {
+            $materi->link = $request->link;
+        }
+
+        $materi->save();
+
+        return redirect()->route('materi.index')->with('success', 'Materi berhasil ditambahkan.');
     }
 
-    public function update(Request $request, $id)
+    public function destroy($id)
     {
         $materi = Materi::findOrFail($id);
 
-        $request->validate([
-            'judul' => 'nullable',
-            'mapel' => 'nullable',
-            'kelas' => 'nullable',
-            'file'  => 'nullable|file|mimes:pdf,doc,docx,zip',
-        ]);
-
-        if ($request->hasFile('file')) {
-            Storage::delete($materi->file);
-            $materi->file = $request->file('file')->store('materi');
+        if ($materi->file_path && Storage::disk('public')->exists($materi->file_path)) {
+            Storage::disk('public')->delete($materi->file_path);
         }
 
-        $materi->judul = $request->judul ?? $materi->judul;
-        $materi->mapel = $request->mapel ?? $materi->mapel;
-        $materi->kelas = $request->kelas ?? $materi->kelas;
-        $materi->save();
+        $materi->delete();
 
-        return back()->with('success', 'Materi berhasil diperbarui.');
+        return redirect()->route('materi.index')->with('success', 'Materi berhasil dihapus.');
+    }
+    public function kirim($id)
+{
+    $materi = Materi::findOrFail($id);
+    $materi->status_kirim = true;
+    $materi->save();
+
+    return back()->with('success', 'Materi berhasil dikirim ke siswa.');
+}
+
+public function update(Request $request, $id)
+{
+    $materi = Materi::findOrFail($id);
+
+    $request->validate([
+        'judul' => 'required',
+        'mapel_id' => 'required',
+        'kelas_id' => 'required',
+        'tipe_konten' => 'required',
+        'deskripsi' => 'nullable',
+        'file_upload' => 'nullable|file|max:20480',
+        'link' => 'nullable|url',
+    ]);
+
+    $materi->judul = $request->judul;
+    $materi->mapel_id = $request->mapel_id;
+    $materi->kelas_id = $request->kelas_id;
+    $materi->tipe_konten = $request->tipe_konten;
+    $materi->deskripsi = $request->deskripsi;
+
+    if ($request->hasFile('file_upload')) {
+        $path = $request->file('file_upload')->store('materi', 'public');
+        $materi->file_path = $path;
     }
 
-    public function import(Request $request)
-    {
-        $request->validate(['file' => 'required|file|mimes:xlsx,csv']);
-        Excel::import(new MateriImport, $request->file('file'));
-        return back()->with('success', 'Data materi berhasil diimpor.');
+    if ($request->tipe_konten === 'link') {
+        $materi->link = $request->link;
     }
 
-    public function export()
-    {
-        return Excel::download(new MateriExport, 'materi.xlsx');
-    }
+    $materi->save();
+
+    return back()->with('success', 'Materi berhasil diperbarui.');
+}
 }

@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             MateriSeeder::class,
              GuruMapelSeeder::class,
                GuruMapelKelasSeeder::class,
+                TugasSeeder::class,
     ]);// ← tambahkan baris ini
     
 

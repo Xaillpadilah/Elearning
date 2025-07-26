@@ -3,29 +3,61 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Materi;
+use App\Models\Absensi;
+use App\Models\Tugas;
+use App\Models\Ujian;
 
 class GuruController extends Controller
 {
-    
-      public function index()
-    {
-        $user = auth()->user(); // ambil user login
+    /**
+     * Tampilkan dashboard guru
+     */
+    public function Dashboard()
+{
+    $user = auth()->user();
 
-        // Dummy data (sementara, nanti bisa diganti dari DB)
-        $jadwalHariIni = 3;
-        $daftarSiswa = 120;
-        $materiBaru = 5;
-        $tugasBaru = 4;
-        $pengumuman = 2;
+    // Ambil guru login
+    $guru = \App\Models\Guru::where('user_id', $user->id)->first();
 
-        return view('guru.dashboardguru', compact(
-            'user',
-            'jadwalHariIni',
-            'daftarSiswa',
-            'materiBaru',
-            'tugasBaru',
-            'pengumuman'
-        ));
+    // Jika tidak ditemukan
+    if (!$guru) {
+        abort(403, 'Guru tidak ditemukan');
     }
+
+    // Relasi guru
+    $relasi = \App\Models\GuruMapelKelas::with(['kelas', 'mapel'])
+        ->where('guru_id', $guru->id)
+        ->get();
+
+    $kelasIds = $relasi->pluck('kelas_id')->toArray();
+    $mapelIds = $relasi->pluck('mapel_id')->toArray();
+
+    // Ambil data ujian
+    $ujians = \App\Models\Ujian::with('relasi.kelas', 'relasi.mapel')
+        ->whereHas('relasi', function ($q) use ($guru) {
+            $q->where('guru_id', $guru->id);
+        })->latest()->take(3)->get();
+
+    // Ambil data tugas
+    $tugas = \App\Models\Tugas::with('relasi.kelas', 'relasi.mapel')
+        ->whereHas('relasi', function ($q) use ($guru) {
+            $q->where('guru_id', $guru->id);
+        })->latest()->take(3)->get();
+
+    // Ambil materi
+    $materis = \App\Models\Materi::with(['mapel', 'kelas'])
+        ->whereIn('mapel_id', $mapelIds)
+        ->whereIn('kelas_id', $kelasIds)
+        ->latest()->take(3)->get();
+
+    // Ambil absensi
+    $absensis = \App\Models\Absensi::with(['siswa', 'kelas', 'mapel'])
+        ->whereIn('mapel_id', $mapelIds)
+        ->whereIn('kelas_id', $kelasIds)
+        ->latest()->take(5)->get();
+
+    return view('guru.dashboardguru', compact('user', 'ujians', 'tugas', 'materis', 'absensis'));
 }
 
+}

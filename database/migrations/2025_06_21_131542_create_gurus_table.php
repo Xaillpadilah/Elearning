@@ -7,13 +7,13 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     public function up(): void
-{
-   
+    {
         Schema::create('gurus', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id'); // relasi ke users
             $table->string('nama');
             $table->string('nik')->unique();
+            $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']); // kolom baru untuk jenis kelamin
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

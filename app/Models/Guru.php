@@ -9,7 +9,7 @@ class Guru extends Model
 {
   use HasFactory;
 
-    protected $fillable = ['user_id', 'nama', 'nik'];
+    protected $fillable = ['user_id', 'nama', 'nik','jenis_kelamin',];
 
     public function user()
     {
@@ -29,4 +29,31 @@ class Guru extends Model
             ->withPivot('mapel_id')
             ->withTimestamps();
     }
+  public function mapelKelas()
+{
+    return $this->hasMany(GuruMapelKelas::class);
+}
+public function kelasWali()
+{
+    return $this->hasOne(Kelas::class, 'wali_kelas');
+}
+
+    public function materis()
+    {
+        return $this->hasMany(Materi::class);
+    }
+
+    public function tugas()
+    {
+        return $this->hasMany(Tugas::class);
+    }
+
+    public function ujians()
+    {
+        return $this->hasMany(Ujian::class);
+    }
+    public function pengumumen()
+{
+    return $this->hasMany(Pengumuman::class, 'dibuat_oleh');
+}
 }

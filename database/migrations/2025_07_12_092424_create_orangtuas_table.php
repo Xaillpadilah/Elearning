@@ -12,15 +12,19 @@ return new class extends Migration
     public function up(): void
     {
        Schema::create('orangtuas', function (Blueprint $table) {
-    $table->id();
-    $table->unsignedBigInteger('user_id')->unique();
-    $table->string('nama');
-    $table->string('no_hp')->nullable();
-    $table->string('alamat')->nullable();
-    $table->timestamps();
+        $table->id();
+        $table->string('nama');
+        $table->string('nomor_hp');
+        $table->unsignedBigInteger('user_id');
+        $table->unsignedBigInteger('siswa_id');
 
-    $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-});
+        $table->timestamps();
+
+        // Foreign keys
+        $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        $table->foreign('siswa_id')->references('id')->on('siswas')->onDelete('cascade');
+    });
+
     }
 
     public function down(): void

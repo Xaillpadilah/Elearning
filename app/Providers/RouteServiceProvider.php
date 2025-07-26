@@ -12,10 +12,6 @@ class RouteServiceProvider extends ServiceProvider
 {
     /**
      * The path to the "home" route for your application.
-     *
-     * Typically, users are redirected here after authentication.
-     *
-     * @var string
      */
     public const HOME = '/home';
 
@@ -24,6 +20,11 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Nonaktifkan semua rate limit global (hanya untuk pengembangan)
+        RateLimiter::for('global', function (Request $request) {
+            return Limit::none();
+        });
+
         $this->configureRateLimiting();
 
         $this->routes(function () {

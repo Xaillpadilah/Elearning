@@ -15,8 +15,9 @@ return new class extends Migration
         $table->id();
         $table->unsignedBigInteger('user_id');
         $table->string('nama');
-        $table->string('email')->nullable(); // HARUS ADA karena kita simpan email di sini
+        $table->string('email')->nullable(); 
         $table->string('nisn')->unique();
+        $table->enum('jenis_kelamin', ['Laki-laki', 'Perempuan']);
         $table->unsignedBigInteger('kelas_id');
         $table->timestamps();
 

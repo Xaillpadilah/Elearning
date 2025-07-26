@@ -18,7 +18,7 @@ class OrangtuaSeeder extends Seeder
         $user = User::create([
             'name' => 'Orang Tua',
             'email' => 'ortu@example.com',
-            'password' => Hash::make('ortu123'), // ✅ password
+            'password' => Hash::make('ortu123'), // password
             'role' => 'orangtua'
         ]);
 

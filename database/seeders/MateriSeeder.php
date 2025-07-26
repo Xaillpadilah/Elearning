@@ -2,39 +2,40 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use App\Models\Materi;
+use App\Models\Mapel;
+use App\Models\Kelas;
+use App\Models\Guru;
+use App\Models\User;
+use Illuminate\Support\Carbon;
+
 class MateriSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        Materi::create([
-            'judul' => 'Materi Matematika Dasar',
-            'mapel' => 'Matematika',
-            'kelas' => '7A',
-            'file' => 'matematika_dasar.pdf',
-            'uploaded_at' => now(),
-        ]);
+        // Ambil data relasi (pastikan data ini sudah di-seed sebelumnya)
+        $mapel = Mapel::first(); // ambil mapel pertama
+        $kelas = Kelas::first(); // ambil kelas pertama
+        $guru  = Guru::first();  // ambil guru pertama
+        $uploader = User::first(); // ambil user pertama (sebagai uploader)
+
+        // Jika salah satu tidak ada, hentikan seeder
+        if (!$mapel || !$kelas || !$guru || !$uploader) {
+            $this->command->warn("Seeder dibatalkan. Pastikan Mapel, Kelas, Guru, dan User sudah tersedia.");
+            return;
+        }
 
         Materi::create([
-            'judul' => 'Pengenalan IPA',
-            'mapel' => 'IPA',
-            'kelas' => '8B',
-            'file' => 'ipa_pengenalan.pdf',
-            'uploaded_at' => now(),
-        ]);
-
-        Materi::create([
-            'judul' => 'Bahasa Indonesia Menulis Puisi',
-            'mapel' => 'Bahasa Indonesia',
-            'kelas' => '9C',
-            'file' => 'bindo_puisi.pdf',
-            'uploaded_at' => now(),
+            'judul'       => 'Materi Pengantar Laravel',
+            'mapel'       => $mapel->nama_mapel, // jika kamu tetap pakai kolom 'mapel'
+            'kelas'       => $kelas->nama_kelas, // jika kamu tetap pakai kolom 'kelas'
+            'file'        => 'materi_pengantar_laravel.pdf',
+            'uploaded_at' => Carbon::now(),
+            'mapel_id'    => $mapel->id,
+            'kelas_id'    => $kelas->id,
+            'guru_id'     => $guru->id,
+            'uploaded_by' => $uploader->id,
         ]);
     }
 }
-

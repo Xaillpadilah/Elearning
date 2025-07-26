@@ -21,9 +21,16 @@ use Illuminate\Support\Facades\Storage;
 use App\Models\Pengumuman;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use App\Models\Mapel;
+use Illuminate\Support\Facades\DB;
+use App\Models\Orangtua;
+use App\Models\Jadwal; 
+use Illuminate\Support\Facades\Auth;
+
 
 class AdminController extends Controller
 {
+  
      // Dashboard Admin
      public function dashboard()
     {
@@ -32,12 +39,12 @@ class AdminController extends Controller
     $jumlahGuru = Guru::count();
     $jumlahSiswa = Siswa::count();
     $jumlahKelas = Kelas::count();
-    $jumlahMapel = Materi::distinct('mapel')->count('mapel');
+ 
     // $jumlahPengumuman = Pengumuman::count();
 
     $dataChart = [
         'labels' => ['Guru', 'Siswa', 'Kelas', 'Mapel', 'Pengumuman'],
-        'jumlah' => [$jumlahGuru, $jumlahSiswa, $jumlahKelas, $jumlahMapel, ],
+        'jumlah' => [$jumlahGuru, $jumlahSiswa, $jumlahKelas, ],
     ];
 
     return view('admin.dashboard', compact(
@@ -45,137 +52,238 @@ class AdminController extends Controller
         'jumlahGuru',
         'jumlahSiswa',
         'jumlahKelas',
-        'jumlahMapel',
+      
     
         'dataChart'
     ));
 }
 //guru
-  public function guruIndex(Request $request)
-{
-    $search = $request->input('search');
+public function guruindex(Request $request)
+    {
+        $search = $request->input('search');
 
-    $gurus = Guru::with(['user', 'mapels']) // << penting
-        ->when($search, function ($query, $search) {
-            return $query->where('nama', 'like', "%{$search}%")
-                         ->orWhere('nik', 'like', "%{$search}%");
-        })
-        ->get();
+        $gurus = Guru::with(['user', 'mapelKelas.mapel', 'mapelKelas.kelas'])
+            ->when($search, function ($query, $search) {
+                return $query->where('nama', 'like', "%{$search}%")
+                             ->orWhere('nik', 'like', "%{$search}%");
+            })
+            ->get()
+            ->map(function ($guru) {
+                // Format agar cocok untuk Blade
+                $guru->mapel_kelas = $guru->mapelKelas->map(function ($mk) {
+                    return [
+                        'mapel_nama' => $mk->mapel->nama_mapel ?? '-',
+                        'kelas_id' => $mk->kelas->nama_kelas ?? '-',
+                    ];
+                });
+                return $guru;
+            });
 
-    return view('admin.guru.index', compact('gurus', 'search'));
-}
-public function guruStore(Request $request)
-{
-    $request->validate([
-        'nama' => 'required',
-        'nik' => 'required|unique:gurus,nik',
-        'email' => 'required|email|unique:users,email',
-        'mengajar' => 'nullable',
-    ]);
+        $mapels = Mapel::all();
+        $kelas = Kelas::all();
 
-    // Buat akun user guru
-    $user = User::create([
-        'name' => $request->nama,
-        'email' => $request->email,
-        'password' => bcrypt('password'), // Default password
-        'role' => 'guru',
-    ]);
+        return view('admin.guru.index', compact('gurus', 'mapels', 'kelas', 'search'));
+    }
 
-    // Buat data guru
-    Guru::create([
-        'user_id' => $user->id,
-        'nama' => $request->nama,
-        'nik' => $request->nik,
-        'mengajar' => $request->mengajar ?? '-',
-    ]);
+    public function gurustore(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            // 1. Simpan user
+            $user = User::create([
+                'name' => $request->nama,
+                'email' => $request->email,
+                'password' => Hash::make('gurusmp5cidaun'), // default password
+                'role' => 'guru',
+            ]);
 
-    return redirect()->route('admin.guru')->with('success', 'Guru berhasil ditambahkan.');
-}
+            // 2. Simpan guru
+            $guru = Guru::create([
+                'user_id' => $user->id,
+                'nama' => $request->nama,
+                'nik' => $request->nik,
+                'jenis_kelamin' => $request->jenis_kelamin,
+            ]);
 
-public function guruUpdate(Request $request, $id)
-{
-    $guru = Guru::findOrFail($id);
-    $user = $guru->user;
+            // 3. Simpan mapel_kelas (relasi pivot)
+            foreach ($request->pelajaran as $pel) {
+    if (!empty($pel['nama']) && !empty($pel['kelas_id'])) {
+        $mapelId = Mapel::where('nama_mapel', $pel['nama'])->value('id');
 
-    $request->validate([
-        'nama' => 'required',
-        'nik' => 'required|unique:gurus,nik,' . $guru->id,
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'mengajar' => 'nullable',
-    ]);
+        // Cek apakah kombinasi ini sudah ada
+        $existing = $guru->mapelKelas()
+            ->where('mapel_id', $mapelId)
+            ->where('kelas_id', $pel['kelas_id'])
+            ->first();
 
-    $guru->update([
-        'nama' => $request->nama,
-        'nik' => $request->nik,
-        'mengajar' => $request->mengajar ?? '-',
-    ]);
-
-    $user->update([
-        'name' => $request->nama,
-        'email' => $request->email,
-    ]);
-
-    return redirect()->route('admin.guru')->with('success', 'Data guru berhasil diperbarui.');
-}
-
-public function guruExport()
-{
-    return Excel::download(new GuruExport, 'data_guru.xlsx');
+        if (!$existing) {
+            $guru->mapelKelas()->create([
+                'mapel_id' => $mapelId,
+                'kelas_id' => $pel['kelas_id'],
+            ]);
+        }
+    }
 }
 
-public function guruImport(Request $request)
-{
-    $request->validate([
-        'file' => 'required|mimes:xlsx,xls',
-    ]);
+            DB::commit();
+            return redirect()->back()->with('success', 'Guru berhasil ditambahkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal menambahkan guru: ' . $e->getMessage());
+        }
+    }
 
-    Excel::import(new GuruImport, $request->file('file'));
+    public function guruupdate(Request $request, $id)
+    {
+        DB::beginTransaction();
+        try {
+            $guru = Guru::findOrFail($id);
+            $guru->update([
+                'nama' => $request->nama,
+                'nik' => $request->nik,
+                'jenis_kelamin' => $request->jenis_kelamin,
+            ]);
 
-    return redirect()->route('admin.guru')->with('success', 'Data guru berhasil diimpor.');
+            // Update user email
+            if ($guru->user) {
+                $guru->user->update(['email' => $request->email]);
+            }
+
+            // Hapus mapel_kelas lama dan buat ulang
+            $guru->mapelKelas()->delete();
+            foreach ($request->pelajaran as $pel) {
+    if (!empty($pel['nama']) && !empty($pel['kelas_id'])) {
+        $mapelId = Mapel::where('nama_mapel', $pel['nama'])->value('id');
+
+        // Cegah duplikat
+        $existing = $guru->mapelKelas()
+            ->where('mapel_id', $mapelId)
+            ->where('kelas_id', $pel['kelas_id'])
+            ->first();
+
+        if (!$existing) {
+            $guru->mapelKelas()->create([
+                'mapel_id' => $mapelId,
+                'kelas_id' => $pel['kelas_id'],
+            ]);
+        }
+    }
 }
+
+            DB::commit();
+            return redirect()->back()->with('success', 'Data guru berhasil diperbarui.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Gagal memperbarui data guru: ' . $e->getMessage());
+        }
+    }
+
+    public function gurudestroy($id)
+    {
+        try {
+            $guru = Guru::findOrFail($id);
+            $guru->mapelKelas()->delete();
+            $guru->user()->delete();
+            $guru->delete();
+
+            return redirect()->back()->with('success', 'Guru berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghapus guru: ' . $e->getMessage());
+        }
+    }
+
+    public function guruexport()
+    {
+        return Excel::download(new GuruExport, 'data_guru.xlsx');
+    }
+
+    public function guruimport(Request $request)
+    {
+        try {
+            Excel::import(new GuruImport, $request->file('file'));
+            return redirect()->back()->with('success', 'Data guru berhasil diimpor.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal impor data guru: ' . $e->getMessage());
+        }
+    }
+
+
     //siswa
-    public function indexSiswa(Request $request)
+   public function indexSiswa(Request $request)
 {
     $search = $request->input('search');
 
-    $siswas = Siswa::with(['kelas', 'user'])
+    $siswas = Siswa::with(['kelas', 'user', 'orangtua']) 
         ->when($search, function ($query) use ($search) {
-            $query->where('nama', 'like', "%$search%")
+            $query->where(function ($q) use ($search) {
+                $q->where('nama', 'like', "%$search%")
                   ->orWhere('nisn', 'like', "%$search%");
+            });
         })
+        ->orderBy('nama')
         ->get();
 
-    $kelas = Kelas::all(); // variabel benar: $kelas
+    $kelas = Kelas::all();
 
     return view('admin.siswa.index', compact('siswas', 'kelas'));
 }
-
+//siswa
 public function storeSiswa(Request $request)
 {
     $request->validate([
-        'nama' => 'required|string',
-        'nisn' => 'required|string|unique:siswas,nisn',
+        'nama' => 'required',
+       'nisn' => 'required|digits_between:8,10|unique:siswas',
+        'kelas_id' => 'required',
         'email' => 'required|email|unique:users,email',
-        'kelas_id' => 'required|exists:kelas,id',
-        'password' => 'required|min:6',
+        'jenis_kelamin' => 'required',
+        'nama_ortu' => 'required',
+        'nomor_hp' => 'required',
     ]);
 
-    $user = User::create([
-        'name' => $request->nama,
-        'email' => $request->email,
-        'password' => Hash::make($request->password),
-        'role' => 'siswa',
-    ]);
+    \DB::beginTransaction();
+    try {
+        // 1. Buat akun user siswa
+        $userSiswa = User::create([
+            'name' => $request->nama,
+            'email' => $request->email,
+            'role' => 'siswa',
+            'password' => Hash::make('smp5siswa'),
+        ]);
 
-    Siswa::create([
-        'user_id' => $user->id,
-        'nama' => $request->nama,
-        'email' => $request->email, // WAJIB ADA
-        'nisn' => $request->nisn,
-        'kelas_id' => $request->kelas_id,
-    ]);
+        // 2. Buat data siswa
+       $siswa = Siswa::create([
+    'nama' => $request->nama,
+    'nisn' => $request->nisn,
+    'kelas_id' => $request->kelas_id,
+    'jenis_kelamin' => $request->jenis_kelamin,
+    'user_id' => $userSiswa->id,
 
-    return redirect()->route('admin.siswa')->with('success', 'Siswa berhasil ditambahkan.');
+        ]);
+
+             // 3. Buat akun user orangtua
+            $userOrtu = User::create([
+                'name' => $request->nama_ortu,
+                'email' => $request->nisn . '@ortu.local', // Email dummy
+                'role' => 'orangtua',
+                'password' => Hash::make('smp5orangtuasiswa'),
+            ]);
+
+            // 4. Buat data orangtua dan kaitkan ke siswa
+            $orangtua = $orangtua = Orangtua::create([
+                'nama' => $request->nama_ortu,
+                'user_id' => $userOrtu->id,
+                'nomor_hp' => $request->nomor_hp,
+                'siswa_id' => $siswa->id,
+            ]);
+
+        \DB::commit();
+
+        return redirect()->back()->with('success', 'Data siswa dan orang tua berhasil ditambahkan.');
+
+    } catch (\Exception $e) {
+        \DB::rollBack();
+        return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+    }
 }
     // Import siswa dari file Excel
     public function importSiswa(Request $request)
@@ -196,66 +304,92 @@ public function storeSiswa(Request $request)
     }
 
     // Mengupdate data siswa
-    public function updateSiswa(Request $request, $id)
-    {
-        $siswa = Siswa::findOrFail($id);
-        $user = $siswa->user;
+ public function updateSiswa(Request $request, $id)
+{
+    // Ambil data siswa yang akan diupdate
+    $siswa = Siswa::findOrFail($id);
 
-        $request->validate([
-            'nama' => 'required|string',
-            'nisn' => 'required|string|unique:siswas,nisn,' . $siswa->id,
-            'email' => 'required|email|unique:users,email,' . $user->id,
-            'kelas_id' => 'required|exists:kelas,id',
-        ]);
+    // Validasi input
+    $request->validate([
+        'nama' => 'required',
+        'nisn' => 'required|digits_between:8,10|unique:siswas,nisn,' . $siswa->id,
+        'kelas_id' => 'required',
+        'email' => 'required|email|unique:users,email,' . $siswa->user_id,
+        'jenis_kelamin' => 'required',
+        'nama_ortu' => 'required',
+        'nomor_hp' => 'required',
+    ]);
 
-        $user->update([
-            'name' => $request->nama,
-            'email' => $request->email,
-        ]);
+    // Update user
+    $user = $siswa->user;
+    $user->email = $request->email;
+    $user->save();
 
-        $siswa->update([
-            'nama' => $request->nama,
-            'nisn' => $request->nisn,
-            'kelas_id' => $request->kelas_id,
-        ]);
+    // Update orangtua
+    $orangtua = $siswa->orangtua;
+    $orangtua->nama = $request->nama_ortu;
+    $orangtua->nomor_hp = $request->nomor_hp;
+    $orangtua->save();
 
-        return redirect()->route('admin.siswa')->with('success', 'Siswa berhasil diperbarui.');
-    }
+    // Update siswa
+    $siswa->update([
+        'nama' => $request->nama,
+        'nisn' => $request->nisn,
+        'kelas_id' => $request->kelas_id,
+        'jenis_kelamin' => $request->jenis_kelamin,
+    ]);
+
+    return redirect()->back()->with('success', 'Data siswa berhasil diperbarui.');
+}
 
     // Menghapus data siswa
     public function destroySiswa($id)
     {
-        $siswa = Siswa::findOrFail($id);
-        $user = $siswa->user;
+       $siswa = Siswa::with('user', 'orangtua')->findOrFail($id);
 
+        // Hapus orangtua
+        if ($siswa->orangtua) {
+            $siswa->orangtua->delete();
+        }
+
+        // Hapus user
+        if ($siswa->user) {
+            $siswa->user->delete();
+        }
+
+        // Hapus siswa
         $siswa->delete();
-        if ($user) $user->delete();
 
-        return redirect()->route('admin.siswa')->with('success', 'Siswa berhasil dihapus.');
+        return redirect()->back()->with('success', 'Data siswa berhasil dihapus.');
     }
 
 
 //kelas
    public function indexkelas(Request $request)
-    {
-        $search = $request->search;
-        $kelas = Kelas::when($search, function ($query, $search) {
+{
+    $search = $request->search;
+  $kelas = Kelas::with('guru')->get(); // jika ada relasi ke guru
+    $gurus = Guru::all(); // ambil semua guru
+    $kelas = Kelas::withCount('siswas') // menghitung otomatis jumlah siswa
+        ->when($search, function ($query, $search) {
             $query->where('nama_kelas', 'like', "%$search%")
                   ->orWhere('wali_kelas', 'like', "%$search%");
-        })->get();
+        })
+        ->get();
 
-        return view('admin.kelas.index', compact('kelas', 'search'));
-    }
-
+    return view('admin.kelas.index', compact('kelas', 'search', 'gurus'));
+}
     public function storekelas(Request $request)
     {
-        $request->validate([
-            'nama_kelas' => 'required|string|max:255',
-            'wali_kelas' => 'required|string|max:255',
-            'jumlah_siswa' => 'required|integer|min:0',
-        ]);
+         $request->validate([
+        'nama_kelas' => 'required|string',
+        'wali_kelas' => 'required|exists:gurus,id', // pastikan ini ID guru
+    ]);
 
-        Kelas::create($request->all());
+    Kelas::create([
+        'nama_kelas' => $request->nama_kelas,
+        'wali_kelas' => $request->wali_kelas, // ini harus ID
+    ]);
 
         return redirect()->route('admin.kelas')->with('success', 'Kelas berhasil ditambahkan.');
     }
@@ -265,13 +399,23 @@ public function storeSiswa(Request $request)
         $request->validate([
             'nama_kelas' => 'required|string|max:255',
             'wali_kelas' => 'required|string|max:255',
-            'jumlah_siswa' => 'required|integer|min:0',
         ]);
 
         $kelas = Kelas::findOrFail($id);
-        $kelas->update($request->all());
+        $kelas->update([
+            'nama_kelas' => $request->nama_kelas,
+            'wali_kelas' => $request->wali_kelas,
+        ]);
 
         return redirect()->route('admin.kelas')->with('success', 'Kelas berhasil diperbarui.');
+    }
+
+    public function destroyKelas($id)
+    {
+        $kelas = Kelas::findOrFail($id);
+        $kelas->delete();
+
+        return redirect()->route('admin.kelas')->with('success', 'Data kelas berhasil dihapus.');
     }
 
     public function importkelas(Request $request)
@@ -289,131 +433,132 @@ public function storeSiswa(Request $request)
     {
         return Excel::download(new KelasExport, 'data_kelas.xlsx');
     }
-//mapel
-      public function indexmateri(Request $request)
+//jadwal
+     public function indexJadwal($kelas_id)
     {
-        $user = auth()->user();
-        $search = $request->input('search');
+        $kelas = Kelas::with('jadwals.mapel', 'jadwals.guru')->findOrFail($kelas_id);
+        $mapels = Mapel::all();
+        $gurus = Guru::all();
+        $jadwals = $kelas->jadwals;
 
-        $materi = Materi::when($search, function ($query, $search) {
-            return $query->where('judul', 'like', "%$search%")
-                         ->orWhere('mapel', 'like', "%$search%")
-                         ->orWhere('kelas', 'like', "%$search%");
-        })->latest()->get();
-
-        return view('admin.mapel.index', compact('materi', 'user', 'search'));
+        return view('admin.kelas.jadwal', compact('kelas', 'mapels', 'gurus', 'jadwals'));
     }
 
-    public function storemateri(Request $request)
+    // Menyimpan jadwal baru
+    public function storeJadwal(Request $request)
     {
         $request->validate([
-            'judul' => 'required|string|max:255',
-            'mapel' => 'required|string|max:255',
-            'kelas' => 'required|string|max:100',
-            'file'  => 'required|file|mimes:pdf,docx,ppt,pptx|max:2048',
+            'kelas_id' => 'required|exists:kelas,id',
+            'mapel_id' => 'required|exists:mapels,id',
+            'guru_id'  => 'required|exists:gurus,id',
+            'hari'     => 'required|string',
+            'jam'      => 'required|string',
+            'tipe_ruangan' => 'required|in:online,offline',
+            'ruangan'  => 'nullable|string',
         ]);
 
-        $path = $request->file('file')->store('mapel', 'public');
-
-        Materi::create([
-            'judul' => $request->judul,
-            'mapel' => $request->mapel,
-            'kelas' => $request->kelas,
-            'file'  => $path,
-            'uploaded_at' => now(),
+        Jadwal::create([
+            'kelas_id' => $request->kelas_id,
+            'mapel_id' => $request->mapel_id,
+            'guru_id'  => $request->guru_id,
+            'hari'     => $request->hari,
+            'jam'      => $request->jam,
+            'tipe_ruangan' => $request->tipe_ruangan,
+            'ruangan'  => $request->tipe_ruangan === 'online' ? $request->ruangan : ($request->ruangan ?? null),
         ]);
 
-        return redirect()->route('admin.mapel.index')->with('success', 'Materi berhasil ditambahkan.');
+        return redirect()->route('admin.kelas.jadwal', $request->kelas_id)->with('success', 'Jadwal berhasil ditambahkan.');
     }
-
-    public function updatemateri(Request $request, $id)
+     // Tampilkan data jadwal untuk diedit 
+      public function jadwalUpdate(Request $request, $id)
     {
-        $materi = Materi::findOrFail($id);
-
         $request->validate([
-            'judul' => 'required|string|max:255',
-            'mapel' => 'required|string|max:255',
-            'kelas' => 'required|string|max:100',
-            'file'  => 'nullable|file|mimes:pdf,docx,ppt,pptx|max:2048',
+            'kelas_id' => 'required',
+            'mapel_id' => 'required',
+            'guru_id' => 'required',
+            'hari' => 'required',
+            'jam' => 'required',
+            'tipe_ruangan' => 'required',
+            'ruangan' => 'nullable|string',
         ]);
 
-        if ($request->hasFile('file')) {
-            // Hapus file lama
-            if ($materi->file && Storage::disk('public')->exists($materi->file)) {
-                Storage::disk('public')->delete($materi->file);
-            }
+        $jadwal = Jadwal::findOrFail($id);
+        $jadwal->update($request->all());
 
-            $materi->file = $request->file('file')->store('materi', 'public');
-        }
-
-        $materi->update([
-            'judul' => $request->judul,
-            'mapel' => $request->mapel,
-            'kelas' => $request->kelas,
-            'file'  => $materi->file,
-        ]);
-
-        return redirect()->route('admin.mapel.index')->with('success', 'Materi berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Jadwal berhasil diupdate');
     }
 
-    public function importmateri(Request $request)
+    // ✅ Mengambil data untuk edit via AJAX
+    public function getJadwal($id)
     {
-        // Validasi dan baca file excel
-        // Gunakan Laravel Excel (maatwebsite/excel) jika sudah terpasang
-        return back()->with('info', 'Fitur impor materi belum diimplementasikan.');
+        $jadwal = Jadwal::findOrFail($id);
+        return response()->json($jadwal);
     }
 
-    public function exportmateri()
+    // Hapus jadwal
+    public function jadwalDestroy($id)
     {
-        // Gunakan Laravel Excel juga di sini jika sudah di-setup
-        return back()->with('info', 'Fitur ekspor materi belum diimplementasikan.');
+        $jadwal = Jadwal::findOrFail($id);
+        $jadwal->delete();
+
+        return redirect()->back()->with('success', 'Jadwal berhasil dihapus');
     }
-
-//pengumuman
-  public function indexpengumuman(Request $request)
+    
+//pengumuman 
+ public function pengumumanindex()
     {
-        $search = $request->input('search');
-
-        $pengumuman = Pengumuman::when($search, function ($query, $search) {
-            return $query->where('judul', 'like', "%$search%")
-                         ->orWhere('isi', 'like', "%$search%");
-        })->latest()->get();
-
-        return view('admin.pengumuman.index', compact('pengumuman', 'search'));
+        $pengumumen = Pengumuman::with('dibuat_oleh_user')->latest()->get();
+        return view('admin.pengumuman.index', compact('pengumumen'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'judul' => 'required',
-            'isi' => 'required',
-            'tujuan' => 'required|in:guru,siswa,orangtua',
-            'tanggal' => 'required|date',
+            'judul' => 'required|string|max:255',
+            'isi' => 'required|string',
+            'tanggal_pengumuman' => 'required|date',
+            'ditujukan_kepada' => 'required|in:semua,guru,siswa,orangtua',
         ]);
 
-        Pengumuman::create($request->all());
+        Pengumuman::create([
+            'judul' => $request->judul,
+            'isi' => $request->isi,
+            'tanggal_pengumuman' => $request->tanggal_pengumuman,
+            'ditujukan_kepada' => $request->ditujukan_kepada,
+            'dibuat_oleh' => Auth::id(),
+        ]);
 
-        return redirect()->route('admin.pengumuman')->with('success', 'Pengumuman berhasil ditambahkan.');
+        return redirect()->back()->with('success', 'Pengumuman berhasil ditambahkan.');
     }
 
-    public function editpengumuman($id)
+    public function pengumumanupdate(Request $request, $id)
     {
         $pengumuman = Pengumuman::findOrFail($id);
-        return view('admin.pengumuman.edit', compact('pengumuman'));
-    }
 
-    public function updatepengumuman(Request $request, $id)
-    {
         $request->validate([
-            'judul' => 'required',
-            'isi' => 'required',
-            'tujuan' => 'required|in:guru,siswa,orangtua',
-            'tanggal' => 'required|date',
+            'judul' => 'required|string|max:255',
+            'isi' => 'required|string',
+            'tanggal_pengumuman' => 'required|date',
+            'ditujukan_kepada' => 'required|in:semua,guru,siswa,orangtua',
         ]);
 
-        $pengumuman = Pengumuman::findOrFail($id);
-        $pengumuman->update($request->all());
+        $pengumuman->update([
+            'judul' => $request->judul,
+            'isi' => $request->isi,
+            'tanggal_pengumuman' => $request->tanggal_pengumuman,
+            'ditujukan_kepada' => $request->ditujukan_kepada,
+        ]);
 
-        return redirect()->route('admin.pengumuman')->with('success', 'Pengumuman berhasil diperbarui.');
+        return redirect()->back()->with('success', 'Pengumuman berhasil diperbarui.');
+    }
+
+    public function pengumumandestroy($id)
+    {
+        $pengumuman = Pengumuman::findOrFail($id);
+        $pengumuman->delete();
+
+        return redirect()->back()->with('success', 'Pengumuman berhasil dihapus.');
     }
 }
+
+

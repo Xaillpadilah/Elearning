@@ -16,7 +16,7 @@ class RedirectController extends Controller
             case 'guru':
                 return redirect()->route('guru.dashboard');
             case 'siswa':
-                return redirect()->route('siswa.dashboard');
+                return redirect()->route('siswa.siswadashboard');
             case 'orangtua':
                 return redirect()->route('orangtua.dashboard');
             default:

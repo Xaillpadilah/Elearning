@@ -7,9 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Siswa extends Model
 {
-    use HasFactory;
+        use HasFactory;
+  protected $table = 'siswas';
+    protected $fillable = ['nama', 'nisn', 'kelas_id', 'jenis_kelamin', 'nomor_hp', 'user_id', 'orangtua_id'];
 
-    protected $fillable = ['user_id', 'nama', 'nisn', 'kelas_id', 'email'];
 
     public function user()
     {
@@ -20,4 +21,30 @@ class Siswa extends Model
     {
         return $this->belongsTo(Kelas::class);
     }
+    public function orangtua()
+{
+    return $this->hasOne(Orangtua::class);
+}
+
+
+    public function jawaban_tugas()
+    {
+        return $this->hasMany(JawabanTugas::class);
+    }
+    public function rekapPembelajaran()
+{
+    return $this->hasMany(RekapPembelajaranBulanan::class);
+}
+public function rekapSemester()
+{
+    return $this->hasMany(RekapPembelajaranSemester::class);
+}
+  public function guru()
+    {
+        return $this->belongsTo(Guru::class, 'wali_kelas');
+    }
+    public function pengumumen()
+{
+    return $this->hasMany(Pengumuman::class, 'dibuat_oleh');
+}
 }

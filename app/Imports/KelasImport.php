@@ -12,10 +12,13 @@ class KelasImport implements ToModel
     *
     * @return \Illuminate\Database\Eloquent\Model|null
     */
-    public function model(array $row)
+   public function model(array $row)
     {
         return new Kelas([
-            //
+            'nama_kelas'     => $row['nama_kelas'],
+            'wali_kelas'     => $row['wali_kelas'],
+            'jumlah_siswa'   => $row['jumlah_siswa'],
         ]);
     }
 }
+    
