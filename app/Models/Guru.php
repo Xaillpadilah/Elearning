@@ -16,12 +16,6 @@ class Guru extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function mapels()
-    {
-        return $this->belongsToMany(Mapel::class, 'guru_mapel_kelas')
-            ->withPivot('kelas_id')
-            ->withTimestamps();
-    }
 
     public function kelas()
     {
@@ -55,5 +49,10 @@ public function kelasWali()
     public function pengumumen()
 {
     return $this->hasMany(Pengumuman::class, 'dibuat_oleh');
+}
+public function mapels()
+{
+    return $this->belongsToMany(Mapel::class, 'guru_mapel_kelas', 'guru_id', 'mapel_id')
+        ->withPivot('kelas_id');
 }
 }

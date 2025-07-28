@@ -23,4 +23,9 @@ class Absensi extends Model
     public function kelas() {
         return $this->belongsTo(Kelas::class);
     }
+    
+public function guru()
+{
+    return $this->belongsTo(\App\Models\Guru::class);
+}
 }

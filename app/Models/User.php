@@ -23,6 +23,7 @@ class User extends Authenticatable
     'nisn',
     'password',
     'role',
+    'kelas_id'
 ];
 
     /**
@@ -51,10 +52,7 @@ class User extends Authenticatable
         return $this->hasOne(Admin::class);
     }
 
-    public function guru()
-    {
-        return $this->hasOne(Guru::class);
-    }
+   
 
     public function siswa()
     {
@@ -76,5 +74,9 @@ public function pengumumen()
 public function GuruMapelKelas()
 {
     return $this->hasMany(GuruMapelKelas::class, 'guru_id');
+}
+public function guru()
+{
+    return $this->hasOne(\App\Models\Guru::class);
 }
 }

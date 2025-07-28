@@ -26,6 +26,9 @@ use App\Http\Controllers\UjianController;
 use App\Http\Controllers\SoalUjianController;
 use App\Http\Controllers\PenilaianController;
 use App\Http\Controllers\AbsensiController;
+use App\Http\Controllers\TugasSiswaController;
+use App\Http\Controllers\MateriSiswaController;
+use App\Http\Controllers\UjianSiswaController;
 // Welcome atau halaman awal
 Route::get('/', function () {
     return view('welcome');
@@ -57,26 +60,26 @@ Route::middleware(['auth', 'checkrole:guru'])->group(function () {
 Route::middleware(['auth', 'checkrole:orangtua'])->group(function () {
     Route::get('/dashboard-orangtua', [OrangtuaController::class, 'index'])->name('orangtua.dashboard');
 });
-// Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-// Dashboard Redirect by Role
-// Reset Password (tambahan agar route('password.request') tidak error)
-Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-// Tampilkan form reset password
-// Tampilkan form reset password
-Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
+    // Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+    // Dashboard Redirect by Role
+    // Reset Password (tambahan agar route('password.request') tidak error)
+    Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+    // Tampilkan form reset password
+    // Tampilkan form reset password
+    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
     ->middleware('guest')
     ->name('password.reset');
 
-Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
+    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
     ->middleware('guest')
     ->name('password.update');
 
-// Proses update password
-Route::get('/test-email', function () {
+    // Proses update password
+    Route::get('/test-email', function () {
     Mail::raw('Ini email uji coba dari Laravel ke Mailpit', function ($msg) {
         $msg->to('user@example.com')->subject('Email Test');
     });
@@ -84,7 +87,7 @@ Route::get('/test-email', function () {
     return 'Email berhasil dikirim ke Mailpit!';
 });
 //  Admin
-  Route::middleware(['auth', 'checkrole:admin'])->group(function () {
+    Route::middleware(['auth', 'checkrole:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 });
 
@@ -96,11 +99,6 @@ Route::middleware(['auth', 'checkrole:guru'])->group(function () {
 Route::middleware(['auth', 'checkrole:orangtua'])->group(function () {
     Route::get('/dashboard-orangtua', [OrangtuaController::class, 'index'])->name('orangtua.dashboard');
 });
-
-// siswa
-
-
-
 
 //tampilan sub dashboard
 Route::prefix('siswa/fitur')->middleware(['auth'])->name('siswa.fitur.')->group(function () {
@@ -118,7 +116,7 @@ Route::prefix('siswa/matapelajaran')->name('siswa.matapelajaran.')->group(functi
 });
 //Dashboard guru
 Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function () {
- Route::get('/guru/dashboard', [GuruController::class, 'dashboard'])->name('guru.dashboard');
+    Route::get('/guru/dashboard', [GuruController::class, 'dashboard'])->name('guru.dashboard');
 });
 
 
@@ -150,23 +148,18 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::post('/kelas/import', [AdminController::class, 'importkelas'])->name('admin.kelas.import');
     Route::get('/kelas/export', [AdminController::class, 'exportkelas'])->name('admin.kelas.export');
     Route::delete('/admin/kelas/{id}', [AdminController::class, 'destroyKelas'])->name('admin.kelas.destroy');
-
     //jadwal
     Route::get('/admin/kelas/{kelas_id}/jadwal', [AdminController::class, 'indexJadwal'])->name('admin.kelas.jadwal');
     Route::post('/admin/kelas/jadwal/store', [AdminController::class, 'storeJadwal'])->name('admin.kelas.jadwal.store');
     Route::put('/kelas/jadwal/{id}', [AdminController::class, 'jadwalUpdate'])->name('admin.kelas.jadwal.update');
     Route::get('/kelas/jadwal/{id}/edit', [AdminController::class, 'getJadwal'])->name('admin.kelas.jadwal.get');
     Route::delete('/kelas/jadwal/{id}', [AdminController::class, 'jadwalDestroy'])->name('admin.kelas.jadwal.destroy');
-    
-    //materi 
-    
     //pengumuman
     Route::get('/pengumuman', [AdminController::class, 'pengumumanindex'])->name('admin.pengumuman.index');
     Route::post('/pengumuman', [AdminController::class, 'store'])->name('admin.pengumuman.store');
     Route::put('/pengumuman/{id}', [AdminController::class, 'pengumumanupdate'])->name('admin.pengumuman.update');
     Route::delete('/pengumuman/{id}', [AdminController::class, 'pengumumandestroy'])->name('admin.pengumuman.destroy');
 });
-
 //orang tua
 Route::prefix('orangtua')->group(function () {
     Route::get('/dashboard', [OrangtuaController::class, 'index'])->name('orangtua.dashboard');
@@ -179,52 +172,44 @@ Route::prefix('orangtua')->group(function () {
     Route::get('/orangtua/komunikasi', [OrangtuaController::class, 'komunikasi'])->name('orangtua.komunikasi');
     Route::post('/orangtua/kirim-pesan', [OrangtuaController::class, 'kirimPesan'])->name('orangtua.kirimPesan');
 });
-
 //import
 Route::get('/cek-zip', function () {
     return class_exists('ZipArchive') ? 'ZipArchive aktif' : 'ZipArchive tidak ditemukan';
 });
 // Materi - Bisa diakses oleh admin dan guru
-
 Route::middleware(['auth', 'checkRole:admin,guru'])->group(function () {
     Route::get('/materi', [MateriController::class, 'index'])->name('materi.index');
     Route::post('/materi', [MateriController::class, 'store'])->name('materi.store');
     Route::delete('/materi/{id}', [MateriController::class, 'destroy'])->name('materi.destroy');
     Route::post('/admin/materi/{id}/kirim', [MateriController::class, 'kirim'])->name('materi.kirim');
-Route::put('/admin/materi/{id}', [MateriController::class, 'update'])->name('materi.update');
+    Route::put('/admin/materi/{id}', [MateriController::class, 'update'])->name('materi.update');
 });
-//crud siswaadmin 
-
+//tugas
 Route::middleware(['auth', 'checkRole:admin,guru'])->group(function () {
-Route::get('/guru/dashboard', [GuruController::class, 'Dashboard'])->name('guru.dashboardguru');
-    // Halaman daftar tugas
+    Route::get('/guru/dashboard', [GuruController::class, 'Dashboard'])->name('guru.dashboardguru');
     Route::get('/tugas', [TugasController::class, 'index'])->name('guru.tugas.index');
-
-    // Tambah tugas
     Route::post('/tugas', [TugasController::class, 'store'])->name('guru.tugas.store');
-
-    // Update tugas (pakai method POST atau PUT sesuai kebutuhan form edit)
     Route::put('/tugas/{id}', [TugasController::class, 'update'])->name('guru.tugas.update');
-Route::put('/guru/tugas/{id}/kirim', [TugasController::class, 'kirim'])->name('tugas.kirim');
-    // Hapus tugas
+    Route::put('/guru/tugas/{id}/kirim', [TugasController::class, 'kirim'])->name('tugas.kirim');
     Route::delete('/tugas/{id}', [TugasController::class, 'destroy'])->name('guru.tugas.destroy');
+    
 });
 
 // guru
-Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function () {
-Route::get('/guru/menu', [PembelajaranController::class, 'index'])->name('guru.menu');
+    Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function () {
+    Route::get('/guru/menu', [PembelajaranController::class, 'index'])->name('guru.menu');
 
 });
 Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function () {
-Route::get('/ujian', [UjianController::class, 'index'])->name('guru.ujian.index');
+    Route::get('/ujian', [UjianController::class, 'index'])->name('guru.ujian.index');
     Route::post('/ujian', [UjianController::class, 'store'])->name('guru.ujian.store');
     Route::delete('/ujian/{id}', [UjianController::class, 'destroy'])->name('guru.ujian.destroy');
     Route::put('/ujian/{id}', [UjianController::class, 'update'])->name('guru.ujian.update');
-Route::put('/guru/ujian/kirim/{id}', [UjianController::class, 'kirim'])->name('guru.ujian.kirim');
+    Route::put('/guru/ujian/kirim/{id}', [UjianController::class, 'kirim'])->name('guru.ujian.kirim');
 });
 //penilaina 
 Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function () {
-  Route::get('/nilai', [PenilaianController::class, 'index'])->name('guru.penilaian.index');
+    Route::get('/nilai', [PenilaianController::class, 'index'])->name('guru.penilaian.index');
     Route::get('/nilai/create', [PenilaianController::class, 'create'])->name('guru.penilaian.create');
     Route::post('/nilai', [PenilaianController::class, 'store'])->name('guru.penilaian.store');
     Route::get('/nilai/{id}/edit', [PenilaianController::class, 'edit'])->name('guru.penilaian.edit');
@@ -235,29 +220,42 @@ Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function ()
     Route::post('/store', [PenilaianController::class, 'store'])->name('store');
     Route::get('/guru/penilaian/form', [PenilaianController::class, 'formPartial'])->name('guru.penilaian._form');
     Route::put('/guru/penilaian/update-multiple', [PenilaianController::class, 'updateMultiple'])->name('guru.penilaian.updateMultiple');
-
-    // Form input nilai
-Route::get('/guru/nilai/input/{relasi_id}', [PenilaianController::class, 'create'])->name('penilaian.create');
-
-// Simpan nilai
-Route::post('/guru/nilai/simpan', [PenilaianController::class, 'store'])->name('penilaian.store');
-
+    Route::get('/guru/nilai/input/{relasi_id}', [PenilaianController::class, 'create'])->name('penilaian.create');
+    Route::post('/guru/nilai/simpan', [PenilaianController::class, 'store'])->name('penilaian.store');
 });
 Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function () {
-  Route::get('absensi', [AbsensiController::class, 'index'])->name('guru.absensi.index');
- Route::get('/absensi/create', [AbsensiController::class, 'create'])->name('guru.absensi.create');
+    Route::get('absensi', [AbsensiController::class, 'index'])->name('guru.absensi.index');
+    Route::get('/absensi/create', [AbsensiController::class, 'create'])->name('guru.absensi.create');
     Route::post('/absensi/store', [AbsensiController::class, 'store'])->name('guru.absensi.store');
     Route::post('/guru/absensi/update', [AbsensiController::class, 'update'])->name('guru.absensi.update');
 });
 //siswa
 Route::prefix('siswa')->middleware(['auth', 'checkRole:siswa'])->group(function () {
-     Route::get('/dashboard', [SiswaController::class, 'index'])->name('siswa.siswadashboard');
+    Route::get('/dashboard', [SiswaController::class, 'index'])->name('siswa.siswadashboard');
     Route::get('/mapel', [SiswaController::class, 'mapel'])->name('siswa.mapel.index');
-    Route::get('/mapel/{id}', [SiswaController::class, 'show'])->name('siswa.mapel.index');
-    Route::get('/siswa/mapel/{id}/materi', [SiswaController::class, 'materi'])->name('siswa.mapel.index');
-     Route::get('{id}/tugas', [SiswaController::class, 'tugas'])->name('tugas');
+Route::get('/siswa/mapel/{id}', [SiswaController::class, 'show'])->name('siswa.mapel.index');
+    Route::get('/siswa/materi/{id}', [SiswaController::class, 'materi'])->name('siswa.materi.index');
+    Route::get('/mapel/{id}/materi', [SiswaController::class, 'materi'])->name('siswa.mapel.index');
+    Route::get('{id}/tugas', [SiswaController::class, 'tugas'])->name('tugas');
     Route::get('{id}/ujian', [SiswaController::class, 'ujian'])->name('ujian');
     Route::get('{id}/video', [SiswaController::class, 'video'])->name('video');
     Route::get('/siswa/absensi', [SiswaController::class, 'absensi'])->name('siswa.absensi.index');
-       Route::get('/nilai', [SiswaController::class, 'nilai'])->name('siswa.nilai.index');
-    });
+    Route::get('/siswa/nilai', [SiswaController::class, 'nilai'])->name('siswa.nilai.index');
+
+   Route::get('/siswa/materi/popup/{id}', [SiswaController::class, 'materiByMapelPopup']);
+// routes/web.php
+Route::get('/siswa/materi/{id}', [SiswaController::class, 'materiByMapel'])->name('siswa.materi.index');
+Route::get('/tugas', [TugasSiswaController::class, 'index'])->name('siswa.tugas.index');
+     Route::get('/tugas', [TugasSiswaController::class, 'index'])->name('siswa.tugas.index');
+    Route::post('/tugas/{id}', [TugasSiswaController::class, 'submit'])->name('siswa.tugas.submit');
+
+ });
+ Route::middleware(['auth', 'checkRole:siswa'])->prefix('siswa')->group(function () {
+    Route::get('/absensi', [AbsensiController::class, 'absensiSiswa'])->name('siswa.absensi.index');
+    
+});
+Route::middleware(['auth', 'checkRole:siswa'])->prefix('siswa')->group(function () {
+Route::get('/siswa/materi', [MateriSiswaController::class, 'index'])->name('siswa.materi.index');
+Route::get('/siswa/materi/mapel/{mapel_id}', [MateriSiswaController::class, 'showByMapel'])->name('siswa.materi.mapel');
+Route::get('/siswa/ujian', [UjianSiswaController::class, 'index'])->name('siswa.ujian.index');
+});

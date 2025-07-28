@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nilai Siswa</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  @vite(['resources/css/dashboarsiswa.css'])
+  <style>
+    .container {
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Poppins', sans-serif;
+    overflow-x: auto;
+}
+
+.empty {
+    text-align: center;
+    color: #888;
+    font-size: 1.1rem;
+    padding: 30px 0;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+thead {
+    background-color: #4a90e2;
+    color: white;
+}
+
+thead th {
+    padding: 12px 16px;
+    font-weight: 600;
+    text-align: left;
+}
+
+tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f0f4fa;
+}
+
+tbody tr:hover {
+    background-color: #e1ebf7;
+}
+
+tbody td {
+    padding: 12px 16px;
+    color: #333;
+    font-size: 0.95rem;
+    vertical-align: top;
+}
+
+@media screen and (max-width: 768px) {
+    table, thead, tbody, th, td, tr {
+        display: block;
+    }
+
+    thead {
+        display: none;
+    }
+
+    tbody tr {
+        margin-bottom: 15px;
+        background: #fff;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 10px;
+    }
+
+    tbody td {
+        position: relative;
+        padding-left: 50%;
+    }
+
+    tbody td::before {
+        position: absolute;
+        top: 12px;
+        left: 16px;
+        width: 45%;
+        white-space: nowrap;
+        font-weight: bold;
+        color: #555;
+    }
+
+    tbody td:nth-of-type(1)::before { content: "Mata Pelajaran"; }
+    tbody td:nth-of-type(2)::before { content: "Guru"; }
+    tbody td:nth-of-type(3)::before { content: "Tugas"; }
+    tbody td:nth-of-type(4)::before { content: "Kuis"; }
+    tbody td:nth-of-type(5)::before { content: "UTS"; }
+    tbody td:nth-of-type(6)::before { content: "UAS"; }
+    tbody td:nth-of-type(7)::before { content: "Catatan"; }
+}
+  </style>
+</head>
+<body>
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+    <h2>E-LEARNING</h2>
+    <ul>
+        <li>
+            <a href="{{ route('siswa.siswadashboard') }}" 
+               class="{{ request()->routeIs('siswa.siswadashboard') ? 'active' : '' }}">
+                🏠 Beranda
+            </a>
+        </li>
+        <li>
+            <a href="javascript:void(0)" onclick="toggleMapel()">📚 Mata Pelajaran</a>
+            <ul id="sub-mapel" class="sub-mapel" style="{{ request()->routeIs('siswa.mapel.index') || request()->routeIs('siswa.mapel.show') ? 'display:block' : 'display:none' }}">
+                @foreach($mapels as $m)
+                    <li>
+                        <a href="{{ route('siswa.mapel.index', $m->id) }}"
+                           class="{{ request()->routeIs('siswa.mapel.index') && request()->route('id') == $m->id ? 'active' : '' }}">
+                            {{ $m->nama_mapel }}
+                        </a>
+                    </li>
+                @endforeach
+            </ul>
+        </li>
+        <li><a href="{{ route('siswa.absensi.index') }}" >📋 Absensi</a></li>
+        <li><a href="{{ route('siswa.nilai.index') }}"class="active">📊 Nilai</a></li>
+    </ul>
+</div>
+
+<!-- Main Content -->
+<div class="main" id="main-content">
+    <div class="header">
+        <button class="fullscreen-btn" onclick="toggleFullscreenDashboard()">☰</button>
+        <div class="user">👤 {{ Auth::user()->name ?? 'Nama Siswa' }}</div>
+    </div>
+
+   <div class="info-frame">
+    <h4>📊 Informasi Nilai</h4>
+    <p>Anda dapat melihat daftar nilai yang telah diberikan oleh guru. Pastikan semua data sesuai dengan hasil pembelajaran Anda.</p>
+</div>
+    <div class="container">
+        @if($penilaians->isEmpty())
+            <p class="empty">Tidak ada data nilai yang tersedia.</p>
+        @else
+            <table>
+                <thead>
+                    <tr>
+                        <th>Mata Pelajaran</th>
+                        <th>Tugas</th>
+                        <th>Kuis</th>
+                        <th>UTS</th>
+                        <th>UAS</th>
+                        <th>Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach($penilaians as $nilai)
+                        <tr>
+                            <td>{{ $nilai->mapel->nama_mapel ?? '-' }}</td>
+                            <td>{{ $nilai->nilai_tugas }}</td>
+                            <td>{{ $nilai->nilai_kuis }}</td>
+                            <td>{{ $nilai->nilai_uts }}</td>
+                            <td>{{ $nilai->nilai_uas }}</td>
+                            <td>{{ $nilai->catatan }}</td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        @endif
+    </div>
+    <footer id="footer">
+  &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN.
+</footer>
+
+    <script>
+    function toggleMapel() {
+        const el = document.getElementById("sub-mapel");
+        el.style.display = (el.style.display === "none" || el.style.display === "") ? "block" : "none";
+    }
+
+     function toggleFullscreenDashboard() {
+    document.getElementById('sidebar').classList.toggle('hidden');
+    document.getElementById('main-content').classList.toggle('fullscreen');
+    document.getElementById('footer').classList.toggle('fullscreen');
+  }
+</script>
+</body>
+</html>

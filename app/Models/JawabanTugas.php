@@ -7,15 +7,20 @@ use Illuminate\Database\Eloquent\Model;
 
 class JawabanTugas extends Model
 {
-    protected $fillable = ['tugas_id', 'siswa_id', 'jawaban', 'file'];
+    use HasFactory;
+
+  protected $fillable = [
+    'tugas_id', 'siswa_id', 'jawaban', 'file_jawaban', 'skor'
+];
 
     public function tugas()
     {
         return $this->belongsTo(Tugas::class);
     }
 
-    public function siswa()
+    public function user()
     {
-        return $this->belongsTo(Siswa::class);
+        return $this->belongsTo(User::class);
     }
 }
+

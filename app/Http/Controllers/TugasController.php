@@ -124,7 +124,8 @@ class TugasController extends Controller
 // ✅ Fungsi bantu ini diletakkan di dalam controller ini
     private function checkAksesGuru($tugas)
     {
-        $guru = Auth::user()->load('mapels');
+       $guru = Auth::user()->guru; // Ambil model Guru dari User yang login
+$mapels = $guru->mapels;    // Ambil relasi mapel dari Guru
         $allowedIds = $guru->mapelKelas->pluck('id')->toArray();
 
         if (!in_array($tugas->guru_mapel_kelas_id, $allowedIds)) {
@@ -133,16 +134,7 @@ class TugasController extends Controller
     }
 
     // ✅ Fungsi bantu untuk validasi dari form input (id langsung)
-    private function checkAksesGuruFromInput($guruMapelKelasId)
-    {
-        $guru = Auth::user()->load('mapelKelas');
-        $allowedIds = $guru->mapelKelas->pluck('id')->toArray();
 
-        if (!in_array($guruMapelKelasId, $allowedIds)) {
-            abort(403, 'Anda tidak memiliki akses untuk kelas-mapel ini.');
-        }
-        
-    }
      private function fisherYatesShuffle(array $array)
     {
         $n = count($array);

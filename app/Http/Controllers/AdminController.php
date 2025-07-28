@@ -232,7 +232,7 @@ public function storeSiswa(Request $request)
 {
     $request->validate([
         'nama' => 'required',
-       'nisn' => 'required|digits_between:8,10|unique:siswas',
+        'nisn' => 'required|digits_between:8,10|unique:siswas,nisn',
         'kelas_id' => 'required',
         'email' => 'required|email|unique:users,email',
         'jenis_kelamin' => 'required',
@@ -241,6 +241,7 @@ public function storeSiswa(Request $request)
     ]);
 
     \DB::beginTransaction();
+
     try {
         // 1. Buat akun user siswa
         $userSiswa = User::create([
@@ -248,38 +249,37 @@ public function storeSiswa(Request $request)
             'email' => $request->email,
             'role' => 'siswa',
             'password' => Hash::make('smp5siswa'),
+            'kelas_id' => $request->kelas_id,
         ]);
 
         // 2. Buat data siswa
-       $siswa = Siswa::create([
-    'nama' => $request->nama,
-    'nisn' => $request->nisn,
-    'kelas_id' => $request->kelas_id,
-    'jenis_kelamin' => $request->jenis_kelamin,
-    'user_id' => $userSiswa->id,
-
+        $siswa = Siswa::create([
+            'nama' => $request->nama,
+            'nisn' => $request->nisn,
+            'kelas_id' => $request->kelas_id,
+            'jenis_kelamin' => $request->jenis_kelamin,
+            'user_id' => $userSiswa->id,
         ]);
 
-             // 3. Buat akun user orangtua
-            $userOrtu = User::create([
-                'name' => $request->nama_ortu,
-                'email' => $request->nisn . '@ortu.local', // Email dummy
-                'role' => 'orangtua',
-                'password' => Hash::make('smp5orangtuasiswa'),
-            ]);
+        // 3. Buat akun user orangtua (email dummy)
+        $userOrtu = User::create([
+            'name' => $request->nama_ortu,
+            'email' => $request->nisn . '@ortu.local',
+            'role' => 'orangtua',
+            'password' => Hash::make('smp5orangtuasiswa'),
+        ]);
 
-            // 4. Buat data orangtua dan kaitkan ke siswa
-            $orangtua = $orangtua = Orangtua::create([
-                'nama' => $request->nama_ortu,
-                'user_id' => $userOrtu->id,
-                'nomor_hp' => $request->nomor_hp,
-                'siswa_id' => $siswa->id,
-            ]);
+        // 4. Buat data orangtua dan kaitkan ke siswa
+        Orangtua::create([
+            'nama' => $request->nama_ortu,
+            'user_id' => $userOrtu->id,
+            'nomor_hp' => $request->nomor_hp,
+            'siswa_id' => $siswa->id,
+        ]);
 
         \DB::commit();
 
         return redirect()->back()->with('success', 'Data siswa dan orang tua berhasil ditambahkan.');
-
     } catch (\Exception $e) {
         \DB::rollBack();
         return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());

@@ -20,7 +20,6 @@ class GuruController extends Controller
     // Ambil guru login
     $guru = \App\Models\Guru::where('user_id', $user->id)->first();
 
-    // Jika tidak ditemukan
     if (!$guru) {
         abort(403, 'Guru tidak ditemukan');
     }
@@ -33,31 +32,44 @@ class GuruController extends Controller
     $kelasIds = $relasi->pluck('kelas_id')->toArray();
     $mapelIds = $relasi->pluck('mapel_id')->toArray();
 
-    // Ambil data ujian
+    // Data ujian
     $ujians = \App\Models\Ujian::with('relasi.kelas', 'relasi.mapel')
         ->whereHas('relasi', function ($q) use ($guru) {
             $q->where('guru_id', $guru->id);
         })->latest()->take(3)->get();
 
-    // Ambil data tugas
+    // Data tugas
     $tugas = \App\Models\Tugas::with('relasi.kelas', 'relasi.mapel')
         ->whereHas('relasi', function ($q) use ($guru) {
             $q->where('guru_id', $guru->id);
         })->latest()->take(3)->get();
 
-    // Ambil materi
+    // Data materi
     $materis = \App\Models\Materi::with(['mapel', 'kelas'])
         ->whereIn('mapel_id', $mapelIds)
         ->whereIn('kelas_id', $kelasIds)
         ->latest()->take(3)->get();
 
-    // Ambil absensi
+    // Data absensi
     $absensis = \App\Models\Absensi::with(['siswa', 'kelas', 'mapel'])
         ->whereIn('mapel_id', $mapelIds)
         ->whereIn('kelas_id', $kelasIds)
         ->latest()->take(5)->get();
 
-    return view('guru.dashboardguru', compact('user', 'ujians', 'tugas', 'materis', 'absensis'));
-}
+    // ✅ Tambahkan pengumuman untuk guru
+    $pengumumen = \App\Models\Pengumuman::with('dibuat_oleh_user')
+        ->whereIn('ditujukan_kepada', ['guru', 'semua'])
+        ->latest()
+        ->take(5)
+        ->get();
 
+    return view('guru.dashboardguru', compact(
+        'user',
+        'ujians',
+        'tugas',
+        'materis',
+        'absensis',
+        'pengumumen' // Tambahkan ke compact
+    ));
+}
 }

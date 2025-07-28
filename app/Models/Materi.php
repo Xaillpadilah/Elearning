@@ -10,8 +10,9 @@ class Materi extends Model
    protected $table = 'materis';
 
     protected $fillable = [
-        'judul', 'mapel', 'kelas', 'file', 'uploaded_at',
-    ];
+    'mapel_id', 'kelas_id', 'judul', 'deskripsi', 'tipe_konten', 
+    'file_path', 'link', 'uploaded_by', 'status_kirim'
+];
     public function uploader()
 {
     return $this->belongsTo(User::class, 'uploaded_by');

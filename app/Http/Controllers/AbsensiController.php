@@ -123,4 +123,28 @@ public function update(Request $request)
 
     return redirect()->route('guru.absensi.index')->with('success', 'Absensi berhasil diperbarui.');
 }
+public function absensiSiswa()
+{
+    $user = Auth::user();
+
+    // Ambil data siswa berdasarkan user login
+    $siswa = Siswa::where('user_id', $user->id)->first();
+
+    if (!$siswa) {
+        abort(403, 'Siswa tidak ditemukan.');
+    }
+
+    // Ambil semua absensi milik siswa tersebut
+    $absensis = Absensi::with(['mapel', 'kelas', 'guru'])
+        ->where('siswa_id', $siswa->id)
+        ->orderBy('tanggal', 'desc')
+        ->get();
+
+    return view('siswa.absensi.index', [
+        'absensis' => $absensis,
+        'siswa' => $siswa,
+        'user' => $user,
+        'mapels' => \App\Models\Mapel::all()
+    ]);
+}
 }

@@ -41,4 +41,5 @@ public function siswa()
     {
         return $this->belongsTo(Guru::class, 'wali_kelas');
     }
+    
 }

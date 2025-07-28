@@ -5,234 +5,85 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Dashboard Siswa</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
-  @vite(['resources/css/app.css'])
+  @vite(['resources/css/dashboarsiswa.css'])
   <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(135deg, #e3f2fd, #f3e5f5, #e1f5fe);
-      display: flex;
-      min-height: 100vh;
-    }
+    
+.pengumuman-container {
+  margin-bottom: 10px;
+  background: #e3f2fd;
+  border: 1px solid #90caf9;
+  border-radius: 12px;
+  padding: 10px;
+}
 
-    .sidebar {
-      width: 250px;
-      background: linear-gradient(to bottom, #ffffff, #e3f2fd);
-      height: 100vh;
-      padding: 20px;
-      box-shadow: 2px 0 8px rgba(0,0,0,0.05);
-      position: fixed;
-      overflow-y: auto;
-      transition: transform 0.3s ease;
-    }
+.pengumuman-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  color: #1565c0;
+  font-weight: 600;
+}
 
-    .sidebar.hidden { transform: translateX(-100%); }
+#toggle-icon-semua {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
 
-    .sidebar h2 {
-      color: #4a148c;
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 35px;
-    }
+.pengumuman-container.open #toggle-icon-semua {
+  transform: rotate(180deg);
+}
 
-    .sidebar ul { list-style: none; padding: 0; }
-    .sidebar ul li { margin: 14px 0; }
+.pengumuman-box {
+  background: #fff;
+  border: 1px solid #bbdefb;
+  border-radius: 10px;
+  padding: 15px;
+  margin-top: 12px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
 
-    .sidebar ul li a {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 10px 14px;
-      color: #222;
-      text-decoration: none;
-      font-weight: 500;
-      border-radius: 12px;
-      transition: background 0.3s, color 0.3s;
-      background: transparent;
-    }
+.pengumuman-box h4 {
+  margin: 0;
+  color: #0d47a1;
+}
 
-    .sidebar ul li a:hover,
-    .sidebar ul li a.active {
-      background: linear-gradient(to right, #d1c4e9, #bbdefb);
-      color: #6a1b9a;
-    }
+.pengumuman-isi {
+  margin-top: 8px;
+}
 
-    .sub-mapel {
-      display: none;
-      margin-top: 10px;
-      margin-left: 12px;
-      border-left: 2px solid #e0e0e0;
-      padding-left: 10px;
-    }
+.tanggal {
+  font-size: 13px;
+  color: #777;
+  margin-top: 4px;
+}
+/* Pengaturan kontainer utama pengumuman */
+.pengumuman-container {
+  max-width: 1140px;
+  margin-bottom: 30px; /* jarak dari card di bawahnya */
+  font-size: 14px;
+}
 
-    .sub-mapel li a {
-      font-size: 14px;
-      padding: 6px 10px;
-      color: #444;
-      display: block;
-      border-radius: 8px;
-      transition: background 0.3s;
-    }
+/* Judul dalam pengumuman */
+.pengumuman-header h4 {
+  font-size: 15px;
+  margin-bottom: 1px;
+}
 
-    .sub-mapel li a:hover,
-    .sub-mapel li a.active {
-      background: linear-gradient(to right, #d1c4e9, #bbdefb);
-      color: #6a1b9a;
-    }
+/* Tanggal pengumuman */
+.pengumuman-box .tanggal {
+  font-size: 12px;
+  color: #777;
+  margin-bottom: 6px;
+}
 
-    .main {
-      margin-left: 270px;
-      flex: 1;
-      padding: 30px 40px 80px;
-      background: linear-gradient(to bottom right, #f3f4f6, #e0f7fa);
-      transition: margin-left 0.3s ease;
-    }
-
-    .main.fullscreen { margin-left: 0; }
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-
-    .header .fullscreen-btn {
-      background: linear-gradient(to right, #c5cae9, #b2ebf2);
-      border: none;
-      color: #0d47a1;
-      padding: 8px 16px;
-      border-radius: 10px;
-      font-weight: 500;
-      cursor: pointer;
-      font-size: 14px;
-      transition: background 0.3s ease;
-    }
-
-    .header .fullscreen-btn:hover {
-      background: linear-gradient(to right, #9fa8da, #80deea);
-    }
-
-    .user {
-      font-size: 14px;
-      background: linear-gradient(to right, #c5cae9, #b2ebf2);
-      color: #0d47a1;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-weight: 500;
-    }
-
-    .info-frame {
-      background: #ffffff;
-      border: 2px solid #c5cae9;
-      border-radius: 12px;
-      padding: 20px 25px;
-      margin-bottom: 30px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-    }
-
-    .info-frame h4 {
-      margin-top: 0;
-      font-size: 18px;
-      color: #4a148c;
-      margin-bottom: 10px;
-    }
-
-    .info-frame p {
-      margin: 0;
-      font-size: 14px;
-      color: #555;
-    }
-
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 25px;
-    }
-
-    .card {
-      background: linear-gradient(to bottom, #ffffff, #f8f9fa);
-      border-radius: 15px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
-      padding: 25px;
-      display: flex;
-      flex-direction: column;
-      transition: transform 0.3s ease;
-    }
-
-    .card:hover { transform: translateY(-5px); }
-
-    .card img {
-      width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .card-title {
-      font-weight: 600;
-      font-size: 18px;
-      color: #222;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .kelas {
-      background: linear-gradient(to right, #b2ebf2, #c5cae9);
-      color: #004d40;
-      font-size: 12px;
-      padding: 4px 10px;
-      border-radius: 50px;
-      font-weight: 500;
-    }
-
-    .card p {
-      font-size: 14px;
-      color: #555;
-      line-height: 1.5;
-      flex: 1;
-    }
-
-    .card a button {
-      margin-top: 16px;
-      background: linear-gradient(to right, #66bb6a, #43a047);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      font-size: 14px;
-      font-weight: 500;
-      border-radius: 10px;
-      cursor: pointer;
-      align-self: flex-start;
-      transition: background 0.3s ease;
-    }
-
-    .card a button:hover {
-      background: linear-gradient(to right, #388e3c, #2e7d32);
-    }
-
-    footer {
-      position: fixed;
-      bottom: 0;
-      left: 270px;
-      width: calc(100% - 270px);
-      background: #eceff1;
-      color: #333;
-      padding: 12px 30px;
-      text-align: center;
-      font-size: 14px;
-      transition: left 0.3s ease, width 0.3s ease;
-    }
-
-    .fullscreen footer {
-      left: 0;
-      width: 100%;
-    }
+/* Isi pengumuman */
+.pengumuman-isi p {
+  font-size: 13px;
+  margin: 0;
+  line-height: 1.4;
+}
+    
   </style>
 </head>
 <body>
@@ -250,13 +101,13 @@
       <li>
         <a href="{{ route('siswa.mapel.index', $m->id) }}"
            class="{{ request()->routeIs('siswa.mapel.index') && request()->route('id') == $m->id ? 'active' : '' }}">
-           {{ $m->kode_mapel }} - {{ $m->nama_mapel }}
+           {{ $m->nama_mapel }}
         </a>
       </li>
     @endforeach
   </ul>
- <li><a href="{{ route('siswa.absensi.index') }}"> Absensi</a></li>
-  <li><a href="{{ route('siswa.nilai.index') }}"> Nilai</a></li>
+ <li><a href="{{ route('siswa.absensi.index') }}">📋Absensi</a></li>
+  <li><a href="{{ route('siswa.nilai.index') }}"> 📊Nilai</a></li>
    </ul>
 </div>
 
@@ -272,6 +123,32 @@
     <p>Selamat datang di platform E-Learning! Silakan cek jadwal dan tugas Anda secara berkala.</p>
   </div>
 
+ 
+  <!-- Pengumuman -->
+  <div class="pengumuman-container">
+    <div class="pengumuman-title" onclick="toggleSemuaPengumuman()">
+      <h3> 📰  Pengumuman </h3>
+      <span id="toggle-icon-semua"></span>
+    </div>
+
+    <div id="pengumuman-list" style="display: none;">
+      @if($pengumumen->isEmpty())
+          <p>Tidak ada pengumuman saat ini.</p>
+      @else
+          @foreach($pengumumen as $p)
+              <div class="pengumuman-box">
+                  <div class="pengumuman-header">
+                      <h4>{{ $p->judul }}</h4>
+                  </div>
+                  <p class="tanggal">🗓️ {{ \Carbon\Carbon::parse($p->tanggal_pengumuman)->translatedFormat('d F Y') }}</p>
+                  <div class="pengumuman-isi">
+                      <p>{{ $p->isi }}</p>
+                  </div>
+              </div>
+          @endforeach
+      @endif
+    </div>
+  </div>
 
 <!-- Footer -->
 <footer id="footer">
@@ -288,6 +165,15 @@
     document.getElementById('sidebar').classList.toggle('hidden');
     document.getElementById('main-content').classList.toggle('fullscreen');
     document.getElementById('footer').classList.toggle('fullscreen');
+  }
+   function toggleSemuaPengumuman() {
+    const list = document.getElementById('pengumuman-list');
+    const container = document.querySelector('.pengumuman-container');
+    const icon = document.getElementById('toggle-icon-semua');
+
+    const isVisible = list.style.display === 'block';
+    list.style.display = isVisible ? 'none' : 'block';
+    container.classList.toggle('open', !isVisible);
   }
 </script>
 </body>
