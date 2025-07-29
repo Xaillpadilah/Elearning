@@ -133,7 +133,7 @@
 
         <div class="form-group">
             <input type="password" id="password" name="password" placeholder="Password" required>
-            <span class="toggle-password" onclick="togglePassword()">👁️</span>
+            <span class="toggle-password" onclick="togglePassword()">🔒</span>
         </div>
 
         <button type="submit">Login</button>
@@ -151,10 +151,10 @@
 
         if (passwordInput.type === "password") {
             passwordInput.type = "text";
-            toggleBtn.textContent = "🙈";
+            toggleBtn.textContent = "🔓";
         } else {
             passwordInput.type = "password";
-            toggleBtn.textContent = "👁️";
+            toggleBtn.textContent = "🔒";
         }
     }
 </script>

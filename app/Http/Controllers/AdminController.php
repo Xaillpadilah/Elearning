@@ -559,6 +559,45 @@ public function storeSiswa(Request $request)
 
         return redirect()->back()->with('success', 'Pengumuman berhasil dihapus.');
     }
+     public function profil()
+    {
+        $user = Auth::user();
+
+        return view('admin.profil', compact('user'));
+    }
+
+    // Update data profil admin
+    public function update(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        // Update data
+        $user->name = $request->name;
+        $user->email = $request->email;
+
+        // Cek jika ada upload foto baru
+        if ($request->hasFile('foto')) {
+            // Hapus foto lama jika ada
+            if ($user->foto && Storage::exists('public/' . $user->foto)) {
+                Storage::delete('public/' . $user->foto);
+            }
+
+            // Simpan foto baru
+            $fotoPath = $request->file('foto')->store('foto_admin', 'public');
+            $user->foto = $fotoPath;
+        }
+
+        $user->save();
+
+        return redirect()->route('admin.profil')->with('success', 'Profil berhasil diperbarui.');
+    }
+
 }
 
 

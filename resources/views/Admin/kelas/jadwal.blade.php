@@ -403,12 +403,18 @@
 <div class="sidebar">
   <h2>Dashboard Admin</h2>
   <ul>
-    <li><a href="{{ route('admin.dashboard') }}">🏠 Dashboard</a></li>
-    <li><a href="{{ route('admin.guru') }}">Data Guru</a></li>
-    <li><a href="{{ route('admin.siswa') }}">👥 Data Siswa</a></li>
-    <li><a href="{{ route('admin.kelas') }}" class="active">Data Kelas Jadwal</a></li>
-    <li><a href="{{ route('materi.index') }}">Materi Dan Konten</a></li>
-    <li><a href="{{ route('admin.pengumuman.index') }}">Pengumuman</a></li>
+    <li><a href="{{ route('admin.dashboard') }}"
+          class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">🏠 Dashboard</a></li>
+      <li><a href="{{ route('admin.guru') }}" class="{{ request()->routeIs('admin.guru') ? 'active' : '' }}">👨‍🏫 Data
+          Guru</a></li>
+      <li><a href="{{ route('admin.siswa') }}" class="{{ request()->routeIs('admin.siswa') ? 'active' : '' }}">🧑‍🎓
+          Data Siswa</a></li>
+      <li><a href="{{ route('admin.kelas') }}" class="{{ request()->routeIs('admin.kelas') ? 'active' : '' }}">📅 Data
+          Kelas Jadwal</a></li>
+      <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}">📚
+          Materi Dan Konten</a></li>
+      <li><a href="{{ route('admin.pengumuman.index') }}"
+          class="{{ request()->routeIs('admin.pengumuman.index') ? 'active' : '' }}">📢 Pengumuman</a></li>
   </ul>
 </div>
 

@@ -200,8 +200,7 @@
   <ul>
     <li><a href="{{ route('orangtua.dashboard') }}" class="{{ request()->routeIs('orangtua.dashboard') ? 'active' : '' }}">🏠 Dashboard</a></li>
     <li><a href="{{ route('orangtua.hasil') }}" class="{{ request()->routeIs('orangtua.hasil') ? 'active' : '' }}">📊 Hasil</a></li>
-    <li><a href="{{ route('orangtua.perkembangan') }}" class="{{ request()->routeIs('orangtua.perkembangan') ? 'active' : '' }}">📈 Perkembangan</a></li>
-    <li><a href="{{ route('orangtua.komunikasi') }}" class="{{ request()->routeIs('orangtua.komunikasi') ? 'active' : '' }}">💬 Komunikasi</a></li>
+    
   </ul>
 </div>
 
@@ -209,29 +208,48 @@
 <div class="main" id="main-content">
   <div class="header">
     <button class="fullscreen-btn" onclick="toggleFullscreenDashboard()">☰</button>
-    <div class="user">👨‍👩‍👧 {{ $user->name ?? 'Orang Tua' }}</div>
+<div class="user" onclick="document.getElementById('logout-form').submit();" style="cursor: pointer;">
+  👨‍👩‍👧 {{ $user->name }}
+</div>
+
+<form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+  @csrf
+</form>
+
+{{-- Nama anak --}}
+@if($siswa)
+    <div class="child"> Anak: {{ $siswa->nama }}</div>
+@endif
   </div>
   <div class="info-frame info-frame-kecil">
     <h4>👋 Selamat Datang</h4>
     <p>Anda dapat melihat perkembangan akademik dan aktivitas anak Anda di sini.</p>
   </div>
 
-<div class="info-container" style="margin-bottom: 20px;">
-  <button onclick="toggleInfo()" class="toggle-btn" style="padding: 8px 12px; background-color:rgb(77, 255, 166); border: none; border-radius: 4px; cursor: pointer;">
-    📢 Pengumuman Sekolah
-  </button>
+  <!-- Pengumuman -->
+  <div class="pengumuman-container">
+    <div class="pengumuman-title" onclick="toggleSemuaPengumuman()">
+      <h3> 📰  Pengumuman </h3>
+      <span id="toggle-icon-semua"></span>
+    </div>
 
-  <div id="infoFrame" class="info-frame p" style="background: #fff3e0; border: 1px solidrgb(20, 183, 204); margin-top: 10px; padding: 10px; transition: max-height 0.5s ease-out, opacity 0.5s;">
-    <h4></h4>
-    <ul style="margin: 0; padding-left: 20px;">
-      @foreach($pengumuman as $item)
-        <li>
-          <strong>{{ $item['tanggal'] }}:</strong> {{ $item['isi'] }}
-        </li>
-      @endforeach
-    </ul>
-  </div>
-</div>
+    <div id="pengumuman-list" style="display: none;">
+      @if($pengumumen->isEmpty())
+          <p>Tidak ada pengumuman saat ini.</p>
+      @else
+          @foreach($pengumumen as $p)
+              <div class="pengumuman-box">
+                  <div class="pengumuman-header">
+                      <h4>{{ $p->judul }}</h4>
+                  </div>
+                  <p class="tanggal">🗓️ {{ \Carbon\Carbon::parse($p->tanggal_pengumuman)->translatedFormat('d F Y') }}</p>
+                  <div class="pengumuman-isi">
+                      <p>{{ $p->isi }}</p>
+                  </div>
+              </div>
+          @endforeach
+      @endif
+    </div>
   <!-- Grafik dalam 1 baris -->
   <div class="info-frame">
     <h4>📊 Grafik Perkembangan Anak</h4>
@@ -251,28 +269,6 @@
     </div>
   </div>
 
-  <!-- Cards -->
- 
-    <div class="card-container">
-  <div class="card">
-    <div class="card-title">🗓️ Hasil</div>
-    <p>Monitor Hasil anak Anda setiap hari.</p>
-    <a href="{{ route('orangtua.hasil') }}"><button>Lihat Absensi</button></a>
-  </div>
-
-  <div class="card">
-    <div class="card-title">📚 Tugas Anak</div>
-    <p>Lihat Perkembangan anak Anda.</p>
-    <a href="{{ route('orangtua.perkembangan') }}"><button>Lihat Tugas</button></a>
-  </div>
-
-  <div class="card">
-    <div class="card-title">🕒 Komunikasi</div>
-    <p>Lihat Komunikasi dengan guru.</p>
-    <a href="{{ route('orangtua.komunikasi') }}"><button>Lihat Jadwal</button></a>
-  </div>
-</div>
-
 <!-- Footer -->
 <footer id="footer">
   &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN - Dashboard Orang Tua.
@@ -287,15 +283,8 @@
     
   }
 
-  const nilaiLabels = {!! json_encode(array_keys($nilaiAnak)) !!};
-  const nilaiData = {!! json_encode(array_values($nilaiAnak)) !!};
 
-  const kehadiranLabels = {!! json_encode(array_keys($kehadiran)) !!};
-  const kehadiranData = {!! json_encode(array_values($kehadiran)) !!};
-
-  const tugasLabels = {!! json_encode(array_keys($perkembanganTugas)) !!};
-  const tugasData = {!! json_encode(array_values($perkembanganTugas)) !!};
-
+  
   new Chart(document.getElementById('nilaiChart'), {
     type: 'bar',
     data: {
@@ -376,5 +365,85 @@
     el.style.opacity = '1';
   });
 </script>
+<script>
+  function toggleSemuaPengumuman() {
+    const list = document.getElementById('pengumuman-list');
+    const container = document.querySelector('.pengumuman-container');
+    const icon = document.getElementById('toggle-icon-semua');
+
+    const isVisible = list.style.display === 'block';
+    list.style.display = isVisible ? 'none' : 'block';
+    container.classList.toggle('open', !isVisible);
+  }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // 1. Grafik Nilai Anak
+  const nilaiChart = new Chart(document.getElementById('nilaiChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Matematika', 'IPA', 'Bahasa', 'IPS', 'PKN'],
+      datasets: [{
+        label: 'Nilai',
+        data: [85, 90, 88, 80, 75],
+        backgroundColor: '#4a90e2'
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true, max: 100 }
+      }
+    }
+  });
+
+  // 2. Grafik Kehadiran
+  const kehadiranChart = new Chart(document.getElementById('kehadiranChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Hadir', 'Alpa', 'Izin'],
+      datasets: [{
+        label: 'Kehadiran',
+        data: [24, 2, 3],
+        backgroundColor: ['#28a745', '#dc3545', '#ffc107']
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'bottom' }
+      }
+    }
+  });
+
+  // 3. Grafik Tugas Diselesaikan
+  const tugasChart = new Chart(document.getElementById('tugasChart'), {
+    type: 'line',
+    data: {
+      labels: ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'],
+      datasets: [{
+        label: 'Tugas Selesai',
+        data: [3, 4, 5, 4],
+        borderColor: '#17a2b8',
+        backgroundColor: 'rgba(23, 162, 184, 0.2)',
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        y: { beginAtZero: true }
+      }
+    }
+  });
+</script>
+
 </body>
 </html>

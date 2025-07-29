@@ -91,7 +91,7 @@ class TugasController extends Controller
             'deskripsi' => $request->deskripsi,
             'file_path' => $tugas->file_path,
         ]);
- $tugas->update($request->all());
+ 
         return redirect()->back()->with('success', 'Tugas berhasil diperbarui.');
     }
 

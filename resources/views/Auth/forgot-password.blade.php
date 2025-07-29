@@ -6,7 +6,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     <style>
         body {
-            background: linear-gradient(135deg, #6A82FB, #FC5C7D);
+            background: linear-gradient(135deg, #657df6ff, #eed7dbff);
             height: 100vh;
             display: flex;
             justify-content: center;
@@ -58,6 +58,41 @@
         }
         .success { background-color: #ddffdd; color: #2e7d32; }
         .error { background-color: #ffdddd; color: #d32f2f; }
+           .form-group {
+        margin-bottom: 15px;
+        width: 100%;
+    }
+
+    .form-group input[type="email"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        font-size: 16px;
+        box-sizing: border-box;
+        transition: border-color 0.3s;
+    }
+
+    .form-group input[type="email"]:focus {
+        border-color: #007BFF;
+        outline: none;
+    }
+
+    button[type="submit"] {
+        background-color: #007BFF;
+        color: white;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color 0.3s;
+    }
+
+    button[type="submit"]:hover {
+        background-color: #0056b3;
+    }
     </style>
 </head>
 <body>

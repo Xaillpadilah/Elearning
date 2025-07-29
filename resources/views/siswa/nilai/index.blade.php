@@ -109,27 +109,22 @@ tbody td {
 <div class="sidebar" id="sidebar">
     <h2>E-LEARNING</h2>
     <ul>
-        <li>
-            <a href="{{ route('siswa.siswadashboard') }}" 
-               class="{{ request()->routeIs('siswa.siswadashboard') ? 'active' : '' }}">
-                🏠 Beranda
-            </a>
-        </li>
-        <li>
-            <a href="javascript:void(0)" onclick="toggleMapel()">📚 Mata Pelajaran</a>
-            <ul id="sub-mapel" class="sub-mapel" style="{{ request()->routeIs('siswa.mapel.index') || request()->routeIs('siswa.mapel.show') ? 'display:block' : 'display:none' }}">
-                @foreach($mapels as $m)
-                    <li>
-                        <a href="{{ route('siswa.mapel.index', $m->id) }}"
-                           class="{{ request()->routeIs('siswa.mapel.index') && request()->route('id') == $m->id ? 'active' : '' }}">
-                            {{ $m->nama_mapel }}
-                        </a>
-                    </li>
-                @endforeach
-            </ul>
-        </li>
-        <li><a href="{{ route('siswa.absensi.index') }}" >📋 Absensi</a></li>
-        <li><a href="{{ route('siswa.nilai.index') }}"class="active">📊 Nilai</a></li>
+        @php
+    // Ambil mapel pertama dari daftar
+    $firstMapel = \App\Models\Mapel::first();
+@endphp
+       <li><a href="{{ route('siswa.siswadashboard') }}">🏠 Beranda</a></li>
+
+@if ($firstMapel)
+    <li>
+        <a href="{{ route('siswa.mapel.detail', ['id' => $firstMapel->id]) }}">
+            📚 Mata Pelajaran
+        </a>
+    </li>
+@endif
+
+<li><a href="{{ route('siswa.absensi.index') }}">📋 Absensi</a></li>
+<li><a href="{{ route('siswa.nilai.index') }}">📊 Nilai</a></li>
     </ul>
 </div>
 

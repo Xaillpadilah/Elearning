@@ -7,7 +7,13 @@ use App\Models\Materi;
 use App\Models\Absensi;
 use App\Models\Tugas;
 use App\Models\Ujian;
-
+use App\Models\Pengumuman;
+use App\Models\JawabanTugas;
+use App\Models\JawabanUjian;
+use App\Models\Siswa;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Guru;
 class GuruController extends Controller
 {
     /**
@@ -71,5 +77,53 @@ class GuruController extends Controller
         'absensis',
         'pengumumen' // Tambahkan ke compact
     ));
+}
+
+public function jawaban()
+{
+    $user = Auth::user();
+
+    if (!$user->guru) {
+        abort(403, 'Hanya guru yang dapat mengakses halaman ini.');
+    }
+
+  $jawabanTugas = JawabanTugas::with(['siswa.user'])->get();
+    $jawabanUjian = JawabanUjian::with(['user', 'ujian'])->get();
+
+    // Ambil SQL-nya
+    $query = JawabanTugas::select('id', 'tugas_id', 'siswa_id', 'jawaban', 'file_jawaban', 'skor', 'created_at', 'updated_at')->toSql();
+
+    return view('guru.jawaban.index', compact('jawabanTugas', 'jawabanUjian', 'query'));
+}
+public function profil()
+{
+    $user = Auth::user();
+    $guru = $user->guru;
+
+    return view('guru.profil', compact('user', 'guru'));
+}
+
+public function updateProfil(Request $request)
+{
+    $user = Auth::user();
+    $guru = $user->guru;
+
+    $request->validate([
+        'name' => 'required|string|max:255',
+        'email' => 'required|email',
+        'foto' => 'nullable|image|max:2048',
+    ]);
+
+    $user->name = $request->name;
+    $user->email = $request->email;
+
+    if ($request->hasFile('foto')) {
+        $path = $request->file('foto')->store('foto_guru', 'public');
+        $user->foto = $path;
+    }
+
+    $user->save();
+
+    return redirect()->route('guru.profil')->with('success', 'Profil berhasil diperbarui.');
 }
 }

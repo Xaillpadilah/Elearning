@@ -74,7 +74,7 @@
             <td>{{ $t->relasi->mapel->nama_mapel ?? '-' }}</td>
             <td>
               <!-- Edit -->
-              <button type="button" class="btn-edit" onclick="openEditModal({{ $t->id }})">✏️</button>
+              <!-- <button type="button" class="btn-edit" onclick="openEditModal({{ $t->id }})">✏️</button> -->
 
               <!-- Hapus -->
               <form action="{{ route('guru.tugas.destroy', $t->id) }}" method="POST" onsubmit="return confirm('Yakin hapus?')" style="display:inline-block">
@@ -141,11 +141,15 @@
 </div>
 
 <!-- MODAL EDIT -->
+<!-- MODAL EDIT -->
 <div id="modalEditTugas" class="modal">
   <div class="modal-content">
     <h3>Edit Tugas/Kuis</h3>
     <form id="formEditTugas" method="POST" enctype="multipart/form-data">
-      @csrf @method('PUT')
+  @csrf
+  @method('PUT')
+
+      <input type="hidden" name="tugas_id" id="editTugasId"> {{-- digunakan untuk isi action JS --}}
 
       <label>Judul</label>
       <input type="text" name="judul" id="editJudul" required>
@@ -166,8 +170,8 @@
         @endforeach
       </select>
 
-      <label>Upload File Baru</label>
-      <input type="file" name="file_upload">
+      <label>Upload File Baru (Opsional)</label>
+      <input type="file" name="file_upload" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.png">
 
       <label>Deskripsi</label>
       <textarea name="deskripsi" id="editDeskripsi"></textarea>
@@ -175,7 +179,6 @@
       <button type="submit" class="btn-simpan-tambah">💾 Simpan Perubahan</button>
     </form>
   </div>
-</div>
 
 <!-- SCRIPT -->
 <script>

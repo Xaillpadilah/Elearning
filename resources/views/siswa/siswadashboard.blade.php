@@ -90,32 +90,35 @@
 
 <!-- Sidebar -->
 <div class="sidebar" id="sidebar">
-  <h2>E-LEARNING</h2>
-  <ul>
-    <li><a href="{{ route('siswa.siswadashboard') }}" class="{{ request()->routeIs('siswa.siswadashboard') ? 'active' : '' }}">🏠 Beranda</a></li>
-  <li>
- <li>
-  <a href="javascript:void(0)" onclick="toggleMapel()">📚 Mata Pelajaran</a>
-  <ul id="sub-mapel" class="sub-mapel" style="{{ request()->routeIs('siswa.mapel.index') || request()->routeIs('siswa.mapel.show') ? 'display:block' : 'display:none' }}">
-    @foreach($mapels as $m)
-      <li>
-        <a href="{{ route('siswa.mapel.index', $m->id) }}"
-           class="{{ request()->routeIs('siswa.mapel.index') && request()->route('id') == $m->id ? 'active' : '' }}">
-           {{ $m->nama_mapel }}
+    <h2>E-LEARNING</h2>
+    <ul>
+            @php
+    // Ambil mapel pertama dari daftar
+    $firstMapel = \App\Models\Mapel::first();
+@endphp
+       <li><a href="{{ route('siswa.siswadashboard') }}">🏠 Beranda</a></li>
+
+@if ($firstMapel)
+    <li>
+        <a href="{{ route('siswa.mapel.detail', ['id' => $firstMapel->id]) }}">
+            📚 Mata Pelajaran
         </a>
-      </li>
-    @endforeach
-  </ul>
- <li><a href="{{ route('siswa.absensi.index') }}">📋Absensi</a></li>
-  <li><a href="{{ route('siswa.nilai.index') }}"> 📊Nilai</a></li>
-   </ul>
+    </li>
+@endif
+
+<li><a href="{{ route('siswa.absensi.index') }}">📋 Absensi</a></li>
+<li><a href="{{ route('siswa.nilai.index') }}">📊 Nilai</a></li>
+    </ul>
 </div>
+
 
 <!-- Konten Utama -->
 <div class="main" id="main-content">
   <div class="header">
     <button class="fullscreen-btn" onclick="toggleFullscreenDashboard()">☰</button>
- <div class="user">👤 {{ Auth::user()->name ?? 'Nama Siswa' }}</div>
+<a href="{{ route('siswa.profil') }}" class="user flex items-center space-x-2 text-blue-600 hover:underline">
+    👤 <span>{{ Auth::user()->name ?? 'Nama Siswa' }}</span>
+</a>
   </div>
 
   <div class="info-frame">
@@ -148,7 +151,33 @@
           @endforeach
       @endif
     </div>
+<!-- Jadwal Hari Ini -->
+<div class="jadwal-hari-ini" style="margin-top: 30px;">
+    <h3>📅 Jadwal Hari Ini</h3>
+    @if($jadwalHariIni->isEmpty())
+        <p>Tidak ada jadwal pelajaran hari ini.</p>
+    @else
+        <ul style="list-style:none; padding:0;">
+            @foreach($jadwalHariIni as $jadwal)
+                <li style="margin-bottom: 10px; background: #f1f8e9; padding: 12px; border-radius: 8px;">
+                    <strong>{{ $jadwal->mapel->nama_mapel ?? '-' }}</strong> -
+                    {{ $jadwal->jam }} |
+                    {{ ucfirst($jadwal->tipe_ruangan) }} {{ $jadwal->ruangan ? "- $jadwal->ruangan" : '' }}<br>
+                    👨‍🏫 {{ $jadwal->guru->nama ?? '-' }}
+                </li>
+            @endforeach
+        </ul>
+    @endif
+</div>
   </div>
+    </div>
+    
+
+   
+
+    <!-- Ujian -->
+    
+
 
 <!-- Footer -->
 <footer id="footer">

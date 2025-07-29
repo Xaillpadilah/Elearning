@@ -140,11 +140,14 @@ public function absensiSiswa()
         ->orderBy('tanggal', 'desc')
         ->get();
 
-    return view('siswa.absensi.index', [
-        'absensis' => $absensis,
-        'siswa' => $siswa,
-        'user' => $user,
-        'mapels' => \App\Models\Mapel::all()
-    ]);
+   $mapel = null; // atau ambil mapel tertentu jika perlu
+
+return view('siswa.absensi.index', [
+    'absensis' => $absensis,
+    'siswa' => $siswa,
+    'user' => $user,
+    'mapels' => \App\Models\Mapel::all(),
+    'mapel' => $mapel, // tambahkan ini agar tidak undefined
+]);
 }
 }

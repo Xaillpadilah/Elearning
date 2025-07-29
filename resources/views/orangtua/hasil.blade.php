@@ -123,8 +123,7 @@
   <ul>
     <li><a href="{{ route('orangtua.dashboard') }}">🏠 Dashboard</a></li>
     <li><a href="{{ route('orangtua.hasil') }}" class="active">🗓️ Hasil</a></li>
-    <li><a href="{{ route('orangtua.perkembangan') }}">📚 Perkembangan</a></li>
-    <li><a href="{{ route('orangtua.komunikasi') }}">🕒 Komunikasi</a></li>
+   
   </ul>
 </div>
 

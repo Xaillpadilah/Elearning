@@ -22,5 +22,10 @@ class JawabanTugas extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function siswa()
+{
+    return $this->belongsTo(\App\Models\Siswa::class);
+}
+
 }
 

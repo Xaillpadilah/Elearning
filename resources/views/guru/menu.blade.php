@@ -121,10 +121,10 @@
   <h2>Dashboard Guru</h2>
   <ul>
     <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">🏠 Dashboard</a></li>
-    <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}"> Materi Dan Konten</a></li>
-    <li><a href="{{ route('guru.menu') }}" class="{{ request()->routeIs('guru.menu') ? 'active' : '' }}">  Kuis dan Tugas</a></li>
-    <li><a href="{{ route('guru.absensi.index') }}" class="{{ request()->routeIs('guru.absensi.index') ? 'active' : '' }}"> Absensi</a></li>
-    <li><a href="{{ route('guru.penilaian.index') }}" class="{{ request()->routeIs('guru.penilaian.index') ? 'active' : '' }}"> Penilaian</a></li>
+    <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}">📚 Materi Dan Konten</a></li>
+    <li><a href="{{ route('guru.menu') }}" class="{{ request()->routeIs('guru.menu') ? 'active' : '' }}">📝  Kuis dan Tugas</a></li>
+    <li><a href="{{ route('guru.absensi.index') }}" class="{{ request()->routeIs('guru.absensi.index') ? 'active' : '' }}">🗓️ Absensi</a></li>
+    <li><a href="{{ route('guru.penilaian.index') }}" class="{{ request()->routeIs('guru.penilaian.index') ? 'active' : '' }}">📊 Penilaian</a></li>
   </ul>
 </div>
 
@@ -149,11 +149,15 @@
 
   </div>
 
-  
+  <div class="card">
+  <h3>📥 Jawaban Siswa</h3>
+  <p>Lihat dan nilai jawaban dari siswa pada tugas, kuis, dan ujian yang telah diberikan.</p>
+  <a href="javascript:void(0)" onclick="openPopup('{{ route('guru.jawaban.index') }}')">Lihat Jawaban</a>
+</div>
   <div class="card">
     <h3>📝 Ujian</h3>
     <p>Buat dan atur ujian serta waktu pelaksanaannya.</p>
-  <a href="javascript:void(0)" onclick="openPopup('{{ route('guru.ujian.index') }}')">Kelola Tugas</a>
+  <a href="javascript:void(0)" onclick="openPopup('{{ route('guru.ujian.index') }}')">Kelola Ujian</a>
 
   </div>
 

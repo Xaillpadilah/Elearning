@@ -131,76 +131,77 @@
 <div class="container mt-4">
     <h2>📚 Tugas & Kuis</h2>
 
+  {{-- Tugas Section --}}
+<div id="tugas" class="tab-content">
+    {{-- Pesan sukses --}}
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
     {{-- Daftar Tugas --}}
-   @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-@endif
-@if ($tugasList->isEmpty())
-    <div class="alert alert-info">Tidak ada tugas atau kuis yang tersedia saat ini.</div>
-@else
-    <div class="row tugas-grid">
-        @foreach ($tugasList as $item)
-            @php
-                $sudahDikerjakan = \App\Models\JawabanTugas::where('tugas_id', $item->id)
-                    ->where('siswa_id', auth()->id())->exists();
-            @endphp
+    @if ($tugasList->isEmpty())
+        <div class="alert alert-info">Tidak ada tugas atau kuis yang tersedia saat ini.</div>
+    @else
+        <div class="row tugas-grid">
+            @foreach ($tugasList as $item)
+                @php
+                    $sudahDikerjakan = \App\Models\JawabanTugas::where('tugas_id', $item->id)
+                        ->where('siswa_id', auth()->id())->exists();
+                @endphp
 
-            <div class="col-md-6 col-lg-4">
-                <div class="card card-small shadow-sm">
-                    <div class="card-body">
-                        <h5 class="card-title">{{ $item->judul }}</h5>
-                        <p>{{ Str::limit($item->deskripsi, 100) }}</p>
-                        <p>Jenis: <strong>{{ ucfirst($item->jenis) }}</strong></p>
-                        <p>Deadline: {{ \Carbon\Carbon::parse($item->tanggal_deadline)->translatedFormat('d M Y') }}</p>
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card card-small shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ $item->judul }}</h5>
+                            <p>{{ Str::limit($item->deskripsi, 100) }}</p>
+                            <p>Jenis: <strong>{{ ucfirst($item->jenis) }}</strong></p>
+                            <p>Deadline: {{ \Carbon\Carbon::parse($item->tanggal_deadline)->translatedFormat('d M Y') }}</p>
 
-                       
+                            <a href="javascript:void(0)" onclick="openPopup('{{ route('siswa.tugas.index', ['kerjakan' => $item->id]) }}')" class="btn btn-sm btn-success">Kerjakan</a>
 
-                      <a href="javascript:void(0)" onclick="openPopup('{{ route('siswa.tugas.index', ['kerjakan' => $item->id]) }}')" class="btn btn-sm btn-success">Kerjakan</a>
-
-                            {{ $sudahDikerjakan ?  : '' }}
-                        </a>
-
-                        @if($sudahDikerjakan)
-                            <span class="badge bg-success ms-2">✅ Sudah Dikerjakan</span>
-                        @endif
+                            @if($sudahDikerjakan)
+                                <span class="badge bg-success ms-2">✅ Sudah Dikerjakan</span>
+                            @endif
+                        </div>
                     </div>
                 </div>
-            </div>
-        @endforeach
-    </div>
-@endif
-
-@if ($tugas)
-    <hr>
-    <h3>📝 {{ $tugas->judul }}</h3>
-
-    @if ($soal)
-        <form method="POST" action="{{ route('siswa.tugas.submit', $tugas->id) }}">
-            @csrf
-            @foreach ($soal as $index => $s)
-                <div class="mb-3">
-                    <label><strong>Soal {{ $index +  1}}:</strong> {{ $s['pertanyaan'] }}</label>
-                    <input type="text" name="jawaban[{{ $index }}]" class="form-control" required>
-                </div>
             @endforeach
-            <button type="submit" class="btn btn-primary">Kirim Jawaban</button>
-        </form>
-    @elseif ($tugas->file_path)
-        <p>📎 Tugas berbentuk file. Silakan unduh & kerjakan lalu unggah hasilnya:</p>
-        <a href="{{ asset('storage/' . $tugas->file_path) }}" class="btn btn-sm btn-info">📥 Unduh File</a>
-
-        <form method="POST" action="{{ route('siswa.tugas.submit', $tugas->id) }}" enctype="multipart/form-data" class="mt-3">
-            @csrf
-            <div class="mb-3">
-                <label for="file_jawaban">📤 Upload File Jawaban</label>
-                <input type="file" name="file_jawaban" class="form-control" required>
-            </div>
-            <button type="submit" class="btn btn-success">Kirim Jawaban</button>
-        </form>
-    @else
-        <p>Tugas ini tidak memiliki soal atau file.</p>
+        </div>
     @endif
-@endif
+
+    {{-- Detail Tugas Jika Ada --}}
+    @if ($tugas)
+        <hr>
+        <h3>📝 {{ $tugas->judul }}</h3>
+
+        @if ($soal)
+            <form method="POST" action="{{ route('siswa.tugas.submit', $tugas->id) }}">
+                @csrf
+                @foreach ($soal as $index => $s)
+                    <div class="mb-3">
+                        <label><strong>Soal {{ $index + 1 }}:</strong> {{ $s['pertanyaan'] }}</label>
+                        <input type="text" name="jawaban[{{ $index }}]" class="form-control" required>
+                    </div>
+                @endforeach
+                <button type="submit" class="btn btn-primary">Kirim Jawaban</button>
+            </form>
+        @elseif ($tugas->file_path)
+            <p>📎 Tugas berbentuk file. Silakan unduh & kerjakan lalu unggah hasilnya:</p>
+            <a href="{{ asset('storage/' . $tugas->file_path) }}" class="btn btn-sm btn-info">📥 Unduh File</a>
+
+            <form method="POST" action="{{ route('siswa.tugas.submit', $tugas->id) }}" enctype="multipart/form-data" class="mt-3">
+                @csrf
+                <div class="mb-3">
+                    <label for="file_jawaban">📤 Upload File Jawaban</label>
+                    <input type="file" name="file_jawaban" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-success">Kirim Jawaban</button>
+            </form>
+        @else
+            <p>Tugas ini tidak memiliki soal atau file.</p>
+        @endif
+    @endif
+</div>
 </div>
 <script>
     function openPopup(url) {

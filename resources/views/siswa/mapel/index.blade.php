@@ -75,14 +75,14 @@
     <li>
       <a href="javascript:void(0)" onclick="toggleMapel()">📚 Mata Pelajaran</a>
       <ul id="sub-mapel" class="sub-mapel" style="{{ request()->routeIs('siswa.mapel.*') ? 'display:block' : 'display:none' }}">
-        @foreach($mapels as $mapel)
-          <li>
-            <a href="{{ route('siswa.mapel.index', $mapel->id) }}"
-               class="{{ (request()->route('id') == $mapel->id) ? 'active' : '' }}">
-               {{ $mapel->nama_mapel }}
-            </a>
-          </li>
-        @endforeach
+       @foreach($mapels as $mapel)
+<li>
+  <a href="{{ route('siswa.mapel.detail', $mapel->id) }}"
+     class="{{ request()->route('mapel_id') == $mapel->id ? 'active' : '' }}">
+     {{ $mapel->nama_mapel }}
+  </a>
+</li>
+@endforeach
       </ul>
     </li>
     <li><a href="{{ route('siswa.absensi.index') }}"> 📋Absensi</a></li>

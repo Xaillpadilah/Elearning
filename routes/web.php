@@ -60,26 +60,26 @@ Route::middleware(['auth', 'checkrole:guru'])->group(function () {
 Route::middleware(['auth', 'checkrole:orangtua'])->group(function () {
     Route::get('/dashboard-orangtua', [OrangtuaController::class, 'index'])->name('orangtua.dashboard');
 });
-    // Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
-    Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-    Route::post('/login', [AuthController::class, 'login']);
-    Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-    // Dashboard Redirect by Role
-    // Reset Password (tambahan agar route('password.request') tidak error)
-    Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
-    Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
-    // Tampilkan form reset password
-    // Tampilkan form reset password
-    Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
+// Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+
+// Reset Password (tambahan agar route('password.request') tidak error)
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+// Tampilkan form reset password
+Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])
     ->middleware('guest')
     ->name('password.reset');
 
-    Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
+Route::post('/reset-password', [ResetPasswordController::class, 'reset'])
     ->middleware('guest')
     ->name('password.update');
 
-    // Proses update password
-    Route::get('/test-email', function () {
+// Proses update password
+Route::get('/test-email', function () {
     Mail::raw('Ini email uji coba dari Laravel ke Mailpit', function ($msg) {
         $msg->to('user@example.com')->subject('Email Test');
     });
@@ -87,7 +87,7 @@ Route::middleware(['auth', 'checkrole:orangtua'])->group(function () {
     return 'Email berhasil dikirim ke Mailpit!';
 });
 //  Admin
-    Route::middleware(['auth', 'checkrole:admin'])->group(function () {
+Route::middleware(['auth', 'checkrole:admin'])->group(function () {
     Route::get('/dashboard', [AdminController::class, 'index'])->name('admin.dashboard');
 });
 
@@ -127,7 +127,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::get('/siswa', [AdminController::class, 'siswa'])->name('admin.siswa');
     Route::get('/kelas', [AdminController::class, 'kelas'])->name('admin.kelas');
     Route::get('/mapel', [AdminController::class, 'mapel'])->name('admin.mapel');
-   //guru
+    //guru
     Route::get('/guru', [AdminController::class, 'guruIndex'])->name('admin.guru');
     Route::post('/guru', [AdminController::class, 'guruStore'])->name('admin.guru.store');
     Route::put('/guru/{id}', [AdminController::class, 'guruUpdate'])->name('admin.guru.update');
@@ -142,7 +142,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::delete('/siswa/{id}', [AdminController::class, 'destroySiswa'])->name('admin.siswa.destroy');
     Route::put('/siswa/{id}', [AdminController::class, 'updateSiswa'])->name('admin.siswa.update');
     //admin kelas
-      Route::get('/kelas', [AdminController::class, 'indexkelas'])->name('admin.kelas');
+    Route::get('/kelas', [AdminController::class, 'indexkelas'])->name('admin.kelas');
     Route::post('/kelas', [AdminController::class, 'storekelas'])->name('admin.kelas.store');
     Route::post('/kelas/{id}', [AdminController::class, 'updatekelas'])->name('admin.kelas.update');
     Route::post('/kelas/import', [AdminController::class, 'importkelas'])->name('admin.kelas.import');
@@ -159,9 +159,11 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::post('/pengumuman', [AdminController::class, 'store'])->name('admin.pengumuman.store');
     Route::put('/pengumuman/{id}', [AdminController::class, 'pengumumanupdate'])->name('admin.pengumuman.update');
     Route::delete('/pengumuman/{id}', [AdminController::class, 'pengumumandestroy'])->name('admin.pengumuman.destroy');
+     Route::get('/profil', [AdminController::class, 'profil'])->name('admin.profil');
+    Route::put('/profil', [AdminController::class, 'update'])->name('admin.profil.update');
 });
 //orang tua
-Route::prefix('orangtua')->group(function () {
+Route::prefix('orangtua')->middleware(['auth', 'checkRole:orangtua'])->group(function () {
     Route::get('/dashboard', [OrangtuaController::class, 'index'])->name('orangtua.dashboard');
     Route::get('/hasil', [OrangtuaController::class, 'hasil'])->name('orangtua.hasil');
     Route::get('/perkembangan', [OrangtuaController::class, 'perkembangan'])->name('orangtua.perkembangan');
@@ -192,11 +194,10 @@ Route::middleware(['auth', 'checkRole:admin,guru'])->group(function () {
     Route::put('/tugas/{id}', [TugasController::class, 'update'])->name('guru.tugas.update');
     Route::put('/guru/tugas/{id}/kirim', [TugasController::class, 'kirim'])->name('tugas.kirim');
     Route::delete('/tugas/{id}', [TugasController::class, 'destroy'])->name('guru.tugas.destroy');
-    
 });
 
 // guru
-    Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function () {
+Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function () {
     Route::get('/guru/menu', [PembelajaranController::class, 'index'])->name('guru.menu');
 
 });
@@ -228,12 +229,15 @@ Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function ()
     Route::get('/absensi/create', [AbsensiController::class, 'create'])->name('guru.absensi.create');
     Route::post('/absensi/store', [AbsensiController::class, 'store'])->name('guru.absensi.store');
     Route::post('/guru/absensi/update', [AbsensiController::class, 'update'])->name('guru.absensi.update');
+    Route::get('/guru/jawaban', [GuruController::class, 'jawaban'])->name('guru.jawaban.index');
+    Route::get('/guru/profil', [GuruController::class, 'profil'])->name('guru.profil');
+    Route::put('/guru/profil', [GuruController::class, 'updateProfil'])->name('guru.profil.update');
 });
 //siswa
 Route::prefix('siswa')->middleware(['auth', 'checkRole:siswa'])->group(function () {
     Route::get('/dashboard', [SiswaController::class, 'index'])->name('siswa.siswadashboard');
     Route::get('/mapel', [SiswaController::class, 'mapel'])->name('siswa.mapel.index');
-Route::get('/siswa/mapel/{id}', [SiswaController::class, 'show'])->name('siswa.mapel.index');
+    Route::get('/mapel/{id}', [SiswaController::class, 'show'])->name('siswa.mapel.index');
     Route::get('/siswa/materi/{id}', [SiswaController::class, 'materi'])->name('siswa.materi.index');
     Route::get('/mapel/{id}/materi', [SiswaController::class, 'materi'])->name('siswa.mapel.index');
     Route::get('{id}/tugas', [SiswaController::class, 'tugas'])->name('tugas');
@@ -242,20 +246,25 @@ Route::get('/siswa/mapel/{id}', [SiswaController::class, 'show'])->name('siswa.m
     Route::get('/siswa/absensi', [SiswaController::class, 'absensi'])->name('siswa.absensi.index');
     Route::get('/siswa/nilai', [SiswaController::class, 'nilai'])->name('siswa.nilai.index');
 
-   Route::get('/siswa/materi/popup/{id}', [SiswaController::class, 'materiByMapelPopup']);
-// routes/web.php
-Route::get('/siswa/materi/{id}', [SiswaController::class, 'materiByMapel'])->name('siswa.materi.index');
-Route::get('/tugas', [TugasSiswaController::class, 'index'])->name('siswa.tugas.index');
-     Route::get('/tugas', [TugasSiswaController::class, 'index'])->name('siswa.tugas.index');
+    Route::get('/siswa/materi/popup/{id}', [SiswaController::class, 'materiByMapelPopup']);
+    Route::get('/siswa/materi/{id}', [SiswaController::class, 'materiByMapel'])->name('siswa.materi.index');
+    Route::get('/tugas', [TugasSiswaController::class, 'index'])->name('siswa.tugas.index');
+    Route::get('/tugas', [TugasSiswaController::class, 'index'])->name('siswa.tugas.index');
     Route::post('/tugas/{id}', [TugasSiswaController::class, 'submit'])->name('siswa.tugas.submit');
 
- });
- Route::middleware(['auth', 'checkRole:siswa'])->prefix('siswa')->group(function () {
-    Route::get('/absensi', [AbsensiController::class, 'absensiSiswa'])->name('siswa.absensi.index');
-    
 });
 Route::middleware(['auth', 'checkRole:siswa'])->prefix('siswa')->group(function () {
-Route::get('/siswa/materi', [MateriSiswaController::class, 'index'])->name('siswa.materi.index');
-Route::get('/siswa/materi/mapel/{mapel_id}', [MateriSiswaController::class, 'showByMapel'])->name('siswa.materi.mapel');
-Route::get('/siswa/ujian', [UjianSiswaController::class, 'index'])->name('siswa.ujian.index');
+    Route::get('/absensi', [AbsensiController::class, 'absensiSiswa'])->name('siswa.absensi.index');
+
+});
+Route::middleware(['auth', 'checkRole:siswa'])->prefix('siswa')->group(function () {
+    Route::get('/siswa/materi/{id}', [MateriSiswaController::class, 'showByMapel'])->name('siswa.mapel.detail');
+    Route::get('/siswa/mapel/{id}', [MateriSiswaController::class, 'show'])->name('siswa.mapel.detail');
+    Route::post('/siswa/jawaban', [MateriSiswaController::class, 'store'])->name('siswa.jawaban.store');
+    // Route::get('/siswa/materi/mapel/{id}', [MateriSiswaController::class, 'showByMapel'])->name('siswa.materi.byMapel');
+    Route::get('/siswa/ujian', [UjianSiswaController::class, 'index'])->name('siswa.ujian.index');
+    Route::post('/siswa/jawaban/ujian', [SiswaController::class, 'storeUjianJawaban'])->name('siswa.jawaban.ujian.store');
+    Route::get('/siswa/profil', [SiswaController::class, 'profil'])->name('siswa.profil');
+    Route::post('/siswa/profil/update', [SiswaController::class, 'updateProfil'])->name('siswa.profil.update');
+
 });

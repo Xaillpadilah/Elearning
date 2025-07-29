@@ -29,6 +29,13 @@ public function guru()
 {
     return $this->belongsTo(Guru::class, 'guru_id');
 }
-
+public function guruMapelKelas()
+{
+    return $this->belongsTo(GuruMapelKelas::class, 'guru_mapel_kelas_id');
+}
+public function relasi()
+{
+    return $this->belongsTo(GuruMapelKelas::class, 'guru_mapel_kelas_id');
+}
 }
 

@@ -56,16 +56,16 @@
   <li><a href="{{ route(auth()->user()->role . '.dashboard') }}">🏠 Dashboard</a></li>
 
   @if(auth()->user()->role === 'admin')
-    <li><a href="{{ route('admin.guru') }}"> Data Guru</a></li>
-    <li><a href="{{ route('admin.siswa') }}"> Data Siswa</a></li>
-    <li><a href="{{ route('admin.kelas') }}"> Data Kelas Jadwal</a></li>
-    <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}">  Materi Dan Konten</a></li>
-    <li><a href="{{ route('admin.pengumuman.index') }}"> Pengumuman</a></li>
+    <li><a href="{{ route('admin.guru') }}"> 👨‍🏫Data Guru</a></li>
+    <li><a href="{{ route('admin.siswa') }}"> 🧑‍🎓Data Siswa</a></li>
+    <li><a href="{{ route('admin.kelas') }}"> 📅Data Kelas Jadwal</a></li>
+    <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}">  📚Materi Dan Konten</a></li>
+    <li><a href="{{ route('admin.pengumuman.index') }}">📢 Pengumuman</a></li>
   @elseif(auth()->user()->role === 'guru')
-    <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}"> Materi Dan Konten</a></li>
-    <li><a href="{{ route('guru.menu') }}" class="{{ request()->routeIs('guru.menu') ? 'active' : '' }}">  Kuis dan Tugas</a></li>
-    <li><a href="{{ route('guru.absensi.index') }}" class="{{ request()->routeIs('guru.absensi.index') ? 'active' : '' }}"> Absensi</a></li>
-    <li><a href="{{ route('guru.penilaian.index') }}" class="{{ request()->routeIs('guru.penilaian.index') ? 'active' : '' }}"> Penilaian</a></li>
+    <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}">>📚  Materi Dan Konten</a></li>
+    <li><a href="{{ route('guru.menu') }}" class="{{ request()->routeIs('guru.menu') ? 'active' : '' }}"> 📝 Kuis dan Tugas</a></li>
+    <li><a href="{{ route('guru.absensi.index') }}" class="{{ request()->routeIs('guru.absensi.index') ? 'active' : '' }}">🗓️ Absensi</a></li>
+    <li><a href="{{ route('guru.penilaian.index') }}" class="{{ request()->routeIs('guru.penilaian.index') ? 'active' : '' }}">📊 Penilaian</a></li>
   @endif
 </ul>
 </div>

@@ -55,4 +55,9 @@ public function mapels()
     return $this->belongsToMany(Mapel::class, 'guru_mapel_kelas', 'guru_id', 'mapel_id')
         ->withPivot('kelas_id');
 }
+public function guru()
+{
+    return $this->belongsTo(Guru::class, 'guru_id');
+}
+
 }

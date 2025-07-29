@@ -226,11 +226,11 @@
 <div class="sidebar" id="sidebar">
   <h2>Dashboard Guru</h2>
   <ul>
-    <li><a href="{{ route('guru.dashboard') }}" class="active">🏠 Dashboard</a></li>
-    <li><a href="{{ route('materi.index') }}"> Materi Dan Konten</a></li>
-    <li><a href="{{ route('guru.menu') }}"> Kuis dan Tugas</a></li>
-    <li><a href="{{ route('guru.absensi.index') }}"> Absensi</a></li>
-    <li><a href="{{ route('guru.penilaian.index') }}"> Penilaian</a></li>
+   <li><a href="{{ route('guru.dashboard') }}" class="{{ request()->routeIs('guru.dashboard') ? 'active' : '' }}">🏠 Dashboard</a></li>
+<li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}">📚 Materi dan Konten</a></li>
+<li><a href="{{ route('guru.menu') }}" class="{{ request()->routeIs('guru.menu') ? 'active' : '' }}">📝 Kuis dan Tugas</a></li>
+<li><a href="{{ route('guru.absensi.index') }}" class="{{ request()->routeIs('guru.absensi.index') ? 'active' : '' }}">🗓️ Absensi</a></li>
+<li><a href="{{ route('guru.penilaian.index') }}" class="{{ request()->routeIs('guru.penilaian.index') ? 'active' : '' }}">📊 Penilaian</a></li>
   </ul>
 </div>
 
@@ -238,7 +238,9 @@
 <div class="main" id="main-content">
   <div class="header">
     <button class="fullscreen-btn" onclick="toggleFullscreenDashboard()">☰</button>
-    <div class="user">👨‍🏫 {{ $user->name ?? 'Nama Guru' }}</div>
+   <a href="{{ route('guru.profil') }}" class="user" style="text-decoration: none; color: inherit;">
+    👨‍🏫 {{ $user->name ?? 'Nama Guru' }}
+</a>
   </div>
 
   <div class="info-frame">
