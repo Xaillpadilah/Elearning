@@ -129,7 +129,7 @@ public function guruindex(Request $request)
             return redirect()->back()->with('success', 'Guru berhasil ditambahkan.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal menambahkan guru: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menambahkan guru. ' );
         }
     }
 
@@ -174,7 +174,7 @@ public function guruindex(Request $request)
             return redirect()->back()->with('success', 'Data guru berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Gagal memperbarui data guru: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal memperbarui data guru. ');
         }
     }
 
@@ -188,7 +188,7 @@ public function guruindex(Request $request)
 
             return redirect()->back()->with('success', 'Guru berhasil dihapus.');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Gagal menghapus guru: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Gagal menghapus guru. ' );
         }
     }
 
@@ -230,16 +230,20 @@ public function guruindex(Request $request)
 //siswa
 public function storeSiswa(Request $request)
 {
-    $request->validate([
-        'nama' => 'required',
-        'nisn' => 'required|digits_between:8,10|unique:siswas,nisn',
-        'kelas_id' => 'required',
-        'email' => 'required|email|unique:users,email',
-        'jenis_kelamin' => 'required',
-        'nama_ortu' => 'required',
-        'nomor_hp' => 'required',
-    ]);
-
+  
+   $request->validate([
+    'nama' => 'required',
+    'nisn' => 'required|digits:10|unique:siswas,nisn',
+    'kelas_id' => 'required',
+    'email' => 'required|email|unique:users,email',
+    'jenis_kelamin' => 'required',
+    'nama_ortu' => 'required',
+    'nomor_hp' => 'required',
+], [
+    'nisn.digits' => 'NISN ini tidak valid. Harus terdiri dari tepat 10 digit.',
+    'nisn.unique' => 'NISN ini sudah terdaftar.',
+    'email.unique' => 'Email sudah digunakan.',
+]);
     \DB::beginTransaction();
 
     try {
@@ -309,18 +313,22 @@ public function storeSiswa(Request $request)
     // Ambil data siswa yang akan diupdate
     $siswa = Siswa::findOrFail($id);
 
-    // Validasi input
+    // Validasi input dengan pesan khusus
     $request->validate([
         'nama' => 'required',
-        'nisn' => 'required|digits_between:8,10|unique:siswas,nisn,' . $siswa->id,
+        'nisn' => 'required|digits:10|unique:siswas,nisn,' . $siswa->id,
         'kelas_id' => 'required',
         'email' => 'required|email|unique:users,email,' . $siswa->user_id,
         'jenis_kelamin' => 'required',
         'nama_ortu' => 'required',
         'nomor_hp' => 'required',
+    ], [
+        'nisn.digits' => 'NISN ini tidak valid. Harus terdiri dari tepat 10 digit.',
+        'nisn.unique' => 'NISN ini sudah terdaftar.',
+        'email.unique' => 'Email sudah digunakan.',
     ]);
 
-    // Update user
+    // Update user (akun siswa)
     $user = $siswa->user;
     $user->email = $request->email;
     $user->save();
@@ -331,7 +339,7 @@ public function storeSiswa(Request $request)
     $orangtua->nomor_hp = $request->nomor_hp;
     $orangtua->save();
 
-    // Update siswa
+    // Update data siswa
     $siswa->update([
         'nama' => $request->nama,
         'nisn' => $request->nisn,

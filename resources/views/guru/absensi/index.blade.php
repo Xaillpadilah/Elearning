@@ -7,60 +7,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
     @vite(['resources/css/adminguru.css'])
     <style>
-        .search-form {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-            margin-top: 10px;
-            flex-wrap: wrap;
-        }
-
-        .search-form select,
-        .absensi-form select,
-        .absensi-form input[type="date"],
-        .absensi-form input[type="text"] {
-            padding: 10px 14px;
-            border: 1px solid #c5cae9;
-            border-radius: 10px;
-            background: #f9f9fc;
-            font-size: 14px;
-            color: #333;
-            min-width: 220px;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-            margin-bottom: 10px;
-        }
-
-        .search-form select:focus,
-        .absensi-form select:focus,
-        .absensi-form input:focus {
-            border-color: #64b5f6;
-            background: #fff;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
-        }
-
-        .search-form button,
-        .absensi-form button {
-            padding: 10px 20px;
-            background: linear-gradient(to right, #64b5f6, #81d4fa);
-            color: #0d47a1;
-            border: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 14px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .search-form button:hover,
-        .absensi-form button:hover {
-            background: linear-gradient(to right, #42a5f5, #4fc3f7);
-            transform: scale(1.02);
-        }
-
         .btn-tambah {
             padding: 10px 18px;
             background-color: #4fc3f7;
@@ -121,7 +67,7 @@
         /* Tombol Tambah */
         .btn-tambah-absensi {
             padding: 10px 20px;
-            background-color: #4CAF50;
+            background-color: #695ff4ff;
             color: white;
             border: none;
             border-radius: 6px;
@@ -148,6 +94,191 @@
         .btn-edit:hover {
             background-color: #2980b9;
             /* Biru lebih gelap saat hover */
+        }
+
+        /* Font dan Reset */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+        }
+
+
+
+        /* Tombol Tambah Absensi */
+        .btn-tambah-absensi {
+            background-color: #1488e6ff;
+            color: white;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-tambah-absensi:hover {
+            background-color: #2515b5ff;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 999;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding-top: 40px;
+        }
+
+        /* Modal Content */
+        .modal-content {
+            background-color: #fff;
+            margin: auto;
+            padding: 30px;
+            border: 1px solid #ddd;
+            width: 60%;
+            max-width: 800px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            position: relative;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        /* Animasi Muncul Modal */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Tombol Close */
+        .close {
+            color: #888;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 26px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #e74c3c;
+        }
+
+        /* Judul Modal */
+        .modal-content h3 {
+            margin-bottom: 25px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .modal-content h4 {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        /* Form */
+        form label {
+            display: block;
+            margin-top: 15px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        form input[type="date"],
+        form select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 15px;
+            background-color: #fafafa;
+        }
+
+        /* Daftar Siswa sebagai Tabel */
+        .siswa-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fff;
+            padding: 0;
+            margin-top: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+        }
+
+        .siswa-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .siswa-list th,
+        .siswa-list td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .siswa-list th {
+            background-color: #f5f5f5;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        .siswa-list tr:hover {
+            background-color: #f9f9f9;
+        }
+
+        form input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.1);
+        }
+
+        /* Tombol Simpan */
+        form button[type="submit"] {
+            margin-top: 25px;
+            background-color: #3498db;
+            color: white;
+            padding: 12px 20px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        form button[type="submit"]:hover {
+            background-color: #2980b9;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .modal-content {
+                width: 80%;
+            }
         }
     </style>
 </head>
@@ -180,21 +311,10 @@
 
         <div class="info-frame">
             <h4>📢 Absensi</h4>
-            <p>Selamat datang di dashboard guru. Silakan kelola jadwal, nilai, dan materi Anda.</p>
+            <p>Selamat datang di dashboard guru. Silakan kelola Absensi Sesuai kelas .</p>
         </div>
 
-        <!-- Filter Kelas -->
-        <form method="GET" action="{{ route('guru.absensi.index') }}" class="search-form">
-            <select name="kelas_id">
-                <option value="">-- Semua Kelas --</option>
-                @foreach($kelass as $kelas)
-                    <option value="{{ $kelas->id }}" {{ request('kelas_id') == $kelas->id ? 'selected' : '' }}>
-                        {{ $kelas->nama_kelas }}
-                    </option>
-                @endforeach
-            </select>
-            <button type="submit">Filter</button>
-        </form>
+
 
         @if(session('success'))
             <div style="color: green; margin-top: 15px; font-weight: 600;">
@@ -202,11 +322,9 @@
             </div>
         @endif
 
-        <!-- Form Input Absensi -->
         <!-- Tombol Buka Modal -->
         <button onclick="openModal()" class="btn-tambah-absensi">➕ Tambah Absensi</button>
 
-        <!-- Modal Popup -->
         <!-- Modal Popup -->
         <div id="absensiModal" class="modal">
             <div class="modal-content">
@@ -235,21 +353,22 @@
 
                     <h4>✅ Daftar Siswa (Centang yang Hadir):</h4>
                     <div
-                        style="max-height: 200px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
-                        @foreach($siswas as $siswa)
-                            <div>
-                                <label>
-                                    <input type="checkbox" name="siswa_ids[]" value="{{ $siswa->id }}">
-                                    {{ $siswa->nama }}
-                                </label>
-                            </div>
-                        @endforeach
+                        style="max-height: 300px; overflow-y: auto; margin-bottom: 15px; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">
+                        <table style="width: 100%;">
+                            <tbody id="siswa-list">
+                                <tr>
+                                    <td colspan="3" style="text-align:center; color:gray;">Pilih kelas untuk melihat
+                                        siswa</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
 
                     <button type="submit">Simpan Absensi</button>
                 </form>
             </div>
         </div>
+
         <!-- Tabel Absensi -->
         <div class="info-frame">
             <table>
@@ -267,24 +386,24 @@
                 </thead>
                 <tbody>
                     @forelse($absensis as $index => $a)
-                                        <tr>
-                                            <td>{{ $index + 1 }}</td>
-                                            <td>{{ $a->siswa->nama }}</td>
-                                            <td>{{ $a->mapel->nama_mapel ?? '-' }}</td>
-                                            <td>{{ $a->kelas->nama_kelas ?? '-' }}</td>
-                                            <td>{{ $a->tanggal }}</td>
-                                            <td>{{ ucfirst($a->status) }}</td>
-                                            <td>{{ $a->keterangan ?? '-' }}</td>
-                                            <td>
-                                                <button class="btn-edit" onclick="editAbsensi(
-                            '{{ $a->id }}',
-                            '{{ $a->status }}',
-                            '{{ $a->keterangan }}'
-                        )">
-                                                    ✏️ Edit
-                                                </button>
-                                            </td>
-                                        </tr>
+                        <tr>
+                            <td>{{ $index + 1 }}</td>
+                            <td>{{ $a->siswa->nama }}</td>
+                            <td>{{ $a->mapel->nama_mapel ?? '-' }}</td>
+                            <td>{{ $a->kelas->nama_kelas ?? '-' }}</td>
+                            <td>{{ $a->tanggal }}</td>
+                            <td>{{ ucfirst($a->status) }}</td>
+                            <td>{{ $a->keterangan ?? '-' }}</td>
+                            <td>
+                                <button class="btn-edit" onclick="editAbsensi(
+                                            '{{ $a->id }}',
+                                            '{{ $a->status }}',
+                                            '{{ $a->keterangan }}'
+                                        )">
+                                    ✏️ Edit
+                                </button>
+                            </td>
+                        </tr>
                     @empty
                         <tr>
                             <td colspan="8" class="no-data">Belum ada data absensi.</td>
@@ -362,6 +481,60 @@
                         if (event.target === addModal) closeModal();
                         if (event.target === editModal) closeEditModal();
                     }
+                </script>
+                <script>
+                    function openModal() {
+                        document.getElementById("absensiModal").style.display = "block";
+                    }
+
+                    function closeModal() {
+                        document.getElementById("absensiModal").style.display = "none";
+                    }
+
+                    // Event ketika kelas dipilih
+                    document.getElementById('kelas_id').addEventListener('change', function () {
+                        let kelasId = this.value;
+                        let siswaList = document.getElementById('siswa-list');
+
+                        if (!kelasId) {
+                            siswaList.innerHTML = '<tr><td colspan="3" style="text-align:center;">Pilih kelas terlebih dahulu</td></tr>';
+                            return;
+                        }
+
+                        siswaList.innerHTML = '<tr><td colspan="3" style="text-align:center;">Memuat data siswa...</td></tr>';
+
+                        // URL di-generate langsung dari Laravel route
+                        let baseUrl = `{{ route('guru.absensi.siswa', '') }}`;
+                        let fullUrl = `${baseUrl}/${kelasId}`;
+
+                        fetch(fullUrl)
+                            .then(response => {
+                                if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
+                                return response.json();
+                            })
+                            .then(data => {
+                                siswaList.innerHTML = '';
+                                if (data.length === 0) {
+                                    siswaList.innerHTML = '<tr><td colspan="3" style="text-align:center; color:red;">Tidak ada siswa di kelas ini</td></tr>';
+                                    return;
+                                }
+                                data.forEach((siswa, index) => {
+                                    siswaList.innerHTML += `
+                    <tr style="border-bottom: 1px solid #eee;">
+                        <td style="width: 30px; text-align: center;">${index + 1}</td>
+                        <td style="text-align: left;">${siswa.nama}</td>
+                        <td style="width: 30px; text-align: right;">
+                            <input type="checkbox" name="siswa_ids[]" value="${siswa.id}">
+                        </td>
+                    </tr>
+                `;
+                                });
+                            })
+                            .catch(error => {
+                                console.error('Fetch error:', error);
+                                siswaList.innerHTML = '<tr><td colspan="3" style="text-align:center; color:red;">Gagal memuat data siswa</td></tr>';
+                            });
+                    });
                 </script>
 </body>
 

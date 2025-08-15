@@ -14,6 +14,7 @@ use App\Models\Siswa;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Guru;
+use App\Models\HasilUjian;
 class GuruController extends Controller
 {
     /**
@@ -125,5 +126,11 @@ public function updateProfil(Request $request)
     $user->save();
 
     return redirect()->route('guru.profil')->with('success', 'Profil berhasil diperbarui.');
+}
+public function hasilUjian()
+{
+   $hasil = HasilUjian::with('siswa', 'ujian')->latest()->get();
+    $jawabanUjian = JawabanUjian::with('user', 'ujian')->latest()->get();
+  return view('guru.jawaban.index', compact('hasil', 'jawabanUjian'));
 }
 }

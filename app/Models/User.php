@@ -79,4 +79,12 @@ public function guru()
 {
     return $this->hasOne(\App\Models\Guru::class);
 }
+public function hasilUjians()
+{
+    return $this->hasMany(HasilUjian::class, 'siswa_id');
+}
+public function anak()
+{
+    return $this->hasOne(\App\Models\Siswa::class, 'orangtua_id');
+}
 }

@@ -26,4 +26,5 @@ class Soal extends Model
     {
         return $this->belongsTo(Tugas::class);
     }
+    
 }

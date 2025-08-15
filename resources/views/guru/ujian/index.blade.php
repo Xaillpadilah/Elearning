@@ -186,6 +186,48 @@
     </form>
   </div>
 </div>
+<!-- Tombol -->
+<button class="btn-tambah" onclick="bukaModalSoal({{ $u->id }})">
+    ➕ Tambah Soal Manual
+</button>
+
+<!-- Modal -->
+<div id="modalTambahSoal" class="modal" style="display:none;">
+  <div class="modal-content" onclick="event.stopPropagation()">
+    <h3>Tambah Soal Manual</h3>
+    <form id="formTambahSoal" method="POST" action="{{ route('soal-ujian.store') }}">
+      @csrf
+      <input type="hidden" name="ujian_id" id="soalUjianId">
+
+      <label>Nomor Soal</label>
+      <input type="number" name="nomor" required>
+
+      <label>Pertanyaan</label>
+      <textarea name="pertanyaan" required></textarea>
+
+      <label>Opsi A</label>
+      <input type="text" name="opsi_a" required>
+      <label>Opsi B</label>
+      <input type="text" name="opsi_b" required>
+      <label>Opsi C</label>
+      <input type="text" name="opsi_c" required>
+      <label>Opsi D</label>
+      <input type="text" name="opsi_d" required>
+
+      <label>Jawaban Benar</label>
+      <select name="jawaban_benar" required>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+      </select>
+
+      <div style="margin-top:15px;">
+        <button type="submit" class="btn-simpan-tambah">💾 Simpan Soal</button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script>
   window.onclick = function(event) {
@@ -234,5 +276,69 @@
     }
   };
 </script>
+<script>
+  function bukaModalSoal(ujianId) {
+    document.getElementById('modalTambahSoal').style.display = 'flex';
+    document.getElementById('soalUjianId').value = ujianId;
+  }
+</script>
+<script>
+function bukaModalSoal(ujianId) {
+    document.getElementById('soalUjianId').value = ujianId;
+    document.getElementById('modalTambahSoal').style.display = 'flex';
+}
+
+function tutupModalSoal() {
+    document.getElementById('modalTambahSoal').style.display = 'none';
+}
+
+document.getElementById('modalTambahSoal').addEventListener('click', tutupModalSoal);
+
+document.getElementById('formTambahSoal').addEventListener('submit', function(event) {
+    event.preventDefault();
+
+    let form = this;
+    let formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': form.querySelector('[name=_token]').value
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert('Soal berhasil disimpan!');
+        tutupModalSoal();
+        form.reset();
+    })
+    .catch(error => {
+        console.error(error);
+        alert('Terjadi kesalahan saat menyimpan soal.');
+    });
+});
+</script>
+
+<style>
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    align-items: center; /* biar modal-content di tengah vertikal */
+    justify-content: center; /* tengah horizontal */
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+}
+</style>
 </body>
 </html>

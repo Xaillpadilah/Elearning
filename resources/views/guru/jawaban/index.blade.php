@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <title>Daftar Jawaban Siswa</title>
@@ -39,7 +40,8 @@
             min-width: 600px;
         }
 
-        th, td {
+        th,
+        td {
             padding: 14px 18px;
             border: 1px solid #e0e0e0;
             text-align: left;
@@ -77,85 +79,99 @@
         }
 
         @media (max-width: 768px) {
-            th, td {
+
+            th,
+            td {
                 padding: 10px 12px;
             }
         }
     </style>
 </head>
+
 <body>
 
     <h2>Daftar Jawaban Siswa</h2>
 
-    <!-- Jawaban Tugas -->
-    <div class="table-container">
-        <h3>Jawaban Tugas</h3>
-        <table>
-            <thead>
+  <!-- Jawaban Tugas -->
+<div class="table-container">
+    <h3>Jawaban Tugas</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Siswa</th>
+                <th>Nama Tugas</th>
+                <th>Nama Mapel</th>
+                <th>File Jawaban</th>
+                <th>Tanggal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($jawabanTugas as $jawaban)
                 <tr>
-                    <th>Nama Siswa</th>
-                    <th>Nama Tugas</th>
-                    <th>File Jawaban</th>
-                    <th>Tanggal</th>
+                    <td>{{ $jawaban->siswa->user->name ?? '-' }}</td>
+                    <td>{{ $jawaban->tugas->judul ?? '-' }}</td>
+                    <td>{{ $jawaban->tugas->relasi->mapel->nama_mapel ?? '-' }}</td>
+                    <td>
+                        @if($jawaban->file_jawaban)
+                            <a href="{{ asset('storage/' . $jawaban->file_jawaban) }}" target="_blank">Lihat</a>
+                        @else
+                            -
+                        @endif
+                    </td>
+                    <td>{{ $jawaban->created_at->format('d M Y H:i') }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                @forelse($jawabanTugas as $jawaban)
-                    <tr>
-                        <td>{{ $jawaban->siswa->user->name ?? '-' }}</td>
-                        <td>{{ $jawaban->tugas->judul ?? '-' }}</td>
-                        <td>
-                            @if($jawaban->file_jawaban)
-                                <a href="{{ asset('storage/' . $jawaban->file_jawaban) }}" target="_blank">Lihat</a>
-                            @else
-                                -
-                            @endif
-                        </td>
-                        <td>{{ $jawaban->created_at->format('d M Y H:i') }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="empty-row">Belum ada jawaban tugas.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Jawaban Ujian -->
-    <div class="table-container">
-        <h3>Jawaban Ujian</h3>
-        <table>
-            <thead>
+            @empty
                 <tr>
-                    <th>Nama Siswa</th>
-                    <th>Nama Ujian</th>
-                    <th>File Jawaban</th>
-                    <th>Tanggal</th>
+                    <td colspan="5" class="empty-row">Belum ada jawaban tugas.</td>
                 </tr>
-            </thead>
-            <tbody>
-                @forelse($jawabanUjian as $jawaban)
-                    <tr>
-                        <td>{{ $jawaban->user->name ?? '-' }}</td>
-                        <td>{{ $jawaban->ujian->judul ?? '-' }}</td>
-                        <td>
-                            @if($jawaban->file_path)
-                                <a href="{{ asset('storage/' . $jawaban->file_path) }}" target="_blank">Lihat</a>
-                            @else
-                                -
-                            @endif
-                        </td>
-                        <td>{{ $jawaban->created_at->format('d M Y H:i') }}</td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="4" class="empty-row">Belum ada jawaban ujian.</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
-    </div>
+            @endforelse
+        </tbody>
+    </table>
+</div>
 
+<div class="table-container">
+    <h3>Jawaban Ujian</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Nama Siswa</th>
+                <th>Nama Ujian</th>
+                <th>Nama Pelajaran</th>
+                <th>File Jawaban</th>
+                <th>Skor</th>
+                <th>Tanggal</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse($jawabanUjian->whereNull('soal_id') as $jawaban)
+                <tr>
+                    <td>{{ $jawaban->user->name ?? '-' }}</td>
+                    <td>{{ $jawaban->ujian->judul ?? '-' }}</td>
+                    <td>{{ $jawaban->ujian->guruMapelKelas->mapel->nama_mapel ?? '-' }}</td>
+                    <td>
+                        @if($jawaban->file_path)
+                            <a href="{{ asset('storage/' . $jawaban->file_path) }}" target="_blank">Lihat</a>
+                        @else
+                            -
+                        @endif
+                    </td>
+                    <td>
+                        @if($jawaban->skor !== null)
+                            {{ $jawaban->skor }}%
+                        @else
+                            <span class="text-gray-500 italic">Belum dinilai</span>
+                        @endif
+                    </td>
+                    <td>{{ $jawaban->created_at->format('d M Y H:i') }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="6" class="empty-row">Belum ada jawaban ujian.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
+</div>
 </body>
+
 </html>

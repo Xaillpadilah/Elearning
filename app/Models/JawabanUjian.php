@@ -7,25 +7,29 @@ use Illuminate\Database\Eloquent\Model;
 
 class JawabanUjian extends Model
 {
-    protected $table = 'jawaban_ujian'; // nama tabel di database
+    use HasFactory;
 
     protected $fillable = [
-        'ujian_id',
         'user_id',
+        'ujian_id',
+        'soal_id',
         'jawaban',
-        'file_path',
         'skor',
     ];
 
-    // Relasi ke User
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    // Relasi ke Ujian
     public function ujian()
     {
         return $this->belongsTo(Ujian::class);
     }
+
+    public function soal()
+    {
+        return $this->belongsTo(SoalUjian::class, 'soal_id');
+    }
 }
+

@@ -9,7 +9,7 @@ use App\Models\Mapel;
 use App\Models\Orangtua;
 use Illuminate\Http\Request;
 use App\Models\Pengumuman; // pastikan ini ada
-
+use App\Models\Siswa;
 class OrangtuaController extends Controller
 {
     public function index()
@@ -46,38 +46,41 @@ class OrangtuaController extends Controller
 
 
     // Halaman absensi anak
-    public function hasil()
-    {
-        $user = (object) ['name' => 'Orang Tua'];
+   
 
-        $hasilBelajar = [
-            ['mapel' => 'Matematika', 'tugas' => 85, 'ujian' => 90],
-            ['mapel' => 'Bahasa Indonesia', 'tugas' => 88, 'ujian' => 87],
-            ['mapel' => 'IPA', 'tugas' => 80, 'ujian' => 82],
-            ['mapel' => 'IPS', 'tugas' => 75, 'ujian' => 78],
-            ['mapel' => 'Bahasa Inggris', 'tugas' => 90, 'ujian' => 92],
-        ];
+    
 
-        return view('orangtua.hasil', compact('user', 'hasilBelajar'));
-    }
+   
+  public function hasil()
+{
+    $user = auth()->user();
+    $siswa = $user->anak;
 
-    // Halaman tugas anak
+    $penilaianBulan = collect();
+    $penilaianSemester = collect();
+    $kehadiranBulan = collect();
 
-    public function nilaiAnak()
-    {
-        $user = Auth::user();
-
-        // Ambil anak (asumsinya satu anak untuk satu orang tua)
-        $siswa = Siswa::where('user_id_orangtua', $user->id)->first(); // ganti sesuai field relasi
-
-        if (!$siswa) {
-            return view('orangtua.nilai', ['penilaians' => collect(), 'siswa' => null]);
-        }
-
-        $penilaians = Penilaian::with('mapel')
-            ->where('siswa_id', $siswa->id)
+    if ($siswa) {
+        // Penilaian 1 bulan terakhir
+        $penilaianBulan = $siswa->penilaians()
+            ->with('mapel')
+            ->where('created_at', '>=', now()->subMonth())
             ->get();
 
-        return view('orangtua.nilai', compact('penilaians', 'siswa'));
+        // Penilaian 6 bulan terakhir (semester)
+        $penilaianSemester = $siswa->penilaians()
+            ->with('mapel')
+            ->where('created_at', '>=', now()->subMonths(6))
+            ->get();
+
+        
     }
+
+    return view('orangtua.hasil', compact(
+        'penilaianBulan',
+        'penilaianSemester',
+        'kehadiranBulan'
+    ));
+}
+
 }

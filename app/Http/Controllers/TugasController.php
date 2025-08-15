@@ -11,28 +11,28 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 class TugasController extends Controller
 {
-    
+
     public function index()
     {
-         $user = Auth::user();
+        $user = Auth::user();
 
-    // Ambil guru yang login
-    $guru = \App\Models\Guru::where('user_id', $user->id)->first();
+        // Ambil guru yang login
+        $guru = \App\Models\Guru::where('user_id', $user->id)->first();
 
-    // Ambil semua tugas (opsional bisa filter juga berdasarkan guru)
-    $tugas = \App\Models\Tugas::with('relasi.kelas', 'relasi.mapel')
-        ->whereHas('relasi', function ($query) use ($guru) {
-            $query->where('guru_id', $guru->id);
-        })
-        ->get();
+        // Ambil semua tugas (opsional bisa filter juga berdasarkan guru)
+        $tugas = \App\Models\Tugas::with('relasi.kelas', 'relasi.mapel')
+            ->whereHas('relasi', function ($query) use ($guru) {
+                $query->where('guru_id', $guru->id);
+            })
+            ->get();
 
-    // Ambil hanya relasi milik guru login
-    $relasi = \App\Models\GuruMapelKelas::with(['kelas', 'mapel'])
-        ->where('guru_id', $guru->id)
-        ->get();
+        // Ambil hanya relasi milik guru login
+        $relasi = \App\Models\GuruMapelKelas::with(['kelas', 'mapel'])
+            ->where('guru_id', $guru->id)
+            ->get();
 
-    return view('guru.tugas.index', compact('tugas', 'relasi'));
-}
+        return view('guru.tugas.index', compact('tugas', 'relasi'));
+    }
 
     public function store(Request $request)
     {
@@ -49,7 +49,7 @@ class TugasController extends Controller
         if ($request->hasFile('file_upload')) {
             $filePath = $request->file('file_upload')->store('tugas', 'public');
         }
-        
+
 
         Tugas::create([
             'judul' => $request->judul,
@@ -91,51 +91,51 @@ class TugasController extends Controller
             'deskripsi' => $request->deskripsi,
             'file_path' => $tugas->file_path,
         ]);
- 
+
         return redirect()->back()->with('success', 'Tugas berhasil diperbarui.');
     }
 
 
     public function destroy($id)
-{
-    $tugas = Tugas::findOrFail($id);
-    $this->checkAksesGuru($tugas);
+    {
+        $tugas = Tugas::findOrFail($id);
+        $this->checkAksesGuru($tugas);
 
-    $tugas->delete();
+        $tugas->delete();
 
-    return back()->with('success', 'Tugas berhasil dihapus.');
-}
-   public function kirim($id)
-{
-    $tugas = Tugas::findOrFail($id);
-    
-    // Acak pertanyaan (jika ada detail soal) — contoh implementasi untuk data acak
-    // Misal: $tugas->soal adalah array / JSON dari soal
-    if (!empty($tugas->soal)) {
-        $soal = json_decode($tugas->soal, true);
-        $shuffledSoal = $this->fisherYatesShuffle($soal);
-        $tugas->soal = json_encode($shuffledSoal);
+        return back()->with('success', 'Tugas berhasil dihapus.');
     }
+    public function kirim($id)
+    {
+        $tugas = Tugas::findOrFail($id);
 
-    $tugas->update(['dikirim' => true]);
+        // Acak pertanyaan (jika ada detail soal) — contoh implementasi untuk data acak
+        // Misal: $tugas->soal adalah array / JSON dari soal
+        if (!empty($tugas->soal)) {
+            $soal = json_decode($tugas->soal, true);
+            $shuffledSoal = $this->fisherYatesShuffle($soal);
+            $tugas->soal = json_encode($shuffledSoal);
+        }
 
-    return redirect()->back()->with('success', 'Tugas berhasil dikirim ke siswa dengan soal teracak.');
-}
-// ✅ Fungsi bantu ini diletakkan di dalam controller ini
+        $tugas->update(['dikirim' => true]);
+
+        return redirect()->back()->with('success', 'Tugas berhasil dikirim ke siswa dengan soal teracak.');
+    }
+    // ✅ Fungsi bantu ini diletakkan di dalam controller ini
     private function checkAksesGuru($tugas)
     {
-       $guru = Auth::user()->guru; // Ambil model Guru dari User yang login
-$mapels = $guru->mapels;    // Ambil relasi mapel dari Guru
+        $guru = Auth::user()->guru;
+        $mapels = $guru->mapels;
         $allowedIds = $guru->mapelKelas->pluck('id')->toArray();
 
         if (!in_array($tugas->guru_mapel_kelas_id, $allowedIds)) {
-            abort(403, 'Anda tidak memiliki akses untuk tugas ini.');
+            abort(403, 'Anda tidak memiliki akses untuk tugas/ujian ini.');
         }
     }
 
-    // ✅ Fungsi bantu untuk validasi dari form input (id langsung)
 
-     private function fisherYatesShuffle(array $array)
+
+    private function fisherYatesShuffle(array $array)
     {
         $n = count($array);
         for ($i = $n - 1; $i > 0; $i--) {

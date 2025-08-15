@@ -47,4 +47,9 @@ public function rekapSemester()
 {
     return $this->hasMany(Pengumuman::class, 'dibuat_oleh');
 }
+public function penilaians()
+{
+    return $this->hasMany(Penilaian::class, 'siswa_id');
+}
+
 }

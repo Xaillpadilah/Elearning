@@ -135,87 +135,145 @@
   @endif
   </div>
 
-  <!-- Modal Tambah Siswa -->
-  <div id="modalTambahSiswa" class="modal">
-    <div class="modal-content">
-      <h3>Tambah Data Siswa</h3>
-      <form action="{{ route('admin.siswa.store') }}" method="POST">
-        @csrf
-        <label>Nama</label>
-        <input type="text" name="nama" required>
+<!-- Modal Tambah Siswa -->
+<div id="modalTambahSiswa" class="modal">
+  <div class="modal-content">
+    <h3>Tambah Data Siswa</h3>
+    <form action="{{ route('admin.siswa.store') }}" method="POST">
+      @csrf
 
-        <label>NISN</label>
-        <input type="text" name="nisn" required>
+      <label>Nama</label>
+      <input type="text" name="nama" value="{{ old('nama') }}" required>
+      @error('nama')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <label>Jenis Kelamin</label>
-        <select name="jenis_kelamin" required>
-          <option value="">-- Pilih Jenis Kelamin --</option>
-          <option value="Laki-laki">Laki-laki</option>
-          <option value="Perempuan">Perempuan</option>
-        </select>
+      <label>NISN</label>
+      <input type="text" name="nisn" maxlength="10" value="{{ old('nisn') }}" required>
+      @error('nisn')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <label>Kelas</label>
-        <select name="kelas_id" required>
-          <option value="">-- Pilih Kelas --</option>
-          @foreach($kelas as $k)
-        <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
-      @endforeach
-        </select>
+      <label>Jenis Kelamin</label>
+      <select name="jenis_kelamin" required>
+        <option value="">-- Pilih Jenis Kelamin --</option>
+        <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+        <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+      </select>
+      @error('jenis_kelamin')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <label>Email</label>
-        <input type="email" name="email" required>
+      <label>Kelas</label>
+      <select name="kelas_id" required>
+        <option value="">-- Pilih Kelas --</option>
+        @foreach($kelas as $k)
+          <option value="{{ $k->id }}" {{ old('kelas_id') == $k->id ? 'selected' : '' }}>
+            {{ $k->nama_kelas }}
+          </option>
+        @endforeach
+      </select>
+      @error('kelas_id')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <label>Nama Orang Tua</label>
-        <input type="text" name="nama_ortu" required>
+      <label>Email</label>
+      <input type="email" name="email" value="{{ old('email') }}" required>
+      @error('email')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <label>Nomor HP Orang Tua</label>
-        <input type="text" name="nomor_hp" required>
+      <label>Nama Orang Tua</label>
+      <input type="text" name="nama_ortu" value="{{ old('nama_ortu') }}" required>
+      @error('nama_ortu')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <button type="submit" class="btn-simpan-tambah">💾 Simpan</button>
-      </form>
-    </div>
+      <label>Nomor HP Orang Tua</label>
+      <input type="text" name="nomor_hp" value="{{ old('nomor_hp') }}" required>
+      @error('nomor_hp')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
+
+      <button type="submit" class="btn-simpan-tambah">💾 Simpan</button>
+    </form>
   </div>
+</div>
 
-  <!-- Modal Edit Siswa (dynamic via JS) -->
-  <div id="modalEditSiswa" class="modal">
-    <div class="modal-content">
-      <h3>Edit Data Siswa</h3>
-      <form id="formEditSiswa" method="POST">
-        @csrf
-        @method('PUT')
-        <label>Nama</label>
-        <input type="text" name="nama" id="edit-nama" required>
+<!-- Script: Buka modal jika ada error -->
+@if ($errors->any())
+  <script>
+    window.onload = function () {
+      document.getElementById("modalTambahSiswa").style.display = "block";
+    }
+  </script>
+@endif
 
-        <label>NISN</label>
-        <input type="text" name="nisn" id="edit-nisn" required>
+ <!-- Modal Edit Siswa (dynamic via JS) -->
+<div id="modalEditSiswa" class="modal">
+  <div class="modal-content">
+    <h3>Edit Data Siswa</h3>
+    <form id="formEditSiswa" method="POST">
+      @csrf
+      @method('PUT')
 
-        <label>Jenis Kelamin</label>
-        <select name="jenis_kelamin" id="edit-jk" required>
-          <option value="">-- Pilih Jenis Kelamin --</option>
-          <option value="Laki-laki">Laki-laki</option>
-          <option value="Perempuan">Perempuan</option>
-        </select>
+      <label>Nama</label>
+      <input type="text" name="nama" id="edit-nama" value="{{ old('nama') }}" required>
+      @error('nama')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <label>Kelas</label>
-        <select name="kelas_id" id="edit-kelas" required>
-          @foreach($kelas as $k)
-        <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
-      @endforeach
-        </select>
+      <label>NISN</label>
+      <input type="text" name="nisn" id="edit-nisn" value="{{ old('nisn') }}" maxlength="10" required>
+      @error('nisn')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <label>Email</label>
-        <input type="email" name="email" id="edit-email" required>
+      <label>Jenis Kelamin</label>
+      <select name="jenis_kelamin" id="edit-jk" required>
+        <option value="">-- Pilih Jenis Kelamin --</option>
+        <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+        <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+      </select>
+      @error('jenis_kelamin')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <label>Nama Orang Tua</label>
-        <input type="text" name="nama_ortu" id="edit-ortu" required>
+      <label>Kelas</label>
+      <select name="kelas_id" id="edit-kelas" required>
+        @foreach($kelas as $k)
+          <option value="{{ $k->id }}" {{ old('kelas_id') == $k->id ? 'selected' : '' }}>
+            {{ $k->nama_kelas }}
+          </option>
+        @endforeach
+      </select>
+      @error('kelas_id')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <label>Nomor HP</label>
-        <input type="text" name="nomor_hp" id="edit-hp" required>
+      <label>Email</label>
+      <input type="email" name="email" id="edit-email" value="{{ old('email') }}" required>
+      @error('email')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
 
-        <button type="submit" class="btn-simpan-edit">💾 Simpan Perubahan</button>
-      </form>
-    </div>
+      <label>Nama Orang Tua</label>
+      <input type="text" name="nama_ortu" id="edit-ortu" value="{{ old('nama_ortu') }}" required>
+      @error('nama_ortu')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
+
+      <label>Nomor HP</label>
+      <input type="text" name="nomor_hp" id="edit-hp" value="{{ old('nomor_hp') }}" required>
+      @error('nomor_hp')
+        <small style="color:red;">{{ $message }}</small>
+      @enderror
+
+      <button type="submit" class="btn-simpan-edit">💾 Simpan Perubahan</button>
+    </form>
   </div>
+</div>
+
 
   <script>
     function toggleFullscreenDashboard() {

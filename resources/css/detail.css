@@ -1,0 +1,346 @@
+
+
+        .tab-button.active {
+            background-color: #2563eb;
+            /* bg-blue-600 */
+            color: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Warna tab spesifik per jenis (materi/tugas/ujian) saat aktif */
+        #tabMateri.active {
+            background-color: #332991ff;
+            /* emerald-500 */
+        }
+
+        #tabTugas.active {
+            background-color: #190a72ff;
+            /* amber-500 */
+        }
+
+        #tabUjian.active {
+            background-color: #3616acff;
+            /* red-500 */
+        }
+
+        #materi {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Dropdown details */
+        #materi details {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        #materi details[open] {
+            background-color: #fff;
+            border-color: #cbd5e1;
+        }
+
+        /* Summary Title */
+        #materi summary {
+            list-style: none;
+            outline: none;
+            position: relative;
+            padding-left: 1.5rem;
+            font-weight: 600;
+        }
+
+        #materi summary::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 3px;
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        #materi details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        /* Hapus bullet */
+        #materi ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #materi li {
+            background-color: #f1f5f9;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            transition: background-color 0.2s;
+        }
+
+        #materi li:hover {
+            background-color: #e0f2fe;
+        }
+
+        /* Link file dan link web */
+        #materi a {
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        #materi a:hover {
+            text-decoration: underline;
+            color: #2563eb;
+        }
+
+        /* (Opsional) Form upload - jika akan ditambahkan ke materi */
+        #materi form {
+            background-color: #f8fafc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        #materi form label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        #materi input[type="file"] {
+            border: 1px solid #cbd5e1;
+            padding: 6px;
+            border-radius: 4px;
+            width: 100%;
+            background-color: #fff;
+        }
+
+        #materi button[type="submit"] {
+            margin-top: 10px;
+            background-color: #3b82f6;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        #materi button[type="submit"]:hover {
+            background-color: #2563eb;
+        }
+
+        #tugas {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Dropdown details */
+        #tugas details {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        #tugas details[open] {
+            background-color: #fff;
+            border-color: #cbd5e1;
+        }
+
+        /* Summary Title */
+        #tugas summary {
+            list-style: none;
+            outline: none;
+            position: relative;
+            padding-left: 1.5rem;
+            font-weight: 600;
+        }
+
+        #tugas summary::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 3px;
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        #tugas details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        /* Hapus bullet */
+        #tugas ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #tugas li {
+            background-color: #f1f5f9;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            transition: background-color 0.2s;
+        }
+
+        #tugas li:hover {
+            background-color: #e0f2fe;
+        }
+
+        /* File link */
+        #tugas a {
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        #tugas a:hover {
+            text-decoration: underline;
+            color: #2563eb;
+        }
+
+        /* Form upload */
+        #tugas form {
+            background-color: #f8fafc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        #tugas form label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        #tugas input[type="file"] {
+            border: 1px solid #cbd5e1;
+            padding: 6px;
+            border-radius: 4px;
+            width: 100%;
+            background-color: #fff;
+        }
+
+        #tugas button[type="submit"] {
+            margin-top: 10px;
+            background-color: #3b82f6;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        #tugas button[type="submit"]:hover {
+            background-color: #2563eb;
+        }
+
+        #ujian {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        /* Dropdown details */
+        #ujian details {
+            background-color: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+
+        #ujian details[open] {
+            background-color: #fff;
+            border-color: #cbd5e1;
+        }
+
+        /* Summary Title */
+        #ujian summary {
+            list-style: none;
+            outline: none;
+            position: relative;
+            padding-left: 1.5rem;
+            font-weight: 600;
+        }
+
+        #ujian summary::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 3px;
+            font-size: 1rem;
+            transition: transform 0.3s ease;
+        }
+
+        #ujian details[open] summary::before {
+            transform: rotate(90deg);
+        }
+
+        /* Hapus bullet */
+        #ujian ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        #ujian li {
+            background-color: #f1f5f9;
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+            transition: background-color 0.2s;
+        }
+
+        #ujian li:hover {
+            background-color: #e0f2fe;
+        }
+
+        /* File link */
+        #ujian a {
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        #ujian a:hover {
+            text-decoration: underline;
+            color: #2563eb;
+        }
+
+        /* Form upload */
+        #ujian form {
+            background-color: #f8fafc;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 6px;
+            border: 1px dashed #cbd5e1;
+        }
+
+        #ujian form label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #334155;
+        }
+
+        #ujian input[type="file"] {
+            border: 1px solid #cbd5e1;
+            padding: 6px;
+            border-radius: 4px;
+            width: 100%;
+            background-color: #fff;
+        }
+
+        #ujian button[type="submit"] {
+            margin-top: 10px;
+            background-color: #3b82f6;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        #ujian button[type="submit"]:hover {
+            background-color: #2563eb;
+        }
+
+        .hidden {
+            display: none;
+        }

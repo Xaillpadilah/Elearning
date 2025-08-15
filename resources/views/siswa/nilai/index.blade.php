@@ -139,36 +139,48 @@ tbody td {
     <h4>📊 Informasi Nilai</h4>
     <p>Anda dapat melihat daftar nilai yang telah diberikan oleh guru. Pastikan semua data sesuai dengan hasil pembelajaran Anda.</p>
 </div>
-    <div class="container">
-        @if($penilaians->isEmpty())
-            <p class="empty">Tidak ada data nilai yang tersedia.</p>
-        @else
-            <table>
-                <thead>
+   <div class="container">
+    @if($penilaians->isEmpty())
+        <p class="empty">Tidak ada data nilai yang tersedia.</p>
+    @else
+        <table>
+            <thead>
+                <tr>
+                    <th>Mata Pelajaran</th>
+                    <th>Tugas</th>
+                    <th>Kuis</th>
+                    <th>UTS</th>
+                    <th>UAS</th>
+                    <th>Nilai Akhir</th>
+                    <th>Catatan</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($penilaians as $nilai)
+                    @php
+                        // Ambil nilai, gunakan 0 jika null
+                        $tugas = $nilai->nilai_tugas ?? 0;
+                        $kuis = $nilai->nilai_kuis ?? 0;
+                        $uts = $nilai->nilai_uts ?? 0;
+                        $uas = $nilai->nilai_uas ?? 0;
+
+                        // Hitung nilai akhir dengan bobot
+                        $nilaiAkhir = round(($tugas * 0.2) + ($kuis * 0.2) + ($uts * 0.3) + ($uas * 0.3), 2);
+                    @endphp
                     <tr>
-                        <th>Mata Pelajaran</th>
-                        <th>Tugas</th>
-                        <th>Kuis</th>
-                        <th>UTS</th>
-                        <th>UAS</th>
-                        <th>Catatan</th>
+                        <td>{{ $nilai->mapel->nama_mapel ?? '-' }}</td>
+                        <td>{{ $tugas }}</td>
+                        <td>{{ $kuis }}</td>
+                        <td>{{ $uts }}</td>
+                        <td>{{ $uas }}</td>
+                        <td>{{ $nilaiAkhir }}</td>
+                        <td>{{ $nilai->catatan }}</td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach($penilaians as $nilai)
-                        <tr>
-                            <td>{{ $nilai->mapel->nama_mapel ?? '-' }}</td>
-                            <td>{{ $nilai->nilai_tugas }}</td>
-                            <td>{{ $nilai->nilai_kuis }}</td>
-                            <td>{{ $nilai->nilai_uts }}</td>
-                            <td>{{ $nilai->nilai_uas }}</td>
-                            <td>{{ $nilai->catatan }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
-    </div>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
+</div>
     <footer id="footer">
   &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN.
 </footer>

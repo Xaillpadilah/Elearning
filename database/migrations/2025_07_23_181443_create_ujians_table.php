@@ -19,7 +19,7 @@ return new class extends Migration
 
     $table->enum('tipe_ujian', ['pilihan_ganda', 'essai', 'campuran'])->default('pilihan_ganda'); // jenis ujian
     $table->string('file_soal')->nullable(); // untuk upload file soal (PDF/DOCX dll)
-
+ $table->longText('isi_soal')->nullable(); // ✅ kolom tambahan untuk menyimpan hasil convert isi soal dari PDF
     $table->foreignId('guru_mapel_kelas_id')->constrained('guru_mapel_kelas')->onDelete('cascade');
 
     $table->boolean('acak_soal')->default(false); // untuk acak soal

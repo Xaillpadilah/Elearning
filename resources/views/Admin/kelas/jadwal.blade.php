@@ -438,16 +438,16 @@
       ✅ {{ session('success') }}
     </div>
 
-  @endif
- {{-- Tombol Tambah Jadwal --}}
+  @endif{{-- Tombol Tambah Jadwal --}}
 <button onclick="toggleForm()" class="btn-tambah-jadwal">➕ Tambah Jadwal</button>
+
 {{-- Form Tambah Jadwal (Floating Card) --}}
 <div id="formTambahJadwal" class="floating-card" style="display: none;">
   <div class="card-header">
     <h3>➕ Tambah Jadwal</h3>
     <button class="close-btn" onclick="toggleForm()">✖</button>
   </div>
-  <form action="{{ route('admin.kelas.jadwal.store') }}" method="POST">
+  <form id="formJadwal" action="{{ route('admin.kelas.jadwal.store') }}" method="POST">
     @csrf
     <input type="hidden" name="kelas_id" value="{{ $kelas->id }}">
 
@@ -497,13 +497,14 @@
 
       <div class="form-group" id="ruanganField" style="display: none;">
         <label>Link Ruangan / Nama Ruangan</label>
-        <input type="text" name="ruangan" placeholder="https://meet.google.com/... atau Ruang A1">
+        <input type="text" id="ruangan" name="ruangan" placeholder="https://meet.google.com/... atau Ruang A1">
       </div>
     </div>
 
     <button type="submit">Simpan Jadwal</button>
   </form>
 </div>
+
 
   {{-- Tabel Jadwal --}}
   @if($jadwals->count())
@@ -551,14 +552,13 @@
 @else
   <div class="info-frame no-data">Tidak ada jadwal untuk kelas ini.</div>
 @endif
- 
-{{-- Form Edit Jadwal (Floating Card) --}}
+ {{-- Form Edit Jadwal (Floating Card) --}}
 <div id="formEditJadwal" class="floating-card" style="display: none;">
   <div class="card-header">
     <h3>✏️ Edit Jadwal</h3>
     <button class="close-btn" onclick="toggleFormEdit()">✖</button>
   </div>
-   <form id="editJadwalForm" method="POST">
+  <form id="editJadwalForm" method="POST">
     @csrf
     @method('PUT')
     <input type="hidden" name="kelas_id" id="edit_kelas_id">
@@ -609,13 +609,14 @@
 
       <div class="form-group" id="edit_ruangan_field" style="display: none;">
         <label>Link Ruangan / Nama Ruangan</label>
-        <input type="text" name="ruangan" id="edit_ruangan">
+        <input type="text" name="ruangan" id="edit_ruangan" placeholder="">
       </div>
     </div>
 
     <button type="submit">Update Jadwal</button>
   </form>
 </div>
+
 <footer>&copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN.</footer>
 <script>
   function toggleFullscreenDashboard() {
@@ -689,6 +690,71 @@
       document.getElementById('edit_ruangan').value = '';
     }
   }
+</script>
+<script>
+  function toggleRuanganField() {
+    const tipe = document.getElementById('tipe_ruangan').value;
+    const field = document.getElementById('ruanganField');
+    const input = document.getElementById('ruangan');
+    if (tipe === 'online') {
+        field.style.display = 'block';
+        input.placeholder = 'https://meet.google.com/...';
+    } else if (tipe === 'offline') {
+        field.style.display = 'block';
+        input.placeholder = 'Ruang A1';
+    } else {
+        field.style.display = 'none';
+        input.value = '';
+    }
+}
+
+// Validasi saat submit
+document.getElementById('formJadwal').addEventListener('submit', function(e) {
+    const tipe = document.getElementById('tipe_ruangan').value;
+    const ruangan = document.getElementById('ruangan').value.trim();
+    
+    if (tipe === 'online') {
+        const meetPattern = /^https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}$/;
+        if (!meetPattern.test(ruangan)) {
+            alert('Link Google Meet tidak valid! Contoh: https://meet.google.com/abc-defg-hij');
+            e.preventDefault();
+            return false;
+        }
+    }
+});
+</script>
+
+<script>
+  function toggleEditRuanganField() {
+  const tipe = document.getElementById('edit_tipe_ruangan').value;
+  const field = document.getElementById('edit_ruangan_field');
+  const input = document.getElementById('edit_ruangan');
+  if (tipe === 'online') {
+    field.style.display = 'block';
+    input.placeholder = 'https://meet.google.com/...';
+  } else if (tipe === 'offline') {
+    field.style.display = 'block';
+    input.placeholder = 'Ruang A1';
+  } else {
+    field.style.display = 'none';
+    input.value = '';
+  }
+}
+
+// Validasi form edit sebelum submit
+document.getElementById('editJadwalForm').addEventListener('submit', function(e) {
+  const tipe = document.getElementById('edit_tipe_ruangan').value;
+  const ruangan = document.getElementById('edit_ruangan').value.trim();
+
+  if (tipe === 'online') {
+    const meetPattern = /^https:\/\/meet\.google\.com\/[a-z]{3}-[a-z]{4}-[a-z]{3}$/;
+    if (!meetPattern.test(ruangan)) {
+      alert('Link Google Meet tidak valid! Contoh: https://meet.google.com/abc-defg-hij');
+      e.preventDefault();
+      return false;
+    }
+  }
+});
 </script>
 
 </body>

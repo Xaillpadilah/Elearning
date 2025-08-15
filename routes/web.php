@@ -29,6 +29,9 @@ use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\TugasSiswaController;
 use App\Http\Controllers\MateriSiswaController;
 use App\Http\Controllers\UjianSiswaController;
+use App\Http\Controllers\SoalController;
+use App\Http\Controllers\PdfSoalController;
+
 // Welcome atau halaman awal
 Route::get('/', function () {
     return view('welcome');
@@ -165,7 +168,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
 //orang tua
 Route::prefix('orangtua')->middleware(['auth', 'checkRole:orangtua'])->group(function () {
     Route::get('/dashboard', [OrangtuaController::class, 'index'])->name('orangtua.dashboard');
-    Route::get('/hasil', [OrangtuaController::class, 'hasil'])->name('orangtua.hasil');
+ Route::get('/orangtua/hasil', [OrangtuaController::class, 'hasil'])->name('orangtua.hasil');
     Route::get('/perkembangan', [OrangtuaController::class, 'perkembangan'])->name('orangtua.perkembangan');
     Route::get('/komunikasi', [OrangtuaController::class, 'komunikasi'])->name('orangtua.komunikasi');
     Route::get('/orangtua/nilai', [OrangtuaController::class, 'nilai'])->name('orangtua.nilai');
@@ -194,6 +197,8 @@ Route::middleware(['auth', 'checkRole:admin,guru'])->group(function () {
     Route::put('/tugas/{id}', [TugasController::class, 'update'])->name('guru.tugas.update');
     Route::put('/guru/tugas/{id}/kirim', [TugasController::class, 'kirim'])->name('tugas.kirim');
     Route::delete('/tugas/{id}', [TugasController::class, 'destroy'])->name('guru.tugas.destroy');
+    Route::post('/soal', [SoalController::class, 'store'])->name('soal.store');
+    Route::delete('/soal/{id}', [SoalController::class, 'destroy'])->name('soal.destroy');
 });
 
 // guru
@@ -207,6 +212,14 @@ Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function ()
     Route::delete('/ujian/{id}', [UjianController::class, 'destroy'])->name('guru.ujian.destroy');
     Route::put('/ujian/{id}', [UjianController::class, 'update'])->name('guru.ujian.update');
     Route::put('/guru/ujian/kirim/{id}', [UjianController::class, 'kirim'])->name('guru.ujian.kirim');
+    Route::post('/guru/ujian/soal', [UjianController::class, 'storeSoal'])->name('guru.ujian.soal.store');
+    Route::post('/convert-pdf', [PdfSoalController::class, 'convert'])->name('convert.pdf');
+Route::post('/soal-ujian', [SoalUjianController::class, 'store'])->name('soal-ujian.store');
+Route::post('/soal-ujian/store', [SoalUjianController::class, 'store'])->name('soal-ujian.store');
+Route::get('/ujian/{ujian_id}/soal', [UjianController::class, 'tampilkanSoal'])->name('soal-ujian.index');
+Route::get('/guru/ujian/{id}/soal', [UjianController::class, 'soal'])->name('guru.ujian.soal');
+
+
 });
 //penilaina 
 Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function () {
@@ -232,6 +245,9 @@ Route::prefix('guru')->middleware(['auth', 'checkRole:guru'])->group(function ()
     Route::get('/guru/jawaban', [GuruController::class, 'jawaban'])->name('guru.jawaban.index');
     Route::get('/guru/profil', [GuruController::class, 'profil'])->name('guru.profil');
     Route::put('/guru/profil', [GuruController::class, 'updateProfil'])->name('guru.profil.update');
+    Route::get('/get-siswa-by-kelas/{kelas_id}', [AbsensiController::class, 'getSiswaByKelas']);
+   Route::get('/absensi/siswa/{kelas_id}', [AbsensiController::class, 'getSiswaByKelas'])
+        ->name('guru.absensi.siswa');
 });
 //siswa
 Route::prefix('siswa')->middleware(['auth', 'checkRole:siswa'])->group(function () {
@@ -266,5 +282,7 @@ Route::middleware(['auth', 'checkRole:siswa'])->prefix('siswa')->group(function 
     Route::post('/siswa/jawaban/ujian', [SiswaController::class, 'storeUjianJawaban'])->name('siswa.jawaban.ujian.store');
     Route::get('/siswa/profil', [SiswaController::class, 'profil'])->name('siswa.profil');
     Route::post('/siswa/profil/update', [SiswaController::class, 'updateProfil'])->name('siswa.profil.update');
+    Route::post('/siswa/ujian/jawaban-pg', [SiswaController::class, 'jawabanPilihanGandaStore'])->name('siswa.jawaban.ujian.pilihan-ganda.store');
+
 
 });

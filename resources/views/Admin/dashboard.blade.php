@@ -248,6 +248,90 @@
         grid-template-columns: 1fr;
       }
     }
+    @media (max-width: 1024px) {
+  .main {
+    margin-left: 0;
+    padding: 20px;
+  }
+
+  .sidebar {
+    position: fixed;
+    left: -100%;
+    top: 0;
+    width: 240px;
+    height: 100vh;
+    background: linear-gradient(to bottom, #ffffff, #e3f2fd);
+    z-index: 999;
+    padding: 20px;
+    transition: left 0.3s ease;
+  }
+
+  .sidebar.active {
+    left: 0;
+  }
+
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.3);
+    z-index: 998;
+  }
+
+  .overlay.active {
+    display: block;
+  }
+}
+@media (max-width: 1366px) {
+  .main {
+    padding: 24px;
+  }
+
+  .actions a, .actions button {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+
+  .sidebar {
+    width: 220px;
+  }
+
+  .main {
+    margin-left: 240px;
+  }
+
+  footer {
+    left: 240px;
+    width: calc(100% - 240px);
+  }
+}
+@media (max-width: 360px) {
+  .sidebar h2 {
+    font-size: 16px;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 16px;
+  }
+
+  .btn-simpan-tambah,
+  .btn-simpan-edit {
+    padding: 8px;
+    font-size: 13px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .search-form input {
+    font-size: 13px;
+  }
+}
+
   </style>
 </head>
 

@@ -56,13 +56,14 @@ class MateriSiswaController extends Controller
         $mapel = Mapel::with('guru')->findOrFail($id);
 
         // Ambil materi sesuai mapel dan kelas siswa
-    $materis = Materi::with(['mapel', 'guru'])
-    ->where('status_kirim', 1)
-    ->orderBy('created_at', 'desc')
-    ->get();
-
+        $materis = Materi::with(['relasi.mapel', 'relasi.guru'])
+            ->where('mapel_id', $id)
+            ->where('kelas_id', $siswa->kelas_id)
+            ->where('status_kirim', 1)
+            ->orderBy('created_at', 'desc')
+            ->get();
         // Group berdasarkan Nama Mapel - Nama Guru
-       
+
 
         // Tambahan debug jika kosong
         if ($materis->isEmpty()) {
@@ -70,31 +71,50 @@ class MateriSiswaController extends Controller
         }
 
         // Ambil tugas sesuai mapel dan kelas
-        $tugas = Tugas::with(['relasi.mapel', 'relasi.guru'])
-            ->where('mapel_id', $id)
-            ->where('kelas_id', $siswa->kelas_id)
-            ->orderBy('tanggal_deadline', 'asc')
-            ->get();
-       
-   
-        // Ambil ujian sesuai mapel dan kelas
-        $ujians = Ujian::with(['relasi.mapel', 'relasi.guru'])->get();
-        $ujians = Ujian::where('mapel_id', $id)
-            ->where('kelas_id', $siswa->kelas_id)
-            ->orderBy('tanggal', 'asc')
-            ->get();
+       $tugas = Tugas::with(['mapel', 'guru', 'soals'])
+    ->where('mapel_id', $id)
+    ->where('kelas_id', $siswa->kelas_id)
+    ->orderBy('tanggal_deadline', 'asc')
+    ->get();
+
+       // Ambil ujian sesuai mapel dan kelas
+$ujians = Ujian::with(['guruMapelKelas.mapel', 'guruMapelKelas.guru', 'soals'])
+    ->whereHas('guruMapelKelas', function ($query) use ($id, $siswa) {
+        $query->where('mapel_id', $id)
+              ->where('kelas_id', $siswa->kelas_id);
+    })
+    ->orderBy('tanggal', 'asc')
+    ->get();
+    
         $materis = Materi::all();
         $tugas = Tugas::all();
-        $ujians = Ujian::all(); // sama dengan query "WHERE 1"// sesuai query SELECT * FROM tugas WHERE 1
-        // Kirim semua data ke view detail mapel
-
+        $ujians = Ujian::all(); 
+    
+    foreach ($ujians as $ujian) {
+        if ($ujian->acak_soal && $ujian->soals->isNotEmpty()) {
+            $shuffled = $ujian->soals->toArray();
+            for ($i = count($shuffled) - 1; $i > 0; $i--) {
+                $j = random_int(0, $i);
+                $temp = $shuffled[$i];
+                $shuffled[$i] = $shuffled[$j];
+                $shuffled[$j] = $temp;
+            }
+            
+           $ujian->soals = $ujian->soals->shuffle();
+        }
+          // Timer: Set waktu mulai hanya jika belum diset
+    $sessionKey = 'ujian_start_time_' . $ujian->id;
+    if (!session()->has($sessionKey)) {
+        session([$sessionKey => now()]);
+    }
+    }
         return view('siswa.mapel.detail', compact('mapel', 'mapels', 'materis', 'tugas', 'ujians'));
     }
     public function store(Request $request)
     {
         $request->validate([
             'tugas_id' => 'required|exists:tugas,id',
-            'file_jawaban' => 'required|file|max:10240', // max 10 MB
+            'file_jawaban' => 'required|file|max:10240', 
         ]);
 
         $path = $request->file('file_jawaban')->store('jawaban', 'public');

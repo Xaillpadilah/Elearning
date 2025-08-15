@@ -13,12 +13,18 @@ use App\Models\Video;
 use App\Models\Penilaian;
 use App\Models\Pengumuman;
 use App\Models\Absensi;
+use Carbon\Carbon;
+use App\Models\Jadwal;
+use App\Models\Siswa;
+use App\Models\JawabanUjian;
 class SiswaController extends Controller
 {
     // Halaman Dashboard Siswa
-   public function index()
+    public function index()
 {
-    $siswa = Auth::user();
+    $user = Auth::user();
+    $siswa = Siswa::where('user_id', $user->id)->first();
+
     $mapels = Mapel::with('guru')->get();
     $mapel = $mapels->first(); // ambil mapel pertama untuk ditampilkan default
 
@@ -26,18 +32,16 @@ class SiswaController extends Controller
     $tugas = [];
     $ujians = [];
 
-    if ($mapel) {
+    if ($mapel && $siswa && $siswa->kelas_id) {
         $materis = Materi::where('mapel_id', $mapel->id)
-                    ->where('kelas_id', $siswa->kelas_id)
-                    ->get();
+            ->where('kelas_id', $siswa->kelas_id)
+            ->get();
 
         $tugas = Tugas::where('mapel_id', $mapel->id)
-                    ->where('kelas_id', $siswa->kelas_id)
-                    ->get();
+            ->where('kelas_id', $siswa->kelas_id)
+            ->get();
 
-        $ujians = Ujian::where('mapel_id', $mapel->id)
-                    ->where('kelas_id', $siswa->kelas_id)
-                    ->get();
+        
     }
 
     $pengumumen = Pengumuman::with('dibuat_oleh_user')
@@ -45,27 +49,37 @@ class SiswaController extends Controller
         ->latest()
         ->take(5)
         ->get();
-  $jumlahAbsensi = Absensi::where('siswa_id', $siswa->id)->count(); // tambahkan ini
+
+    $jumlahAbsensi = $siswa ? Absensi::where('siswa_id', $siswa->id)->count() : 0;
     $jumlahUjian = 0;
-      $jadwalHariIni = collect();
-      $jumlahTugas = 5;
-        return view('siswa.siswadashboard', compact(
+
+    $hariIni = Carbon::now()->locale('id')->isoFormat('dddd');
+
+    $jadwalHariIni = [];
+
+    if ($siswa && $siswa->kelas_id) {
+        $jadwalHariIni = Jadwal::with(['mapel', 'guru'])
+            ->where('hari', $hariIni)
+            ->where('kelas_id', $siswa->kelas_id)
+            ->get();
+    }
+
+    return view('siswa.siswadashboard', compact(
         'siswa',
         'pengumumen',
         'jumlahAbsensi',
-       
         'jumlahUjian',
         'jadwalHariIni',
         'mapels',
         'mapel',
         'materis',
         'tugas',
-        'ujians'
+     
+        'hariIni'
     ));
 }
-
     // Halaman Daftar Semua Mata Pelajaran
-       public function absensi()
+    public function absensi()
     {
 
         // Ambil data absensi siswa
@@ -92,105 +106,175 @@ class SiswaController extends Controller
         return view('siswa.nilai.index', compact('penilaians', 'siswa', 'mapels'));
     }
 
-public function materi($id)
+    public function materi($id)
+    {
+        $user = Auth::user();
+        $siswa = Siswa::where('user_id', $user->id)->first();
+
+        $mapels = Mapel::all(); // untuk sidebar jika diperlukan
+        $mapel = Mapel::findOrFail($id);
+
+        // Ambil materi hanya yang dikirim oleh guru dan sesuai kelas siswa
+        $materis = Materi::where('mapel_id', $id)
+            ->where('kelas_id', $siswa->kelas_id)
+            ->where('status_kirim', 'terkirim')
+            ->get();
+
+        return view('siswa.materi.index', compact('materis', 'mapels', 'mapel'));
+    }
+    public function tugas($id)
+    {
+        $user = Auth::user();
+        $siswa = Siswa::where('user_id', $user->id)->first();
+
+        $mapel = Mapel::findOrFail($id);
+        $tugas = Tugas::where('mapel_id', $id)
+            ->where('kelas_id', $siswa->kelas_id)
+            ->get();
+
+        $mapels = Mapel::all();
+
+        return view('siswa.tugas', compact('tugas', 'mapel', 'mapels'));
+    }
+
+    public function ujian($id)
+    {
+        $user = Auth::user();
+        $siswa = Siswa::where('user_id', $user->id)->first();
+
+        $mapel = Mapel::findOrFail($id);
+        $ujian = Ujian::where('mapel_id', $id)
+            ->where('kelas_id', $siswa->kelas_id)
+            ->get();
+
+        $mapels = Mapel::all();
+
+        return view('siswa.ujian', compact('ujian', 'mapel', 'mapels'));
+    }
+    public function storeUjianJawaban(Request $request)
+    {
+        $request->validate([
+            'ujian_id' => 'required|exists:ujians,id',
+            'file_jawaban' => 'required|file|mimes:pdf,docx,doc,zip|max:10240'
+        ]);
+
+        $path = $request->file('file_jawaban')->store('jawaban_ujian', 'public');
+
+        JawabanUjian::create([
+            'ujian_id' => $request->ujian_id,
+            'user_id' => Auth::id(),
+            'file_path' => $path,
+        ]);
+
+        return back()->with('success', 'Jawaban berhasil dikirim.');
+    }
+    public function profil()
+    {
+        $user = Auth::user();
+
+        // Ambil data siswa yang terhubung dengan user
+        $siswa = $user->siswa()->with('kelas')->first();
+
+        if (!$siswa) {
+            abort(403, 'Data siswa tidak ditemukan.');
+        }
+
+        return view('siswa.profil', compact('user', 'siswa'));
+    }
+    public function updateProfil(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $data = [
+            'name' => $request->name,
+            'email' => $request->email,
+        ];
+
+        if ($request->hasFile('foto')) {
+            // Simpan file foto ke dalam storage/app/public/foto_profil
+            $path = $request->file('foto')->store('foto_profil', 'public');
+            $data['foto'] = $path;
+        }
+
+        $user->update($data);
+
+        return redirect()->route('siswa.profil')->with('success', 'Profil berhasil diperbarui.');
+    }
+ public function jawabanPilihanGandaStore(Request $request)
 {
-    $user = Auth::user();
-    $siswa = Siswa::where('user_id', $user->id)->first();
+    $ujianId = $request->ujian_id;
+    $siswaId = auth()->id(); // sesuaikan jika pakai guard lain
 
-    $mapels = Mapel::all(); // untuk sidebar jika diperlukan
-    $mapel = Mapel::findOrFail($id);
+    // Cek apakah siswa sudah pernah menjawab ujian ini
+    $sudahJawab = JawabanUjian::where('ujian_id', $ujianId)
+        ->where('user_id', $siswaId)
+        ->exists();
 
-    // Ambil materi hanya yang dikirim oleh guru dan sesuai kelas siswa
-    $materis = Materi::where('mapel_id', $id)
-        ->where('kelas_id', $siswa->kelas_id)
-        ->where('status_kirim', 'terkirim')
-        ->get();
+    if ($sudahJawab) {
+        return back()->with('error', 'Anda sudah mengerjakan ujian ini.');
+    }
 
-    return view('siswa.materi.index', compact('materis', 'mapels', 'mapel'));
-}
-public function tugas($id)
-{
-    $user = Auth::user();
-    $siswa = Siswa::where('user_id', $user->id)->first();
-
-    $mapel = Mapel::findOrFail($id);
-    $tugas = Tugas::where('mapel_id', $id)
-                  ->where('kelas_id', $siswa->kelas_id)
-                  ->get();
-
-    $mapels = Mapel::all();
-
-    return view('siswa.tugas', compact('tugas', 'mapel', 'mapels'));
-}
-
-public function ujian($id)
-{
-    $user = Auth::user();
-    $siswa = Siswa::where('user_id', $user->id)->first();
-
-    $mapel = Mapel::findOrFail($id);
-    $ujian = Ujian::where('mapel_id', $id)
-                  ->where('kelas_id', $siswa->kelas_id)
-                  ->get();
-
-    $mapels = Mapel::all();
-
-    return view('siswa.ujian', compact('ujian', 'mapel', 'mapels'));
-}
- public function storeUjianJawaban(Request $request)
-{
+    // Validasi input
     $request->validate([
         'ujian_id' => 'required|exists:ujians,id',
-        'file_jawaban' => 'required|file|mimes:pdf,docx,doc,zip|max:10240'
+        'jawaban' => 'required|array',
     ]);
 
-    $path = $request->file('file_jawaban')->store('jawaban_ujian', 'public');
+    $ujian = Ujian::with('soals')->findOrFail($ujianId);
+    $jawabanSiswa = $request->input('jawaban');
 
+    $jumlahSoal = $ujian->soals->count();
+    $jawabanBenar = 0;
+
+    // Simpan jawaban siswa per soal
+    foreach ($ujian->soals as $soal) {
+        $jawaban = $jawabanSiswa[$soal->id] ?? null;
+
+        if ($jawaban && $jawaban == $soal->kunci_jawaban) {
+            $jawabanBenar++;
+        }
+
+        JawabanUjian::create([
+            'ujian_id' => $ujian->id,
+            'user_id' => $siswaId,
+            'soal_id' => $soal->id,
+            'jawaban' => $jawaban,
+            'skor' => null,
+        ]);
+    }
+
+    // Hitung skor akhir
+    $skor = $jumlahSoal > 0 ? round(($jawabanBenar / $jumlahSoal) * 100) : 0;
+
+    // Simpan skor total di baris khusus
     JawabanUjian::create([
-        'ujian_id' => $request->ujian_id,
-        'user_id' => Auth::id(),
-        'file_path' => $path,
+        'ujian_id' => $ujian->id,
+        'user_id' => $siswaId,
+        'soal_id' => null,
+        'jawaban' => null,
+        'skor' => $skor,
     ]);
 
-    return back()->with('success', 'Jawaban berhasil dikirim.');
-}  
-public function profil()
-{
-    $user = Auth::user();
-
-    // Ambil data siswa yang terhubung dengan user
-    $siswa = $user->siswa()->with('kelas')->first();
-
-    if (!$siswa) {
-        abort(403, 'Data siswa tidak ditemukan.');
-    }
-
-    return view('siswa.profil', compact('user', 'siswa'));
+    return redirect()->back()->with('success', 'Jawaban berhasil dikirim!');
 }
-public function updateProfil(Request $request)
+public function kerjakanUjian($ujianId, $soalKe = 1)
 {
-    $user = Auth::user();
+    $ujian = Ujian::with(['soalUjian'])->findOrFail($ujianId);
 
-    $request->validate([
-        'name' => 'required|string|max:255',
-        'email' => 'required|email|unique:users,email,' . $user->id,
-        'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-    ]);
+    $soalTotal = $ujian->soalUjian->count();
+    $soal = $ujian->soalUjian->skip($soalKe - 1)->take(1)->first();
 
-    $data = [
-        'name' => $request->name,
-        'email' => $request->email,
-    ];
-
-    if ($request->hasFile('foto')) {
-        // Simpan file foto ke dalam storage/app/public/foto_profil
-        $path = $request->file('foto')->store('foto_profil', 'public');
-        $data['foto'] = $path;
+    if (!$soal) {
+        return redirect()->route('siswa.ujian.selesai', $ujianId);
     }
 
-    $user->update($data);
-
-    return redirect()->route('siswa.profil')->with('success', 'Profil berhasil diperbarui.');
+    return view('siswa.ujian.kerjakan', compact('ujian', 'soal', 'soalKe', 'soalTotal'));
 }
 }
 

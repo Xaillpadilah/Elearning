@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Ujian extends Model
-{ protected $fillable = [
+{
+     protected $table = 'ujians';
+    protected $fillable = [
         'judul',
         'tanggal',
         'keterangan',
@@ -41,5 +43,23 @@ public function relasi()
     {
         return $this->belongsTo(GuruMapelKelas::class, 'guru_mapel_kelas_id');
     }
+    public function soals()
+    {
+        return $this->hasMany(SoalUjian::class, 'ujian_id');
+    }
+    public function hasilUjians()
+{
+    return $this->hasMany(HasilUjian::class, 'ujian_id');
+}
+// Ujian.php
+
+public function jawabanPilihanGandaBySiswa($siswaId)
+{
+    return $this->hasMany(JawabanUjian::class)->where('user_id', $siswaId);
+}
+public function jawabanSiswa()
+{
+    return $this->hasMany(\App\Models\JawabanUjian::class)->where('user_id', auth()->id());
+}
 }
 

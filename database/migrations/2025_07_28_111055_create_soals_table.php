@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -13,10 +12,10 @@ return new class extends Migration
     {
         Schema::create('soals', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tugas_id')->constrained()->onDelete('cascade');
+            $table->foreignId('tugas_id')->constrained('tugas')->onDelete('cascade');
             $table->text('pertanyaan');
-            $table->json('pilihan')->nullable(); // jika multiple choice
-            $table->string('jawaban_benar')->nullable();
+            $table->json('pilihan')->nullable(); // untuk pilihan ganda
+            $table->string('jawaban_benar')->nullable(); // bisa berupa huruf A/B/C/D atau jawaban singkat
             $table->timestamps();
         });
     }
