@@ -62,7 +62,7 @@
     <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}">  📚Materi Dan Konten</a></li>
     <li><a href="{{ route('admin.pengumuman.index') }}">📢 Pengumuman</a></li>
   @elseif(auth()->user()->role === 'guru')
-    <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}">>📚  Materi Dan Konten</a></li>
+    <li><a href="{{ route('materi.index') }}" class="{{ request()->routeIs('materi.index') ? 'active' : '' }}">📚  Materi Dan Konten</a></li>
     <li><a href="{{ route('guru.menu') }}" class="{{ request()->routeIs('guru.menu') ? 'active' : '' }}"> 📝 Kuis dan Tugas</a></li>
     <li><a href="{{ route('guru.absensi.index') }}" class="{{ request()->routeIs('guru.absensi.index') ? 'active' : '' }}">🗓️ Absensi</a></li>
     <li><a href="{{ route('guru.penilaian.index') }}" class="{{ request()->routeIs('guru.penilaian.index') ? 'active' : '' }}">📊 Penilaian</a></li>

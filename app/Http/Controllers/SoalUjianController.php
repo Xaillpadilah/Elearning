@@ -7,13 +7,14 @@ use Illuminate\Http\Request;
 use App\Models\Ujian;
 class SoalUjianController extends Controller
 {
-    public function index(Ujian $ujian)
-    {
-        $soals = SoalUjian::where('ujian_id', $ujian->id)->orderBy('nomor_urut')->get();
-        return view('guru.soal.index', compact('ujian', 'soals'));
-    }
+   public function index(Ujian $ujian)
+{
+    $soals = SoalUjian::where('ujian_id', $ujian->id)
+        ->orderBy('nomor_urut')
+        ->get();
 
-   public function store(Request $request)
+    return view('guru.soal.index', compact('ujian', 'soals'));
+}   public function store(Request $request)
 {
     $validated = $request->validate([
         'ujian_id' => 'required|exists:ujians,id',

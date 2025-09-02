@@ -157,7 +157,7 @@
                     </td>
                     <td>
                         @if($jawaban->skor !== null)
-                            {{ $jawaban->skor }}%
+                            {{ $jawaban->skor }}
                         @else
                             <span class="text-gray-500 italic">Belum dinilai</span>
                         @endif

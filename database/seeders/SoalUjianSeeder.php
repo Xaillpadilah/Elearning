@@ -74,108 +74,109 @@ class SoalUjianSeeder extends Seeder
    private function getSoalBank(): array
 {
    return [
-    'matematika' => [
-        [
-            'pertanyaan' => "Jika \( x = 3 \), maka nilai dari \( 2x^2 + 5x - 4 \) adalah?",
-            'opsi' => ["17", "23", "26", "29"],
-            'jawaban' => 'b'
-        ],
-        [
-            'pertanyaan' => "Panjang sisi alas sebuah segitiga sama kaki adalah 10 cm dan tinggi segitiga adalah 12 cm. Berapakah luas segitiga tersebut?",
-            'opsi' => ["60 cm²", "120 cm²", "72 cm²", "24 cm²"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Sebuah lingkaran memiliki diameter 14 cm. Berapakah keliling lingkaran tersebut? (Gunakan π = 22/7)",
-            'opsi' => ["44 cm", "28 cm", "22 cm", "14 cm"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Jika suatu bilangan dikalikan 5 dan kemudian dikurangi 7 hasilnya 33. Berapakah bilangan tersebut?",
-            'opsi' => ["6", "8", "7", "9"],
-            'jawaban' => 'b'
-        ],
-        [
-            'pertanyaan' => "Bentuk faktorisasi dari \( x^2 - 16 \) adalah?",
-            'opsi' => ["\( (x-4)(x+4) \)", "\( (x-8)(x+2) \)", "\( (x-2)(x+8) \)", "\( (x-16)(x+1) \)"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Nilai dari \( \sqrt{81} + \sqrt{49} \) adalah?",
-            'opsi' => ["18", "16", "14", "15"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Berapakah hasil dari \( 3^{3} \times 3^{2} \)?",
-            'opsi' => ["\( 3^{5} \)", "\( 3^{6} \)", "\( 9^{5} \)", "\( 15 \)"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Jika sudut \( A \) pada segitiga siku-siku adalah 30°, berapakah besar sudut \( B \)?",
-            'opsi' => ["30°", "45°", "60°", "90°"],
-            'jawaban' => 'c'
-        ],
-        [
-            'pertanyaan' => "Persamaan garis yang melalui titik (2, 3) dengan gradien 4 adalah?",
-            'opsi' => ["\( y = 4x + 3 \)", "\( y = 4x - 5 \)", "\( y = 4x - 5 \)", "\( y = 4x - 5 \)"],
-            'jawaban' => 'b' // seharusnya y - 3 = 4(x - 2) => y = 4x - 8 + 3 = 4x - 5
-        ],
-        [
-            'pertanyaan' => "Sebuah tabung memiliki jari-jari 7 cm dan tinggi 10 cm. Berapakah volume tabung tersebut? (Gunakan π = 22/7)",
-            'opsi' => ["1540 cm³", "154 cm³", "220 cm³", "770 cm³"],
-            'jawaban' => 'd'
-        ],
-        [
-            'pertanyaan' => "Jika \( f(x) = 2x + 1 \), berapakah nilai \( f(4) \)?",
-            'opsi' => ["7", "8", "9", "10"],
-            'jawaban' => 'c'
-        ],
-        [
-            'pertanyaan' => "Sebuah persegi panjang memiliki panjang 12 cm dan lebar 8 cm. Berapakah kelilingnya?",
-            'opsi' => ["40 cm", "20 cm", "96 cm", "48 cm"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Pertidaksamaan \( 3x - 5 > 10 \) akan menghasilkan nilai x?",
-            'opsi' => ["x > 5", "x > \frac{5}{3}", "x > \frac{15}{3}", "x > 1"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Dalam sebuah kelas ada 40 siswa. Jika 25% dari siswa tersebut mendapatkan nilai A, berapa siswa yang mendapat nilai A?",
-            'opsi' => ["8", "10", "15", "12"],
-            'jawaban' => 'b'
-        ],
-        [
-            'pertanyaan' => "Penyederhanaan dari \( \frac{6x^3 y^2}{3xy} \) adalah?",
-            'opsi' => ["\( 2x^2 y \)", "\( 2xy \)", "\( 3x^2 y^3 \)", "\( 3xy \)"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Jika \( \sin 30° = 0,5 \), maka nilai \( \cos 60° \) adalah?",
-            'opsi' => ["0,5", "0,6", "0,7", "0,8"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Berapa nilai \( 5! \) (faktorial 5)?",
-            'opsi' => ["120", "60", "24", "720"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Hasil dari \( \frac{2}{3} + \frac{4}{5} \) adalah?",
-            'opsi' => ["\( \frac{22}{15} \)", "\( \frac{10}{15} \)", "\( \frac{8}{15} \)", "\( \frac{12}{15} \)"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Penyelesaian dari \( x^2 - 5x + 6 = 0 \) adalah?",
-            'opsi' => ["x = 2 atau 3", "x = -2 atau -3", "x = 1 atau 6", "x = -1 atau -6"],
-            'jawaban' => 'a'
-        ],
-        [
-            'pertanyaan' => "Jika \( 3x + 4 = 19 \), maka nilai \( x \) adalah?",
-            'opsi' => ["3", "4", "5", "6"],
-            'jawaban' => 'c'
-        ],
+    //jangan akar
+   'matematika' => [
+    [
+        'pertanyaan' => "Hasil dari 36 × 24 adalah?",
+        'opsi' => ["840", "864", "856", "852"],
+        'jawaban' => 'b'
     ],
+    [
+        'pertanyaan' => "Hasil dari 480 ÷ 12 adalah?",
+        'opsi' => ["36", "40", "42", "38"],
+        'jawaban' => 'b'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 15 × 18 adalah?",
+        'opsi' => ["270", "280", "260", "250"],
+        'jawaban' => 'a'
+    ],
+    [
+        'pertanyaan' => "Jika 84 ÷ x = 7, maka x = ...?",
+        'opsi' => ["10", "12", "14", "16"],
+        'jawaban' => 'c'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 125 × 8 adalah?",
+        'opsi' => ["950", "975", "1000", "1025"],
+        'jawaban' => 'c'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 560 ÷ 8 adalah?",
+        'opsi' => ["60", "70", "75", "80"],
+        'jawaban' => 'b'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 48 × 25 adalah?",
+        'opsi' => ["1100", "1200", "1150", "1250"],
+        'jawaban' => 'b'
+    ],
+    [
+        'pertanyaan' => "Jika 324 ÷ 9 = x, maka x = ...?",
+        'opsi' => ["34", "36", "38", "32"],
+        'jawaban' => 'b'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 56 × 15 adalah?",
+        'opsi' => ["830", "840", "850", "860"],
+        'jawaban' => 'b'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 729 ÷ 9 adalah?",
+        'opsi' => ["80", "81", "82", "83"],
+        'jawaban' => 'b'
+    ],
+    [
+        'pertanyaan' => "Jika 48 ÷ 1/2, hasilnya adalah?",
+        'opsi' => ["24", "48", "96", "12"],
+        'jawaban' => 'c'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 0,6 × 0,3 adalah?",
+        'opsi' => ["0,18", "0,2", "0,16", "0,12"],
+        'jawaban' => 'a'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 7/8 ÷ 1/4 adalah?",
+        'opsi' => ["1 3/4", "2", "2 3/4", "3"],
+        'jawaban' => 'c'
+    ],
+    [
+        'pertanyaan' => "Jika 3/5 × x = 9, maka x = ...?",
+        'opsi' => ["12", "15", "10", "13"],
+        'jawaban' => 'b'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 0,25 ÷ 0,05 adalah?",
+        'opsi' => ["4", "5", "6", "7"],
+        'jawaban' => 'b'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 3/4 × 16 adalah?",
+        'opsi' => ["12", "14", "10", "11"],
+        'jawaban' => 'a'
+    ],
+    [
+        'pertanyaan' => "Jika x ÷ 7 = 9, maka x = ...?",
+        'opsi' => ["56", "63", "49", "72"],
+        'jawaban' => 'b'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 0,9 × 0,6 adalah?",
+        'opsi' => ["0,54", "0,56", "0,52", "0,50"],
+        'jawaban' => 'a'
+    ],
+    [
+        'pertanyaan' => "Jika 5/6 ÷ 1/2 = ...",
+        'opsi' => ["5/12", "5/3", "10/6", "1/2"],
+        'jawaban' => 'b'
+    ],
+    [
+        'pertanyaan' => "Hasil dari 2,4 ÷ 0,3 adalah?",
+        'opsi' => ["7", "8", "8,5", "9"],
+        'jawaban' => 'b'
+    ],
+],
 
        'pkn' => [
     [

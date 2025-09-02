@@ -143,7 +143,10 @@
       @csrf
 
       <label>Nama</label>
-      <input type="text" name="nama" value="{{ old('nama') }}" required>
+    <input type="text" name="nama" value="{{ old('nama') }}" 
+       required 
+       pattern="[A-Za-z\s]+" 
+       title="Nama hanya boleh huruf dan spasi">
       @error('nama')
         <small style="color:red;">{{ $message }}</small>
       @enderror
@@ -218,7 +221,10 @@
       @method('PUT')
 
       <label>Nama</label>
-      <input type="text" name="nama" id="edit-nama" value="{{ old('nama') }}" required>
+     <input type="text" name="nama" value="{{ old('nama') }}" 
+       required 
+       pattern="[A-Za-z\s]+" 
+       title="Nama hanya boleh huruf dan spasi">
       @error('nama')
         <small style="color:red;">{{ $message }}</small>
       @enderror

@@ -93,7 +93,7 @@ public function guruindex(Request $request)
             $user = User::create([
                 'name' => $request->nama,
                 'email' => $request->email,
-                'password' => Hash::make('gurusmp5cidaun'), // default password
+                'password' => Hash::make('gurusmp5cidaun'), 
                 'role' => 'guru',
             ]);
 

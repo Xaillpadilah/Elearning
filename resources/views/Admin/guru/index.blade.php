@@ -15,7 +15,7 @@
   <div class="sidebar">
     <h2>Dashboard Admin</h2>
     <ul>
-       <li><a href="{{ route('admin.dashboard') }}"
+      <li><a href="{{ route('admin.dashboard') }}"
           class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">🏠 Dashboard</a></li>
       <li><a href="{{ route('admin.guru') }}" class="{{ request()->routeIs('admin.guru') ? 'active' : '' }}">👨‍🏫 Data
           Guru</a></li>
@@ -42,10 +42,10 @@
 
     @if(session('success'))
     <div class="info-frame" style="color: green;">{{ session('success') }}</div>
-  @endif
+    @endif
     @if(session('error'))
     <div class="info-frame" style="color: red;">{{ session('error') }}</div>
-  @endif
+    @endif
 
     <div class="actions">
       <button class="btn-tambah" onclick="document.getElementById('modalTambahGuru').style.display='flex'">➕ Tambah
@@ -66,47 +66,47 @@
     @if($gurus->count())
     <table>
       <thead>
-      <tr>
-        <th>No</th>
-        <th>Nama</th>
-        <th>NIK</th>
-        <th>Jenis Kelamin</th>
-        <th>Mengajar</th>
-        <th>Email</th>
-        <th>Aksi</th>
-      </tr>
+        <tr>
+          <th>No</th>
+          <th>Nama</th>
+          <th>NIP</th>
+          <th>Jenis Kelamin</th>
+          <th>Mengajar</th>
+          <th>Email</th>
+          <th>Aksi</th>
+        </tr>
       </thead>
       <tbody>
-      @foreach($gurus as $index => $guru)
-      <tr>
-      <td>{{ $index + 1 }}</td>
-      <td>{{ $guru->nama }}</td>
-      <td>{{ $guru->nik }}</td>
-      <td>{{ $guru->jenis_kelamin ?? '-' }}</td>
-      <td>
-      <ul>
-        @foreach($guru->mapel_kelas as $mk)
-      <li>{{ $mk['mapel_nama'] ?? '-' }} - Kelas {{ $mk['kelas_id'] }}</li>
-      @endforeach
-      </ul>
-      </td>
-      <td>{{ $guru->user->email ?? '-' }}</td>
-      <td style="display: flex; gap: 6px; align-items: center;">
-      <button class="btn-edit" onclick='openEditModal(@json($guru))'>✏️ Edit</button>
-      <form action="{{ route('admin.guru.destroy', $guru->id) }}" method="POST"
-        onsubmit="return confirm('Yakin ingin menghapus guru ini?')">
-        @csrf
-        @method('DELETE')
-        <button type="submit" class="btn-delete">🗑️ Hapus</button>
-      </form>
-      </td>
-      </tr>
-    @endforeach
+        @foreach($gurus as $index => $guru)
+        <tr>
+          <td>{{ $index + 1 }}</td>
+          <td>{{ $guru->nama }}</td>
+          <td>{{ $guru->nik }}</td>
+          <td>{{ $guru->jenis_kelamin ?? '-' }}</td>
+          <td>
+            <ul>
+              @foreach($guru->mapel_kelas as $mk)
+              <li>{{ $mk['mapel_nama'] ?? '-' }} - Kelas {{ $mk['kelas_id'] }}</li>
+              @endforeach
+            </ul>
+          </td>
+          <td>{{ $guru->user->email ?? '-' }}</td>
+          <td style="display: flex; gap: 6px; align-items: center;">
+            <button class="btn-edit" onclick='openEditModal(@json($guru))'>✏️ Edit</button>
+            <form action="{{ route('admin.guru.destroy', $guru->id) }}" method="POST"
+              onsubmit="return confirm('Yakin ingin menghapus guru ini?')">
+              @csrf
+              @method('DELETE')
+              <button type="submit" class="btn-delete">🗑️ Hapus</button>
+            </form>
+          </td>
+        </tr>
+        @endforeach
       </tbody>
     </table>
-  @else
+    @else
     <div class="info-frame no-data">Tidak ada data guru ditemukan.</div>
-  @endif
+    @endif
   </div>
 
   <!-- Modal Tambah Guru -->
@@ -116,9 +116,11 @@
       <form action="{{ route('admin.guru.store') }}" method="POST" id="formTambahGuru">
         @csrf
         <label>Nama</label>
-        <input type="text" name="nama" required>
+        <input type="text" name="nama" required 
+       pattern="[A-Za-z\s\.,]+" 
+       title="Nama hanya boleh huruf, spasi, titik, dan koma">
 
-        <label>NIK</label>
+        <label>NIP</label>
         <input type="text" name="nik" required minlength="16" maxlength="16" pattern="\d{16}">
 
         <label>Jenis Kelamin</label>
@@ -129,27 +131,27 @@
         </select>
 
         @for ($i = 0; $i < 3; $i++)
-        <label>Pelajaran {{ $i + 1 }}</label>
-        <select name="pelajaran[{{ $i }}][nama]" required>
-          <option value="">-- Pilih Mapel --</option>
-          @foreach($mapels as $mapel)
-        <option value="{{ $mapel->nama_mapel }}">{{ $mapel->nama_mapel }}</option>
-        @endforeach
-        </select>
+          <label>Pelajaran {{ $i + 1 }}</label>
+          <select name="pelajaran[{{ $i }}][nama]" required>
+            <option value="">-- Pilih Mapel --</option>
+            @foreach($mapels as $mapel)
+            <option value="{{ $mapel->nama_mapel }}">{{ $mapel->nama_mapel }}</option>
+            @endforeach
+          </select>
 
-        <label>Kelas untuk Pelajaran {{ $i + 1 }}</label>
-        <select name="pelajaran[{{ $i }}][kelas_id]" required>
-          <option value="">-- Pilih Kelas --</option>
-          @foreach($kelas as $k)
-        <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
-        @endforeach
-        </select>
-    @endfor
+          <label>Kelas untuk Pelajaran {{ $i + 1 }}</label>
+          <select name="pelajaran[{{ $i }}][kelas_id]" required>
+            <option value="">-- Pilih Kelas --</option>
+            @foreach($kelas as $k)
+            <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+            @endforeach
+          </select>
+          @endfor
 
-        <label>Email</label>
-        <input type="email" name="email" required>
+          <label>Email</label>
+          <input type="email" name="email" required>
 
-        <button type="submit" class="btn-simpan-tambah">💾 Simpan</button>
+          <button type="submit" class="btn-simpan-tambah">💾 Simpan</button>
       </form>
     </div>
   </div>
@@ -162,9 +164,11 @@
         @csrf
         @method('PUT')
         <label>Nama</label>
-        <input type="text" id="edit-nama" name="nama" required>
+       <input type="text" id="edit-nama" name="nama" required 
+       pattern="[A-Za-z\s\.,]+" 
+       title="Nama hanya boleh huruf, spasi, titik, dan koma">
 
-        <label>NIK</label>
+        <label>NIP</label>
         <input type="text" id="edit-nik" name="nik" required minlength="16" maxlength="16" pattern="\d{16}">
 
         <label>Jenis Kelamin</label>
@@ -175,27 +179,27 @@
         </select>
 
         @for ($i = 0; $i < 3; $i++)
-        <label>Pelajaran {{ $i + 1 }}</label>
-        <select name="pelajaran[{{ $i }}][nama]" id="edit-pelajaran-{{ $i }}" required>
-          <option value="">-- Pilih Mapel --</option>
-          @foreach($mapels as $mapel)
-        <option value="{{ $mapel->nama_mapel }}">{{ $mapel->nama_mapel }}</option>
-        @endforeach
-        </select>
+          <label>Pelajaran {{ $i + 1 }}</label>
+          <select name="pelajaran[{{ $i }}][nama]" id="edit-pelajaran-{{ $i }}" required>
+            <option value="">-- Pilih Mapel --</option>
+            @foreach($mapels as $mapel)
+            <option value="{{ $mapel->nama_mapel }}">{{ $mapel->nama_mapel }}</option>
+            @endforeach
+          </select>
 
-        <label>Kelas untuk Pelajaran {{ $i + 1 }}</label>
-        <select name="pelajaran[{{ $i }}][kelas_id]" id="edit-kelas-{{ $i }}" required>
-          <option value="">-- Pilih Kelas --</option>
-          @foreach($kelas as $k)
-        <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
-        @endforeach
-        </select>
-    @endfor
+          <label>Kelas untuk Pelajaran {{ $i + 1 }}</label>
+          <select name="pelajaran[{{ $i }}][kelas_id]" id="edit-kelas-{{ $i }}" required>
+            <option value="">-- Pilih Kelas --</option>
+            @foreach($kelas as $k)
+            <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
+            @endforeach
+          </select>
+          @endfor
 
-        <label>Email</label>
-        <input type="email" id="edit-email" name="email" required>
+          <label>Email</label>
+          <input type="email" id="edit-email" name="email" required>
 
-        <button type="submit" class="btn-simpan-edit">💾 Simpan Perubahan</button>
+          <button type="submit" class="btn-simpan-edit">💾 Simpan Perubahan</button>
       </form>
     </div>
   </div>
@@ -233,14 +237,14 @@
       }
     }
 
-    document.addEventListener('keydown', function (e) {
+    document.addEventListener('keydown', function(e) {
       if (e.key === "Escape") {
         document.getElementById('modalEditGuru').style.display = 'none';
         document.getElementById('modalTambahGuru').style.display = 'none';
       }
     });
 
-    window.onclick = function (event) {
+    window.onclick = function(event) {
       if (event.target === document.getElementById('modalEditGuru')) document.getElementById('modalEditGuru').style.display = "none";
       if (event.target === document.getElementById('modalTambahGuru')) document.getElementById('modalTambahGuru').style.display = "none";
     };

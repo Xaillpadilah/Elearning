@@ -55,7 +55,7 @@
         }
 
         /* pink muda */
-        <style>.info-mapel {
+        .info-mapel {
             @apply bg-white shadow-md rounded-lg p-4 border-l-4 border-blue-600 mb-6;
         }
 
@@ -94,17 +94,17 @@
         <h2>E-LEARNING</h2>
         <ul>
             @php
-                // Ambil mapel pertama dari daftar
-                $firstMapel = \App\Models\Mapel::first();
+            // Ambil mapel pertama dari daftar
+            $firstMapel = \App\Models\Mapel::first();
             @endphp
             <li><a href="{{ route('siswa.siswadashboard') }}">🏠 Beranda</a></li>
 
             @if ($firstMapel)
-                <li>
-                    <a href="{{ route('siswa.mapel.detail', ['id' => $firstMapel->id]) }}">
-                        📚 Mata Pelajaran
-                    </a>
-                </li>
+            <li>
+                <a href="{{ route('siswa.mapel.detail', ['id' => $firstMapel->id]) }}">
+                    📚 Mata Pelajaran
+                </a>
+            </li>
             @endif
 
             <li><a href="{{ route('siswa.absensi.index') }}">📋 Absensi</a></li>
@@ -126,10 +126,10 @@
         </div>
 
         @if (session('success'))
-            <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show"
-                class="mb-4 px-4 py-2 bg-green-100 border border-green-400 text-green-700 rounded">
-                ✅ {{ session('success') }}
-            </div>
+        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show"
+            class="mb-4 px-4 py-2 bg-green-100 border border-green-400 text-green-700 rounded">
+            ✅ {{ session('success') }}
+        </div>
         @endif
         <!-- Tabs -->
         <div class="flex space-x-2 mb-4">
@@ -140,56 +140,56 @@
         <!-- Tab Contents -->
         <div id="materi" class="tab-content">
             @if($materis->isEmpty())
-                <p class="text-gray-600">Belum ada materi.</p>
+            <p class="text-gray-600">Belum ada materi.</p>
             @else
-                @php
-                    $grouped = $materis->groupBy(function ($item) {
-                        $mapel = $item->mapel->nama_mapel ?? '-';
-                        return "{$mapel}";
-                    });
+            @php
+            $grouped = $materis->groupBy(function ($item) {
+            $mapel = $item->mapel->nama_mapel ?? '-';
+            return "{$mapel}";
+            });
 
-                @endphp
+            @endphp
 
-                @foreach($grouped as $mapelGuru => $items)
-                    <div class="mb-4">
-                        <details class="border rounded p-3">
-                            <summary class="cursor-pointer font-semibold text-lg text-gray-800">
-                                📚 {{ $mapelGuru }}
-                            </summary>
-                            <ul class="list-disc ml-5 mt-2">
-                                @foreach($items as $m)
-                                    <li class="mb-2">
-                                        <strong>{{ $m->judul }}</strong><br>
-                                        {{ $m->deskripsi }}<br>
-                                        @if($m->file_path)
-                                            <a href="{{ asset('storage/' . $m->file_path) }}" target="_blank" class="text-blue-500">📎
-                                                File</a>
-                                        @endif
-                                        @if($m->link)
-                                            <a href="{{ $m->link }}" target="_blank" class="text-blue-500 ml-2">🔗 Link</a>
-                                        @endif
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </details>
-                    </div>
-                @endforeach
+            @foreach($grouped as $mapelGuru => $items)
+            <div class="mb-4">
+                <details class="border rounded p-3">
+                    <summary class="cursor-pointer font-semibold text-lg text-gray-800">
+                        📚 {{ $mapelGuru }}
+                    </summary>
+                    <ul class="list-disc ml-5 mt-2">
+                        @foreach($items as $m)
+                        <li class="mb-2">
+                            <strong>{{ $m->judul }}</strong><br>
+                            {{ $m->deskripsi }}<br>
+                            @if($m->file_path)
+                            <a href="{{ asset('storage/' . $m->file_path) }}" target="_blank" class="text-blue-500">📎
+                                File</a>
+                            @endif
+                            @if($m->link)
+                            <a href="{{ $m->link }}" target="_blank" class="text-blue-500 ml-2">🔗 Link</a>
+                            @endif
+                        </li>
+                        @endforeach
+                    </ul>
+                </details>
+            </div>
+            @endforeach
             @endif
         </div>
 
-      <!-- Tab Tugas -->
-<div id="tugas" class="tab-content hidden">
-    @if($tugas->isEmpty())
-        <p class="text-gray-600">Belum ada tugas.</p>
-    @else
-        @php
+        <!-- Tab Tugas -->
+        <div id="tugas" class="tab-content hidden">
+            @if($tugas->isEmpty())
+            <p class="text-gray-600">Belum ada tugas.</p>
+            @else
+            @php
             $groupedTugas = $tugas->groupBy(function ($item) {
-                $mapel = $item->relasi->mapel->nama_mapel ?? '-';
-                return "{$mapel} ";
+            $mapel = $item->relasi->mapel->nama_mapel ?? '-';
+            return "{$mapel} ";
             });
-        @endphp
+            @endphp
 
-        @foreach($groupedTugas as $mapelNama => $items)
+            @foreach($groupedTugas as $mapelNama => $items)
             <div class="mb-4">
                 <details class="border rounded p-3">
                     <summary class="cursor-pointer font-semibold text-lg text-gray-800">
@@ -197,72 +197,72 @@
                     </summary>
                     <ul class="list-disc ml-5 mt-2">
                         @foreach($items as $t)
-                            @php
-                                $deadline = \Carbon\Carbon::parse($t->tanggal_deadline);
-                                $now = \Carbon\Carbon::now();
-                                $diffMinutes = $now->diffInMinutes($deadline, false); // false = bisa negatif
-                            @endphp
+                        @php
+                        $deadline = \Carbon\Carbon::parse($t->tanggal_deadline);
+                        $now = \Carbon\Carbon::now();
+                        $diffMinutes = $now->diffInMinutes($deadline, false); // false = bisa negatif
+                        @endphp
 
-                            <li class="mb-5 border-b pb-4">
-                                <strong>{{ $t->judul }}</strong> ({{ $t->jenis }})<br>
-                                {{ $t->deskripsi }}<br>
-                                Deadline: {{ $deadline->translatedFormat('d M Y H:i') }}<br>
+                        <li class="mb-5 border-b pb-4">
+                            <strong>{{ $t->judul }}</strong> ({{ $t->jenis }})<br>
+                            {{ $t->deskripsi }}<br>
+                            Deadline: {{ $deadline->translatedFormat('d M Y H:i') }}<br>
 
-                                {{-- Peringatan batas waktu --}}
-                                @if ($diffMinutes <= 0)
-                                    <p class="text-red-600 font-semibold mt-1">⚠️ Sudah lewat deadline</p>
+                            {{-- Peringatan batas waktu --}}
+                            @if ($diffMinutes <= 0)
+                                <p class="text-red-600 font-semibold mt-1">⚠️ Sudah lewat deadline</p>
                                 @elseif ($diffMinutes <= 60)
                                     <p class="text-red-500 font-semibold mt-1">⏰ Segera kumpulkan! Deadline tinggal {{ $diffMinutes }} menit lagi</p>
-                                @elseif ($diffMinutes <= 1440)
-                                    <p class="text-yellow-600 font-semibold mt-1">🕒 Deadline dalam {{ ceil($diffMinutes / 60) }} jam</p>
-                                @endif
+                                    @elseif ($diffMinutes <= 1440)
+                                        <p class="text-yellow-600 font-semibold mt-1">🕒 Deadline dalam {{ ceil($diffMinutes / 60) }} jam</p>
+                                        @endif
 
-                                {{-- File tugas --}}
-                                @if($t->file_path)
-                                    <a href="{{ asset('storage/' . $t->file_path) }}" target="_blank" class="text-blue-500">
-                                        📎 Download Soal</a><br>
-                                @endif
+                                        {{-- File tugas --}}
+                                        @if($t->file_path)
+                                        <a href="{{ asset('storage/' . $t->file_path) }}" target="_blank" class="text-blue-500">
+                                            📎 Download Soal</a><br>
+                                        @endif
 
-                                {{-- Form Kirim Jawaban --}}
-                                @if($diffMinutes > 0)
-                                    <form action="{{ route('siswa.jawaban.store') }}" method="POST"
-                                        enctype="multipart/form-data" class="mt-2">
-                                        @csrf
-                                        <input type="hidden" name="tugas_id" value="{{ $t->id }}">
+                                        {{-- Form Kirim Jawaban --}}
+                                        @if($diffMinutes > 0)
+                                        <form action="{{ route('siswa.jawaban.store') }}" method="POST"
+                                            enctype="multipart/form-data" class="mt-2">
+                                            @csrf
+                                            <input type="hidden" name="tugas_id" value="{{ $t->id }}">
 
-                                        <label class="block text-sm mt-2">Upload Jawaban (PDF, DOCX, dll)</label>
-                                        <input type="file" name="file_jawaban" required class="mt-1 block w-full text-sm">
+                                            <label class="block text-sm mt-2">Upload Jawaban (PDF, DOCX, dll)</label>
+                                            <input type="file" name="file_jawaban" required class="mt-1 block w-full text-sm">
 
-                                        <button type="submit"
-                                            class="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
-                                            Kirim Jawaban
-                                        </button>
-                                    </form>
-                                @else
-                                    <p class="text-sm text-gray-500 italic mt-2">Form tidak tersedia karena sudah lewat deadline.</p>
-                                @endif
-                            </li>
+                                            <button type="submit"
+                                                class="mt-2 bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">
+                                                Kirim Jawaban
+                                            </button>
+                                        </form>
+                                        @else
+                                        <p class="text-sm text-gray-500 italic mt-2">Form tidak tersedia karena sudah lewat deadline.</p>
+                                        @endif
+                        </li>
                         @endforeach
                     </ul>
                 </details>
             </div>
-        @endforeach
-    @endif
-</div>
+            @endforeach
+            @endif
+        </div>
 
-      <!-- Tab  ujian-->
-<div id="ujian" class="tab-content hidden">
-    @if($ujians->isEmpty())
-        <p class="text-gray-600">Belum ada ujian.</p>
-    @else
-        @php
+        <!-- Tab  ujian-->
+        <div id="ujian" class="tab-content hidden">
+            @if($ujians->isEmpty())
+            <p class="text-gray-600">Belum ada ujian.</p>
+            @else
+            @php
             $groupedUjian = $ujians->groupBy(function ($item) {
-                $mapel = $item->guruMapelKelas->mapel->nama_mapel ?? '-';
-                return "{$mapel} ";
+            $mapel = $item->guruMapelKelas->mapel->nama_mapel ?? '-';
+            return "{$mapel} ";
             });
-        @endphp
+            @endphp
 
-        @foreach($groupedUjian as $mapelGuru => $items)
+            @foreach($groupedUjian as $mapelGuru => $items)
             <div class="mb-4">
                 <details class="border rounded p-3">
                     <summary class="cursor-pointer font-semibold text-lg text-gray-800">
@@ -270,96 +270,152 @@
                     </summary>
                     <ul class="ml-0 mt-2">
                         @foreach($items as $u)
-                            <li class="mb-5 p-4 bg-gray-100 rounded border">
-                                <strong>{{ $u->judul }}</strong> ({{ $u->tipe_ujian }})<br>
-                                Tanggal: {{ \Carbon\Carbon::parse($u->tanggal)->translatedFormat('d M Y') }}<br>
-                                {{ $u->keterangan }}<br>
+                        <li class="mb-5 p-4 bg-gray-100 rounded border">
+                            <strong>{{ $u->judul }}</strong> ({{ $u->tipe_ujian }})<br>
+                            Tanggal: {{ \Carbon\Carbon::parse($u->tanggal)->translatedFormat('d M Y') }}<br>
+                            {{ $u->keterangan }}<br>
 
-                              @if($u->jawabanSiswa->isNotEmpty())
-    ✅ Anda sudah mengerjakan ujian ini
-@else
-                                    @if($u->tipe_ujian === 'pilihan_ganda')
-                                        @php $soalList = $u->soals->shuffle()->values(); @endphp
-                                        @if($soalList->count())
-                                            <form action="{{ route('siswa.jawaban.ujian.pilihan-ganda.store') }}" method="POST"
-                                                class="mt-3" id="form-ujian-{{ $u->id }}">
-                                                @csrf
-                                                <input type="hidden" name="ujian_id" value="{{ $u->id }}">
-                                                <div class="text-right text-sm text-red-600 font-semibold mb-2">
-                                                    Sisa Waktu: <span id="timer-{{ $u->id }}">60:00</span>
-                                                </div>
-                                                @foreach($soalList as $index => $soal)
-                                                    <div class="soal-item-{{ $u->id }} hidden" data-index="{{ $index }}">
-                                                        <div class="mb-4 border-b pb-2">
-                                                            <p><strong>No {{ $index + 1 }}.</strong> {{ $soal->pertanyaan }}</p>
-                                                            @foreach(['a', 'b', 'c', 'd'] as $opsi)
-                                                                @php $label = 'opsi_' . $opsi; @endphp
-                                                                <label class="block ml-4">
-                                                                    <input type="radio" name="jawaban[{{ $soal->id }}]" value="{{ $opsi }}"
-                                                                        required>
-                                                                    {{ strtoupper($opsi) }}. {{ $soal->$label }}
-                                                                </label>
-                                                            @endforeach
-                                                        </div>
-                                                    </div>
-                                                @endforeach
+                           @if($u->jawabanSiswa->isNotEmpty())
+    <div class="p-3 border rounded bg-green-50">
+        <p class="text-green-700 font-semibold mb-2">✅ Anda sudah mengerjakan ujian ini</p>
 
-                                                <div class="flex justify-between mt-4">
-                                                    <button type="button"
-                                                        class="prev-btn bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500"
-                                                        data-ujian="{{ $u->id }}">Sebelumnya</button>
-                                                    <button type="button"
-                                                        class="next-btn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
-                                                        data-ujian="{{ $u->id }}">Lanjut</button>
-                                                    <button type="submit"
-                                                        class="submit-btn bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 hidden"
-                                                        data-ujian="{{ $u->id }}">Kirim Jawaban</button>
-                                                </div>
-                                            </form>
-                                        @else
-                                            <p class="text-red-500 mt-2">Belum ada soal untuk ujian ini.</p>
-                                        @endif
+        @if($u->tipe_ujian === 'pilihan_ganda')
+            <h4 class="font-semibold text-gray-800 mb-2">📊 Review Jawaban Anda:</h4>
 
-                                    @else
-                                        {{-- Ujian Non Pilihan Ganda --}}
-                                        @if($u->isi_soal)
-                                            <div class="mt-3 text-gray-800 whitespace-pre-line border-t pt-2">
-                                                <h4 class="font-semibold mb-1">Soal:</h4>
-                                                {!! nl2br(e($u->isi_soal)) !!}
-                                            </div>
-                                        @endif
+            @php
+                $soalList = $u->soals->values(); // pastikan urut
+            @endphp
 
-                                        @if($u->file_soal)
-                                            <a href="{{ asset('storage/' . $u->file_soal) }}" target="_blank"
-                                                class="text-blue-500 block mt-2">
-                                                📄 Download Soal
-                                            </a>
-                                        @endif
+            <div class="review-ujian" id="review-ujian-{{ $u->id }}">
+                @foreach($soalList as $index => $soal)
+                    @php
+                        $jawabanUser = $u->jawabanSiswa->where('soal_id', $soal->id)->first()->jawaban ?? null;
+                        $benar = $soal->jawaban_benar;
+                    @endphp
+                    <div class="review-item-{{ $u->id }} {{ $index === 0 ? '' : 'hidden' }}" data-index="{{ $index }}">
+                        <div class="mb-3 p-2 border-b">
+                            <p><strong>No {{ $index + 1 }}.</strong> {{ $soal->pertanyaan }}</p>
+                            <p>Jawaban Anda: 
+                                <span class="{{ $jawabanUser === $benar ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold' }}">
+                                    {{ strtoupper($jawabanUser ?? '-') }}
+                                </span>
+                            </p>
+                            <p>Jawaban Benar: 
+                                <span class="text-green-700 font-bold">{{ strtoupper($benar) }}</span>
+                            </p>
+                        </div>
 
-                                        <form action="{{ route('siswa.jawaban.ujian.store') }}" method="POST"
-                                            enctype="multipart/form-data" class="mt-4 bg-white border border-dashed rounded p-3">
-                                            @csrf
-                                            <input type="hidden" name="ujian_id" value="{{ $u->id }}">
+                        <div class="flex justify-between mt-4">
+                            <button type="button"
+                                class="prev-review-btn bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500"
+                                data-ujian="{{ $u->id }}"
+                                {{ $index === 0 ? 'disabled' : '' }}>
+                                Sebelumnya
+                            </button>
+                            <button type="button"
+                                class="next-review-btn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                data-ujian="{{ $u->id }}"
+                                {{ $index === $soalList->count() - 1 ? 'disabled' : '' }}>
+                                Selanjutnya
+                            </button>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            {{-- Non pilihan ganda --}}
+            <h4 class="font-semibold text-gray-800 mb-2">📄 Jawaban yang Anda Upload:</h4>
+            @if($u->jawabanSiswa->first()->file_jawaban)
+                <a href="{{ asset('storage/' . $u->jawabanSiswa->first()->file_jawaban) }}" target="_blank"
+                   class="text-blue-600 underline">
+                   🔗 Lihat File Jawaban
+                </a>
+            @endif
+        @endif
+    </div>
+                            @else
+                            @if($u->tipe_ujian === 'pilihan_ganda')
+                            @php $soalList = $u->soals->shuffle()->values(); @endphp
+                            @if($soalList->count())
+                            <form action="{{ route('siswa.jawaban.ujian.pilihan-ganda.store') }}" method="POST"
+                                class="mt-3" id="form-ujian-{{ $u->id }}">
+                                @csrf
+                                <input type="hidden" name="ujian_id" value="{{ $u->id }}">
+                                <div class="text-right text-sm text-red-600 font-semibold mb-2">
+                                    Sisa Waktu: <span id="timer-{{ $u->id }}">60:00</span>
+                                </div>
+                                @foreach($soalList as $index => $soal)
+                                <div class="soal-item-{{ $u->id }} hidden" data-index="{{ $index }}">
+                                    <div class="mb-4 border-b pb-2">
+                                        <p><strong>No {{ $index + 1 }}.</strong> {{ $soal->pertanyaan }}</p>
+                                        @foreach(['a', 'b', 'c', 'd'] as $opsi)
+                                        @php $label = 'opsi_' . $opsi; @endphp
+                                        <label class="block ml-4">
+                                            <input type="radio" name="jawaban[{{ $soal->id }}]" value="{{ $opsi }}"
+                                                required>
+                                            {{ strtoupper($opsi) }}. {{ $soal->$label }}
+                                        </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                @endforeach
 
-                                            <label class="block text-sm font-medium mb-1">Upload Jawaban (PDF, DOCX, dll)</label>
-                                            <input type="file" name="file_jawaban" required
-                                                class="block w-full text-sm border rounded p-1 mb-2">
+                                <div class="flex justify-between mt-4">
+                                    <button type="button"
+                                        class="prev-btn bg-gray-400 text-white px-3 py-1 rounded hover:bg-gray-500"
+                                        data-ujian="{{ $u->id }}">Sebelumnya</button>
+                                    <button type="button"
+                                        class="next-btn bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+                                        data-ujian="{{ $u->id }}">Lanjut</button>
+                                    <button type="submit"
+                                        class="submit-btn bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700 hidden"
+                                        data-ujian="{{ $u->id }}">Kirim Jawaban</button>
+                                </div>
+                            </form>
+                            @else
+                            <p class="text-red-500 mt-2">Belum ada soal untuk ujian ini.</p>
+                            @endif
 
-                                            <button type="submit"
-                                                class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
-                                                Kirim Jawaban
-                                            </button>
-                                        </form>
-                                    @endif
-                                @endif
-                            </li>
+                            @else
+                            {{-- Ujian Non Pilihan Ganda --}}
+                            @if($u->isi_soal)
+                            <div class="mt-3 text-gray-800 whitespace-pre-line border-t pt-2">
+                                <h4 class="font-semibold mb-1">Soal:</h4>
+                                {!! nl2br(e($u->isi_soal)) !!}
+                            </div>
+                            @endif
+
+                            @if($u->file_soal)
+                            <a href="{{ asset('storage/' . $u->file_soal) }}" target="_blank"
+                                class="text-blue-500 block mt-2">
+                                📄 Download Soal
+                            </a>
+                            @endif
+
+                            <form action="{{ route('siswa.jawaban.ujian.store') }}" method="POST"
+                                enctype="multipart/form-data" class="mt-4 bg-white border border-dashed rounded p-3">
+                                @csrf
+                                <input type="hidden" name="ujian_id" value="{{ $u->id }}">
+
+                                <label class="block text-sm font-medium mb-1">Upload Jawaban (PDF, DOCX, dll)</label>
+                                <input type="file" name="file_jawaban" required
+                                    class="block w-full text-sm border rounded p-1 mb-2">
+
+                                <button type="submit"
+                                    class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600">
+                                    Kirim Jawaban
+                                </button>
+                            </form>
+                            @endif
+                            @endif
+                        </li>
                         @endforeach
                     </ul>
                 </details>
             </div>
-        @endforeach
-    @endif
-</div>
+            @endforeach
+            @endif
+        </div>
         <!-- Script untuk tab -->
         <script>
             function showTab(tabId) {
@@ -412,11 +468,13 @@
                 const subMapel = document.getElementById('sub-mapel');
                 subMapel.style.display = subMapel.style.display === 'block' ? 'none' : 'block';
             }
+
             function toggleFullscreenDashboard() {
                 document.getElementById('sidebar').classList.toggle('hidden');
                 document.getElementById('main-content').classList.toggle('fullscreen');
                 document.getElementById('footer').classList.toggle('fullscreen');
             }
+
             function toggleSemuaPengumuman() {
                 const list = document.getElementById('pengumuman-list');
                 const container = document.querySelector('.pengumuman-container');
@@ -446,7 +504,7 @@
         </script>
         <script src="//unpkg.com/alpinejs" defer></script>
         <script>
-            document.addEventListener("DOMContentLoaded", function () {
+            document.addEventListener("DOMContentLoaded", function() {
                 document.querySelectorAll("form[id^='form-ujian-']").forEach(form => {
                     const ujianId = form.querySelector("input[name='ujian_id']").value;
                     const soalItems = form.querySelectorAll(`.soal-item-${ujianId}`);
@@ -542,7 +600,7 @@
                     }
 
                     // ✅ Validasi sebelum kirim
-                    submitBtn.addEventListener('click', function (e) {
+                    submitBtn.addEventListener('click', function(e) {
                         e.preventDefault();
 
                         const radioGroups = form.querySelectorAll("div[class^='soal-item-']");
@@ -591,7 +649,31 @@
                     startTimer();
                 });
             });
+        
+document.addEventListener('DOMContentLoaded', function() {
+    // Ambil semua container review per ujian
+    document.querySelectorAll('.review-ujian').forEach(function(container) {
+        const items = container.querySelectorAll('[class^="review-item-"]');
+        items.forEach((item, idx) => {
+            const nextBtn = item.querySelector('.next-review-btn');
+            const prevBtn = item.querySelector('.prev-review-btn');
+
+            nextBtn?.addEventListener('click', () => {
+                item.classList.add('hidden');
+                if(items[idx + 1]) items[idx + 1].classList.remove('hidden');
+            });
+
+            prevBtn?.addEventListener('click', () => {
+                item.classList.add('hidden');
+                if(items[idx - 1]) items[idx - 1].classList.remove('hidden');
+            });
+        });
+    });
+});
+        
+    
         </script>
+        
 
 </body>
 
