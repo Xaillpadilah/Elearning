@@ -81,11 +81,11 @@
       border-radius: 8px;
       cursor: pointer;
       text-decoration: none;
-      color: white;
+      color: rgb(29, 28, 28);
     }
     .btn-tambah { background: linear-gradient(to right, #81c784, #43a047); }
     .btn-ekspor { background: linear-gradient(to right, #64b5f6, #2196f3); }
-    .btn-impor { background: linear-gradient(to right, #ffb74d, #f57c00); color: white; }
+    .btn-impor { background: linear-gradient(to right, #ffb74d, #f57c00); color: rgb(26, 24, 24); }
     .btn-edit {
       background: linear-gradient(to right, #4fc3f7, #0288d1);
       color: white;

@@ -135,11 +135,11 @@ tbody td {
         <div class="user">👤 {{ Auth::user()->name ?? 'Nama Siswa' }}</div>
     </div>
 
-   <div class="info-frame">
+  <div class="info-frame">
     <h4>📊 Informasi Nilai</h4>
-    <p>Anda dapat melihat daftar nilai yang telah diberikan oleh guru. Pastikan semua data sesuai dengan hasil pembelajaran Anda.</p>
+    <p>Anda dapat melihat daftar nilai, absensi, dan jumlah total pertemuan (36 kali dalam 1 tahun ajaran).</p>
 </div>
-   <div class="container">
+<div class="container">
     @if($penilaians->isEmpty())
         <p class="empty">Tidak ada data nilai yang tersedia.</p>
     @else
@@ -151,36 +151,64 @@ tbody td {
                     <th>Kuis</th>
                     <th>UTS</th>
                     <th>UAS</th>
+                    <th>Absensi</th>
                     <th>Nilai Akhir</th>
                     <th>Catatan</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($penilaians as $nilai)
-                    @php
-                        // Ambil nilai, gunakan 0 jika null
-                        $tugas = $nilai->nilai_tugas ?? 0;
-                        $kuis = $nilai->nilai_kuis ?? 0;
-                        $uts = $nilai->nilai_uts ?? 0;
-                        $uas = $nilai->nilai_uas ?? 0;
+               @foreach($penilaians as $nilai)
+    @php
+        // Data nilai
+        $tugas = $nilai->nilai_tugas ?? 0;
+        $kuis = $nilai->nilai_kuis ?? 0;
+        $uts = $nilai->nilai_uts ?? 0;
+        $uas = $nilai->nilai_uas ?? 0;
 
-                        // Hitung nilai akhir dengan bobot
-                        $nilaiAkhir = round(($tugas * 0.2) + ($kuis * 0.2) + ($uts * 0.3) + ($uas * 0.3), 2);
-                    @endphp
-                    <tr>
-                        <td>{{ $nilai->mapel->nama_mapel ?? '-' }}</td>
-                        <td>{{ $tugas }}</td>
-                        <td>{{ $kuis }}</td>
-                        <td>{{ $uts }}</td>
-                        <td>{{ $uas }}</td>
-                        <td>{{ $nilaiAkhir }}</td>
-                        <td>{{ $nilai->catatan }}</td>
-                    </tr>
-                @endforeach
+        // Ambil data pertemuan untuk siswa + mapel ini
+        $pertemuan = \App\Models\Pertemuan::where('siswa_id', $nilai->siswa_id)
+                        ->where('mapel_id', $nilai->mapel_id)
+                        ->first();
+
+        $hadirSemester1 = $pertemuan->hadir_semester1 ?? 0;
+        $hadirSemester2 = $pertemuan->hadir_semester2 ?? 0;
+
+        $totalHadir = $hadirSemester1 + $hadirSemester2;
+
+        $pertemuan1 = $pertemuan->pertemuan_semester1 ?? 0;
+        $pertemuan2 = $pertemuan->pertemuan_semester2 ?? 0;
+
+        $totalPertemuan = $pertemuan1 + $pertemuan2;
+
+        // Hitung persentase absensi (untuk bobot nilai)
+        $persenAbsensi = $totalPertemuan > 0 
+            ? round(($totalHadir / $totalPertemuan) * 100, 2) 
+            : 0;
+
+        // Hitung nilai akhir (tanpa absensi masuk bobot nilai)
+        $nilaiAkhir = round(
+            ($tugas * 0.2) + 
+            ($kuis * 0.2) + 
+            ($uts * 0.25) + 
+            ($uas * 0.35), // disesuaikan, biar absensi terpisah
+        2);
+    @endphp
+    <tr>
+        <td>{{ $nilai->mapel->nama_mapel ?? '-' }}</td>
+        <td>{{ $tugas }}</td>
+        <td>{{ $kuis }}</td>
+        <td>{{ $uts }}</td>
+        <td>{{ $uas }}</td>
+        <td>{{ $totalHadir }}/{{ $totalPertemuan }}</td> {{-- tampil hadir dari data pertemuans --}}
+        <td>{{ $nilaiAkhir }}</td>
+        <td>{{ $nilai->catatan }}</td>
+    </tr>
+@endforeach
             </tbody>
         </table>
     @endif
 </div>
+
     <footer id="footer">
   &copy; {{ date('Y') }} E-Learning SMP 5 CIDAUN.
 </footer>

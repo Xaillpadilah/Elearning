@@ -48,5 +48,8 @@ class Penilaian extends Model
     {
         return $this->belongsTo(Tugas::class);
     }
-    
+    public function pertemuan()
+{
+    return $this->hasOne(Pertemuan::class, 'mapel_id', 'mapel_id');
+}
 }

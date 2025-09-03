@@ -12,21 +12,25 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->call([
-            AdminSeeder::class,
-            KelasSeeder::class,
-            UserSeeder::class,
-            AdminUserSeeder::class,
-            GuruSeeder::class,
-            OrangtuaSeeder::class,
-            SiswaSeeder::class, // ← ditempatkan setelah User dan Kelas
-            PengumumanSeeder::class,
-            MateriSeeder::class,
-             GuruMapelSeeder::class,
-               GuruMapelKelasSeeder::class,
-                TugasSeeder::class,
-    ]);// ← tambahkan baris ini
-    
+       $this->call([
+    AdminSeeder::class,
+    KelasSeeder::class,
+    UserSeeder::class,
+    AdminUserSeeder::class,
+    GuruSeeder::class,
+    OrangtuaSeeder::class,
+    SiswaSeeder::class,
+    PengumumanSeeder::class,
+    MateriSeeder::class,
+    GuruMapelSeeder::class,
+    GuruMapelKelasSeeder::class,
+    TugasSeeder::class,
+    UjianSeeder::class,         // ← Pastikan ini di atas
+    SoalUjianSeeder::class, 
+     PertemuanSeeder::class, 
+     PenilaianSeeder::class,   // ← Soalnya butuh ID ujian
+]);
+
 
         // Jika masih ingin menggunakan factory (opsional):
         // \App\Models\User::factory(10)->create();
@@ -36,5 +40,5 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
     }
-    
+
 }

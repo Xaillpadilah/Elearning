@@ -276,6 +276,7 @@ public function kerjakanUjian($ujianId, $soalKe = 1)
 
     return view('siswa.ujian.kerjakan', compact('ujian', 'soal', 'soalKe', 'soalTotal'));
 }
+
 }
 
 

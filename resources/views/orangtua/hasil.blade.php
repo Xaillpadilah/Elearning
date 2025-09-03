@@ -203,39 +203,210 @@ tbody tr:hover td {
     <h4>📑 Hasil Belajar Anak</h4>
     <p>Berikut adalah rekap hasil belajar anak berdasarkan mata pelajaran dan penilaian yang tersedia.</p>
 
-<div class="info-frame bulan">
-  <div class="dropdown-header" onclick="toggleDropdown('bulan')">
-    <h4>📑 Hasil Belajar Anak - 1 Bulan Terakhir ⬇️</h4>
-    <p>Berikut adalah rekap hasil belajar anak selama 1 bulan terakhir berdasarkan mata pelajaran dan penilaian.</p>
+@php
+    // Dummy data: tracking nilai kuis & tugas per minggu selama 1 bulan (4 minggu)
+    $penilaianMinggu = collect([
+        // Matematika
+        ['minggu' => 'Minggu 1', 'mapel' => 'Matematika', 'tugas' => 85, 'kuis' => 88],
+        ['minggu' => 'Minggu 2', 'mapel' => 'Matematika', 'tugas' => 86, 'kuis' => 90],
+        ['minggu' => 'Minggu 3', 'mapel' => 'Matematika', 'tugas' => 88, 'kuis' => 92],
+        ['minggu' => 'Minggu 4', 'mapel' => 'Matematika', 'tugas' => 90, 'kuis' => 95],
+
+        // Bahasa Inggris
+        ['minggu' => 'Minggu 1', 'mapel' => 'Bahasa Inggris', 'tugas' => 70, 'kuis' => 75],
+        ['minggu' => 'Minggu 2', 'mapel' => 'Bahasa Inggris', 'tugas' => 72, 'kuis' => 78],
+        ['minggu' => 'Minggu 3', 'mapel' => 'Bahasa Inggris', 'tugas' => 75, 'kuis' => 80],
+        ['minggu' => 'Minggu 4', 'mapel' => 'Bahasa Inggris', 'tugas' => 78, 'kuis' => 85],
+
+        // Seni Budaya
+        ['minggu' => 'Minggu 1', 'mapel' => 'Seni Budaya', 'tugas' => 55, 'kuis' => 60],
+        ['minggu' => 'Minggu 2', 'mapel' => 'Seni Budaya', 'tugas' => 60, 'kuis' => 65],
+        ['minggu' => 'Minggu 3', 'mapel' => 'Seni Budaya', 'tugas' => 65, 'kuis' => 70],
+        ['minggu' => 'Minggu 4', 'mapel' => 'Seni Budaya', 'tugas' => 70, 'kuis' => 75],
+
+        // PKN
+        ['minggu' => 'Minggu 1', 'mapel' => 'Pendidikan Kewarganegaraan', 'tugas' => 50, 'kuis' => 50],
+        ['minggu' => 'Minggu 2', 'mapel' => 'Pendidikan Kewarganegaraan', 'tugas' => 52, 'kuis' => 55],
+        ['minggu' => 'Minggu 3', 'mapel' => 'Pendidikan Kewarganegaraan', 'tugas' => 50, 'kuis' => 50],
+        ['minggu' => 'Minggu 4', 'mapel' => 'Pendidikan Kewarganegaraan', 'tugas' => 55, 'kuis' => 50],
+
+        // Pendidikan Agama
+        ['minggu' => 'Minggu 1', 'mapel' => 'Pendidikan Agama', 'tugas' => 100, 'kuis' => 100],
+        ['minggu' => 'Minggu 2', 'mapel' => 'Pendidikan Agama', 'tugas' => 100, 'kuis' => 100],
+        ['minggu' => 'Minggu 3', 'mapel' => 'Pendidikan Agama', 'tugas' => 100, 'kuis' => 100],
+        ['minggu' => 'Minggu 4', 'mapel' => 'Pendidikan Agama', 'tugas' => 100, 'kuis' => 100],
+
+        // IPA
+        ['minggu' => 'Minggu 1', 'mapel' => 'Ilmu Pengetahuan Alam', 'tugas' => 75, 'kuis' => 75],
+        ['minggu' => 'Minggu 2', 'mapel' => 'Ilmu Pengetahuan Alam', 'tugas' => 78, 'kuis' => 80],
+        ['minggu' => 'Minggu 3', 'mapel' => 'Ilmu Pengetahuan Alam', 'tugas' => 80, 'kuis' => 82],
+        ['minggu' => 'Minggu 4', 'mapel' => 'Ilmu Pengetahuan Alam', 'tugas' => 85, 'kuis' => 85],
+
+        // TIK
+        ['minggu' => 'Minggu 1', 'mapel' => 'Teknologi Informasi dan Komunikasi', 'tugas' => 55, 'kuis' => 60],
+        ['minggu' => 'Minggu 2', 'mapel' => 'Teknologi Informasi dan Komunikasi', 'tugas' => 60, 'kuis' => 65],
+        ['minggu' => 'Minggu 3', 'mapel' => 'Teknologi Informasi dan Komunikasi', 'tugas' => 65, 'kuis' => 68],
+        ['minggu' => 'Minggu 4', 'mapel' => 'Teknologi Informasi dan Komunikasi', 'tugas' => 70, 'kuis' => 70],
+
+        // Penjas
+        ['minggu' => 'Minggu 1', 'mapel' => 'Pendidikan Jasmani', 'tugas' => 50, 'kuis' => 48],
+        ['minggu' => 'Minggu 2', 'mapel' => 'Pendidikan Jasmani', 'tugas' => 55, 'kuis' => 50],
+        ['minggu' => 'Minggu 3', 'mapel' => 'Pendidikan Jasmani', 'tugas' => 60, 'kuis' => 55],
+        ['minggu' => 'Minggu 4', 'mapel' => 'Pendidikan Jasmani', 'tugas' => 65, 'kuis' => 60],
+
+        // IPS
+        ['minggu' => 'Minggu 1', 'mapel' => 'Ilmu Pengetahuan Sosial', 'tugas' => 85, 'kuis' => 80],
+        ['minggu' => 'Minggu 2', 'mapel' => 'Ilmu Pengetahuan Sosial', 'tugas' => 87, 'kuis' => 85],
+        ['minggu' => 'Minggu 3', 'mapel' => 'Ilmu Pengetahuan Sosial', 'tugas' => 90, 'kuis' => 88],
+        ['minggu' => 'Minggu 4', 'mapel' => 'Ilmu Pengetahuan Sosial', 'tugas' => 92, 'kuis' => 90],
+    ]); // Grouping berdasarkan mata pelajaran
+
+    $groupedPenilaian = $penilaianMinggu->groupBy('mapel');
+@endphp
+
+<style>
+  /* Frame Utama */
+  .info-frame.minggu {
+    background: linear-gradient(135deg, #ffffff, #f3f7ff);
+    border: 2px solid #d4e0ff;
+    border-radius: 16px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+  }
+
+  /* Header Dropdown */
+  .info-frame.minggu .dropdown-header {
+    cursor: pointer;
+    background: #3f72af;
+    color: white;
+    padding: 14px 18px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+  }
+  .info-frame.minggu .dropdown-header:hover {
+    background: #2c4f82;
+    transform: scale(1.02);
+  }
+
+  /* Konten Dropdown */
+  .info-frame.minggu .dropdown-content {
+    margin-top: 10px;
+    padding: 12px;
+    background: #f9fbff;
+    border-radius: 12px;
+    border: 1px solid #e0e7ff;
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  /* Mapel Frame */
+  .mapel-frame {
+    border: 1px solid #dce7ff;
+    border-radius: 12px;
+    margin-top: 14px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    padding: 10px;
+  }
+
+  /* Sub-header Mapel */
+  .mapel-frame .dropdown-header {
+    background: #112d4e;
+    font-size: 15px;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin: 0 0 8px 0;
+  }
+
+  /* Tabel Nilai */
+  .mapel-frame table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+    font-size: 14px;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .mapel-frame table thead {
+    background: #3f72af;
+    color: white;
+  }
+  .mapel-frame table th,
+  .mapel-frame table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #e3ebff;
+  }
+  .mapel-frame table tbody tr:nth-child(even) {
+    background: #f0f6ff;
+  }
+  .mapel-frame table tbody tr:hover {
+    background: #dbe7ff;
+    transition: 0.2s;
+  }
+
+  /* Animasi Dropdown */
+  @keyframes fadeIn {
+    from {opacity: 0; transform: translateY(-5px);}
+    to {opacity: 1; transform: translateY(0);}
+  }
+
+  /* Pesan Kosong */
+  .info-frame.minggu .empty {
+    text-align: center;
+    padding: 10px;
+    color: #6c757d;
+    font-style: italic;
+  }
+</style>
+
+<div class="info-frame minggu">
+  <div class="dropdown-header" onclick="toggleDropdown('minggu')">
+    <h4>🗓️ Hasil Belajar Anak - 1 Bulan ⬇️</h4>
+    <p>Berikut adalah rekap nilai tugas dan kuis anak setiap minggu selama 1 bulan terakhir.</p>
   </div>
 
-  <div class="dropdown-content" id="bulan" style="display: none;">
-    @if($penilaianBulan->isEmpty())
-        <p class="empty">Tidak ada data nilai tersedia untuk 1 bulan terakhir.</p>
+  <div class="dropdown-content" id="minggu" style="display: none;">
+    @if($groupedPenilaian->isEmpty())
+        <p class="empty">Tidak ada data nilai mingguan tersedia.</p>
     @else
-        <table>
-            <thead>
-                <tr>
-                    <th>Mata Pelajaran</th>
-                    <th>Tugas</th>
-                    <th>Kuis</th>
-                    <th>Catatan</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach($penilaianBulan as $nilai)
-                    <tr>
-                        <td>{{ $nilai->mapel->nama_mapel ?? '-' }}</td>
-                        <td>{{ $nilai->nilai_tugas }}</td>
-                        <td>{{ $nilai->nilai_kuis }}</td>
-                        <td>{{ $nilai->catatan }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
+        @foreach($groupedPenilaian as $mapel => $nilaiMapel)
+            <div class="mapel-frame">
+                <div class="dropdown-header" onclick="toggleDropdown('mapel-{{ Str::slug($mapel) }}')">
+                    <h4> {{ $mapel }} </h4>
+                    <p>Rekap nilai tugas & kuis {{ $mapel }} per minggu.</p>
+                </div>
+
+                <div class="dropdown-content" id="mapel-{{ Str::slug($mapel) }}" style="display:none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Minggu</th>
+                                <th>Tugas</th>
+                                <th>Kuis</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($nilaiMapel as $nilai)
+                                <tr>
+                                    <td>{{ $nilai['minggu'] }}</td>
+                                    <td>{{ $nilai['tugas'] }}</td>
+                                    <td>{{ $nilai['kuis'] }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endforeach
     @endif
   </div>
 </div>
+
 <div class="info-frame semester" style="margin-top: 30px;">
   <div class="dropdown-header" onclick="toggleDropdown('semester')">
     <h4>📚 Hasil Belajar Anak - 1 Semester Terakhir ⬇️</h4>
@@ -254,6 +425,7 @@ tbody tr:hover td {
                     <th>Kuis</th>
                     <th>UTS</th>
                     <th>UAS</th>
+                    <th>Absensi</th>
                     <th>Nilai Akhir</th>
                     <th>Catatan</th>
                 </tr>
@@ -261,12 +433,39 @@ tbody tr:hover td {
             <tbody>
                 @foreach($penilaianSemester as $nilai)
                     @php
+                        // Data nilai
                         $tugas = $nilai->nilai_tugas ?? 0;
                         $kuis = $nilai->nilai_kuis ?? 0;
                         $uts = $nilai->nilai_uts ?? 0;
                         $uas = $nilai->nilai_uas ?? 0;
 
-                        $nilaiAkhir = round(($tugas * 0.2) + ($kuis * 0.2) + ($uts * 0.3) + ($uas * 0.3), 2);
+                        // Ambil data pertemuan untuk siswa + mapel ini
+                        $pertemuan = \App\Models\Pertemuan::where('siswa_id', $nilai->siswa_id)
+                                        ->where('mapel_id', $nilai->mapel_id)
+                                        ->first();
+
+                        $hadirSemester1 = $pertemuan->hadir_semester1 ?? 0;
+                        $hadirSemester2 = $pertemuan->hadir_semester2 ?? 0;
+
+                        $totalHadir = $hadirSemester1 + $hadirSemester2;
+
+                        $pertemuan1 = $pertemuan->pertemuan_semester1 ?? 0;
+                        $pertemuan2 = $pertemuan->pertemuan_semester2 ?? 0;
+
+                        $totalPertemuan = $pertemuan1 + $pertemuan2;
+
+                        // Hitung persentase absensi (kalau mau ditampilkan)
+                        $persenAbsensi = $totalPertemuan > 0 
+                            ? round(($totalHadir / $totalPertemuan) * 100, 2) 
+                            : 0;
+
+                        // Hitung nilai akhir (absensi tidak masuk ke bobot)
+                        $nilaiAkhir = round(
+                            ($tugas * 0.2) + 
+                            ($kuis * 0.2) + 
+                            ($uts * 0.25) + 
+                            ($uas * 0.35),
+                        2);
                     @endphp
                     <tr>
                         <td>{{ $nilai->mapel->nama_mapel ?? '-' }}</td>
@@ -274,13 +473,15 @@ tbody tr:hover td {
                         <td>{{ $kuis }}</td>
                         <td>{{ $uts }}</td>
                         <td>{{ $uas }}</td>
+                        <td>{{ $totalHadir }}/{{ $totalPertemuan }}</td> {{-- tampil hadir dari tabel pertemuans --}}
                         <td>{{ $nilaiAkhir }}</td>
-                        <td>{{ $nilai->catatan }}</td>
+                        <td>{{ $nilai->catatan ?? '-' }}</td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
     @endif
+  </div>
 </div>
 <!-- Footer -->
 <footer id="footer">
