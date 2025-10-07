@@ -213,6 +213,7 @@
 @endif
 
  <!-- Modal Edit Siswa (dynamic via JS) -->
+<!-- Modal Edit Siswa -->
 <div id="modalEditSiswa" class="modal">
   <div class="modal-content">
     <h3>Edit Data Siswa</h3>
@@ -221,10 +222,9 @@
       @method('PUT')
 
       <label>Nama</label>
-     <input type="text" name="nama" value="{{ old('nama') }}" 
-       required 
-       pattern="[A-Za-z\s]+" 
-       title="Nama hanya boleh huruf dan spasi">
+      <input type="text" name="nama" id="edit-nama" value="{{ old('nama') }}" 
+             required pattern="[A-Za-z\s]+"
+             title="Nama hanya boleh huruf dan spasi">
       @error('nama')
         <small style="color:red;">{{ $message }}</small>
       @enderror
@@ -241,45 +241,27 @@
         <option value="Laki-laki" {{ old('jenis_kelamin') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
         <option value="Perempuan" {{ old('jenis_kelamin') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
       </select>
-      @error('jenis_kelamin')
-        <small style="color:red;">{{ $message }}</small>
-      @enderror
 
       <label>Kelas</label>
       <select name="kelas_id" id="edit-kelas" required>
         @foreach($kelas as $k)
-          <option value="{{ $k->id }}" {{ old('kelas_id') == $k->id ? 'selected' : '' }}>
-            {{ $k->nama_kelas }}
-          </option>
+          <option value="{{ $k->id }}">{{ $k->nama_kelas }}</option>
         @endforeach
       </select>
-      @error('kelas_id')
-        <small style="color:red;">{{ $message }}</small>
-      @enderror
 
       <label>Email</label>
       <input type="email" name="email" id="edit-email" value="{{ old('email') }}" required>
-      @error('email')
-        <small style="color:red;">{{ $message }}</small>
-      @enderror
 
       <label>Nama Orang Tua</label>
       <input type="text" name="nama_ortu" id="edit-ortu" value="{{ old('nama_ortu') }}" required>
-      @error('nama_ortu')
-        <small style="color:red;">{{ $message }}</small>
-      @enderror
 
       <label>Nomor HP</label>
       <input type="text" name="nomor_hp" id="edit-hp" value="{{ old('nomor_hp') }}" required>
-      @error('nomor_hp')
-        <small style="color:red;">{{ $message }}</small>
-      @enderror
 
       <button type="submit" class="btn-simpan-edit">💾 Simpan Perubahan</button>
     </form>
   </div>
 </div>
-
 
   <script>
     function toggleFullscreenDashboard() {
