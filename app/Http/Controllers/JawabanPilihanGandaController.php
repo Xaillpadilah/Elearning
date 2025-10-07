@@ -29,6 +29,7 @@ public function store(Request $request)
         'ujian_id' => $ujian->id,
         'user_id' => auth()->id(),
         'skor' => round($skor),
+        
     ]);
 
     return redirect()->back()->with('success', 'Jawaban berhasil dikirim!');

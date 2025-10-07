@@ -37,5 +37,6 @@ public function relasi()
 {
     return $this->belongsTo(GuruMapelKelas::class, 'guru_mapel_kelas_id');
 }
+
 }
 

@@ -25,10 +25,6 @@ public function jadwals()
 {
     return $this->hasMany(Jadwal::class);
 }
-public function materi() {
-    return $this->hasMany(Materi::class);
-}
-
 
     public function materis()
     {

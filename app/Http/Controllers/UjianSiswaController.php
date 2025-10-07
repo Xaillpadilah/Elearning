@@ -18,4 +18,5 @@ class UjianSiswaController extends Controller
 
     return view('siswa.ujian.index', compact('ujians'));
 }
+
 }

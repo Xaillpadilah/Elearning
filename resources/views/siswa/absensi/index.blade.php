@@ -101,23 +101,23 @@
         <h2>E-LEARNING</h2>
         <ul>
             @php
-    // Ambil mapel pertama dari daftar
-    $firstMapel = \App\Models\Mapel::first();
-@endphp
-       <li><a href="{{ route('siswa.siswadashboard') }}">🏠 Beranda</a></li>
+                // Ambil mapel pertama dari daftar
+                $firstMapel = \App\Models\Mapel::first();
+            @endphp
+            <li><a href="{{ route('siswa.siswadashboard') }}">🏠 Beranda</a></li>
 
-@if ($firstMapel)
-    <li>
-        <a href="{{ route('siswa.mapel.detail', ['id' => $firstMapel->id]) }}">
-            📚 Mata Pelajaran
-        </a>
-    </li>
-@endif
+            @if ($firstMapel)
+                <li>
+                    <a href="{{ route('siswa.mapel.detail', ['id' => $firstMapel->id]) }}">
+                        📚 Mata Pelajaran
+                    </a>
+                </li>
+            @endif
 
-<li><a href="{{ route('siswa.absensi.index') }}">📋 Absensi</a></li>
-<li><a href="{{ route('siswa.nilai.index') }}">📊 Nilai</a></li>
-    </ul>
-</div>
+            <li><a href="{{ route('siswa.absensi.index') }}">📋 Absensi</a></li>
+            <li><a href="{{ route('siswa.nilai.index') }}">📊 Nilai</a></li>
+        </ul>
+    </div>
 
 
     <!-- Main Content -->

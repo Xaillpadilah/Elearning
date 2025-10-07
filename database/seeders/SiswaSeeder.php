@@ -17,7 +17,7 @@ class SiswaSeeder extends Seeder
         // Ambil semua kelas
         $kelasList = Kelas::pluck('id')->toArray();
 
-        for ($i = 1; $i <= 180; $i++) {
+        for ($i = 1; $i <= 20; $i++) {
             $namaSiswa = fake()->name();
             $slugSiswa = Str::slug($namaSiswa); // contoh: "Ahmad Yani" → "ahmad-yani"
             $nisn = fake()->unique()->numberBetween(10000000, 9999999999);

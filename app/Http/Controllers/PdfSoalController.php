@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
+use Smalot\PdfParser\Parser;
 class PdfSoalController extends Controller
 {
      public function convert(Request $request)

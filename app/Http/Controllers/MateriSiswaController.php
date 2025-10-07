@@ -11,6 +11,7 @@ use App\Models\JawabanTugas;
 use App\Models\Tugas;
 use App\Models\Ujian;
 use App\Models\GuruMapelKelas;
+
 class MateriSiswaController extends Controller
 {
     public function showByMapel($mapel_id)
@@ -71,50 +72,50 @@ class MateriSiswaController extends Controller
         }
 
         // Ambil tugas sesuai mapel dan kelas
-       $tugas = Tugas::with(['mapel', 'guru', 'soals'])
-    ->where('mapel_id', $id)
-    ->where('kelas_id', $siswa->kelas_id)
-    ->orderBy('tanggal_deadline', 'asc')
-    ->get();
+        $tugas = Tugas::with(['mapel', 'guru', 'soals'])
+            ->where('mapel_id', $id)
+            ->where('kelas_id', $siswa->kelas_id)
+            ->orderBy('tanggal_deadline', 'asc')
+            ->get();
 
-       // Ambil ujian sesuai mapel dan kelas
-$ujians = Ujian::with(['guruMapelKelas.mapel', 'guruMapelKelas.guru', 'soals'])
-    ->whereHas('guruMapelKelas', function ($query) use ($id, $siswa) {
-        $query->where('mapel_id', $id)
-              ->where('kelas_id', $siswa->kelas_id);
-    })
-    ->orderBy('tanggal', 'asc')
-    ->get();
-    
+        // Ambil ujian sesuai mapel dan kelas
+        $ujians = Ujian::with(['guruMapelKelas.mapel', 'guruMapelKelas.guru', 'soals'])
+            ->whereHas('guruMapelKelas', function ($query) use ($id, $siswa) {
+                $query->where('mapel_id', $id)
+                    ->where('kelas_id', $siswa->kelas_id);
+            })
+            ->orderBy('tanggal', 'asc')
+            ->get();
+
         $materis = Materi::all();
         $tugas = Tugas::all();
-        $ujians = Ujian::all(); 
-    
-    foreach ($ujians as $ujian) {
-        if ($ujian->acak_soal && $ujian->soals->isNotEmpty()) {
-            $shuffled = $ujian->soals->toArray();
-            for ($i = count($shuffled) - 1; $i > 0; $i--) {
-                $j = random_int(0, $i);
-                $temp = $shuffled[$i];
-                $shuffled[$i] = $shuffled[$j];
-                $shuffled[$j] = $temp;
+        $ujians = Ujian::all();
+
+        foreach ($ujians as $ujian) {
+            if ($ujian->acak_soal && $ujian->soals->isNotEmpty()) {
+                $shuffled = $ujian->soals->toArray();
+                for ($i = count($shuffled) - 1; $i > 0; $i--) {
+                    $j = random_int(0, $i);
+                    $temp = $shuffled[$i];
+                    $shuffled[$i] = $shuffled[$j];
+                    $shuffled[$j] = $temp;
+                }
+
+                $ujian->soals = $ujian->soals->shuffle();
             }
-            
-           $ujian->soals = $ujian->soals->shuffle();
+           
+            $sessionKey = 'ujian_start_time_' . $ujian->id;
+            if (!session()->has($sessionKey)) {
+                session([$sessionKey => now()]);
+            }
         }
-          // Timer: Set waktu mulai hanya jika belum diset
-    $sessionKey = 'ujian_start_time_' . $ujian->id;
-    if (!session()->has($sessionKey)) {
-        session([$sessionKey => now()]);
-    }
-    }
         return view('siswa.mapel.detail', compact('mapel', 'mapels', 'materis', 'tugas', 'ujians'));
     }
     public function store(Request $request)
     {
         $request->validate([
             'tugas_id' => 'required|exists:tugas,id',
-            'file_jawaban' => 'required|file|max:10240', 
+            'file_jawaban' => 'required|file|max:10240',
         ]);
 
         $path = $request->file('file_jawaban')->store('jawaban', 'public');
